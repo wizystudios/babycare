@@ -9,7 +9,356 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      babies: {
+        Row: {
+          birth_date: string
+          created_at: string
+          gender: string
+          height: number | null
+          id: string
+          name: string
+          photo_url: string | null
+          user_id: string
+          weight: number | null
+        }
+        Insert: {
+          birth_date: string
+          created_at?: string
+          gender: string
+          height?: number | null
+          id?: string
+          name: string
+          photo_url?: string | null
+          user_id: string
+          weight?: number | null
+        }
+        Update: {
+          birth_date?: string
+          created_at?: string
+          gender?: string
+          height?: number | null
+          id?: string
+          name?: string
+          photo_url?: string | null
+          user_id?: string
+          weight?: number | null
+        }
+        Relationships: []
+      }
+      diapers: {
+        Row: {
+          baby_id: string
+          created_at: string
+          id: string
+          note: string | null
+          time: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          baby_id: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          time: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          baby_id?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          time?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diapers_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feedings: {
+        Row: {
+          amount: number | null
+          baby_id: string
+          created_at: string
+          duration: number | null
+          end_time: string | null
+          id: string
+          note: string | null
+          start_time: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number | null
+          baby_id: string
+          created_at?: string
+          duration?: number | null
+          end_time?: string | null
+          id?: string
+          note?: string | null
+          start_time: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number | null
+          baby_id?: string
+          created_at?: string
+          duration?: number | null
+          end_time?: string | null
+          id?: string
+          note?: string | null
+          start_time?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedings_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      growth_records: {
+        Row: {
+          baby_id: string
+          created_at: string
+          date: string
+          head_circumference: number | null
+          height: number | null
+          id: string
+          note: string | null
+          user_id: string
+          weight: number | null
+        }
+        Insert: {
+          baby_id: string
+          created_at?: string
+          date: string
+          head_circumference?: number | null
+          height?: number | null
+          id?: string
+          note?: string | null
+          user_id: string
+          weight?: number | null
+        }
+        Update: {
+          baby_id?: string
+          created_at?: string
+          date?: string
+          head_circumference?: number | null
+          height?: number | null
+          id?: string
+          note?: string | null
+          user_id?: string
+          weight?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "growth_records_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      health_records: {
+        Row: {
+          baby_id: string
+          created_at: string
+          date: string
+          dosage: string | null
+          id: string
+          medication: string | null
+          note: string | null
+          type: string
+          user_id: string
+          value: string | null
+        }
+        Insert: {
+          baby_id: string
+          created_at?: string
+          date: string
+          dosage?: string | null
+          id?: string
+          medication?: string | null
+          note?: string | null
+          type: string
+          user_id: string
+          value?: string | null
+        }
+        Update: {
+          baby_id?: string
+          created_at?: string
+          date?: string
+          dosage?: string | null
+          id?: string
+          medication?: string | null
+          note?: string | null
+          type?: string
+          user_id?: string
+          value?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "health_records_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      milestones: {
+        Row: {
+          baby_id: string
+          category: string | null
+          created_at: string
+          date: string
+          description: string | null
+          id: string
+          photo_urls: string[] | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          baby_id: string
+          category?: string | null
+          created_at?: string
+          date: string
+          description?: string | null
+          id?: string
+          photo_urls?: string[] | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          baby_id?: string
+          category?: string | null
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: string
+          photo_urls?: string[] | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "milestones_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sleeps: {
+        Row: {
+          baby_id: string
+          created_at: string
+          duration: number | null
+          end_time: string | null
+          id: string
+          location: string | null
+          mood: string | null
+          note: string | null
+          start_time: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          baby_id: string
+          created_at?: string
+          duration?: number | null
+          end_time?: string | null
+          id?: string
+          location?: string | null
+          mood?: string | null
+          note?: string | null
+          start_time: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          baby_id?: string
+          created_at?: string
+          duration?: number | null
+          end_time?: string | null
+          id?: string
+          location?: string | null
+          mood?: string | null
+          note?: string | null
+          start_time?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sleeps_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vaccinations: {
+        Row: {
+          baby_id: string
+          batch_number: string | null
+          created_at: string
+          date: string
+          id: string
+          name: string
+          next_due_date: string | null
+          note: string | null
+          user_id: string
+        }
+        Insert: {
+          baby_id: string
+          batch_number?: string | null
+          created_at?: string
+          date: string
+          id?: string
+          name: string
+          next_due_date?: string | null
+          note?: string | null
+          user_id: string
+        }
+        Update: {
+          baby_id?: string
+          batch_number?: string | null
+          created_at?: string
+          date?: string
+          id?: string
+          name?: string
+          next_due_date?: string | null
+          note?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vaccinations_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
