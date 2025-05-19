@@ -18,14 +18,27 @@ import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import { Loader } from "./components/ui/loader";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+      staleTime: 30000, // 30 seconds
+    },
+  },
+});
 
 // Protected route component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isLoading } = useAuth();
   
+  // Only show loader if authentication is still being determined
   if (isLoading) {
-    return <div className="flex h-screen items-center justify-center"><Loader /></div>;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader />
+      </div>
+    );
   }
   
   if (!user) {

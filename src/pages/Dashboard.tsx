@@ -30,7 +30,7 @@ const Dashboard = () => {
   const { toast } = useToast();
   const [selectedBaby, setSelectedBaby] = useState<Baby | null>(null);
 
-  // Fetch babies data
+  // Fetch babies data with improved caching
   const { 
     data: babies = [], 
     isLoading: isLoadingBabies,
@@ -38,10 +38,11 @@ const Dashboard = () => {
   } = useQuery({
     queryKey: ['babies'],
     queryFn: getBabies,
-    enabled: !!user
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  // Fetch feedings data
+  // Fetch feedings data with optimized loading
   const { 
     data: feedings = [],
     isLoading: isFeedingLoading
@@ -69,10 +70,11 @@ const Dashboard = () => {
         note: feeding.note,
       })) as Feeding[];
     },
-    enabled: !!selectedBaby
+    enabled: !!selectedBaby,
+    staleTime: 60 * 1000, // 1 minute
   });
   
-  // Fetch diapers data
+  // Fetch diapers data with optimized loading
   const {
     data: diapers = [],
     isLoading: isDiaperLoading
@@ -97,10 +99,11 @@ const Dashboard = () => {
         note: diaper.note,
       })) as Diaper[];
     },
-    enabled: !!selectedBaby
+    enabled: !!selectedBaby,
+    staleTime: 60 * 1000, // 1 minute
   });
   
-  // Fetch sleeps data
+  // Fetch sleeps data with optimized loading
   const {
     data: sleeps = [],
     isLoading: isSleepLoading
@@ -129,7 +132,8 @@ const Dashboard = () => {
         note: sleep.note,
       })) as Sleep[];
     },
-    enabled: !!selectedBaby
+    enabled: !!selectedBaby,
+    staleTime: 60 * 1000, // 1 minute
   });
 
   // Select first baby when babies load
@@ -164,13 +168,12 @@ const Dashboard = () => {
   const totalSleepDuration = todaySleeps
     .reduce((sum, sleep) => sum + (sleep.duration || 0), 0);
 
-  // Show loading state
+  // Initial loading state - only show main loader when babies are loading
   if (isLoadingBabies) {
     return (
       <Layout>
         <div className="flex items-center justify-center h-[80vh]">
-          <Loader />
-          <span className="ml-2">Loading baby data...</span>
+          <Loader size="large" />
         </div>
       </Layout>
     );
@@ -247,8 +250,8 @@ const Dashboard = () => {
           <div>
             <h3 className="text-lg font-semibold mb-3">{t("dashboard.recentFeedings")}</h3>
             {isFeedingLoading ? (
-              <div className="flex justify-center py-8">
-                <Loader />
+              <div className="flex justify-center py-4">
+                <Loader size="small" />
               </div>
             ) : feedings.length > 0 ? (
               <div className="space-y-3">
@@ -260,7 +263,7 @@ const Dashboard = () => {
                 </Button>
               </div>
             ) : (
-              <div className="text-center py-6 text-gray-500">
+              <div className="text-center py-4 text-gray-500">
                 No feeding records yet
               </div>
             )}
@@ -270,8 +273,8 @@ const Dashboard = () => {
           <div>
             <h3 className="text-lg font-semibold mb-3">{t("dashboard.recentDiapers")}</h3>
             {isDiaperLoading ? (
-              <div className="flex justify-center py-8">
-                <Loader />
+              <div className="flex justify-center py-4">
+                <Loader size="small" />
               </div>
             ) : diapers.length > 0 ? (
               <div className="space-y-3">
@@ -283,7 +286,7 @@ const Dashboard = () => {
                 </Button>
               </div>
             ) : (
-              <div className="text-center py-6 text-gray-500">
+              <div className="text-center py-4 text-gray-500">
                 No diaper records yet
               </div>
             )}
@@ -293,8 +296,8 @@ const Dashboard = () => {
           <div>
             <h3 className="text-lg font-semibold mb-3">{t("dashboard.recentSleep")}</h3>
             {isSleepLoading ? (
-              <div className="flex justify-center py-8">
-                <Loader />
+              <div className="flex justify-center py-4">
+                <Loader size="small" />
               </div>
             ) : sleeps.length > 0 ? (
               <div className="space-y-3">
@@ -306,7 +309,7 @@ const Dashboard = () => {
                 </Button>
               </div>
             ) : (
-              <div className="text-center py-6 text-gray-500">
+              <div className="text-center py-4 text-gray-500">
                 No sleep records yet
               </div>
             )}
