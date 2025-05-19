@@ -33,19 +33,29 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     for (const k of keys) {
       if (!value[k]) {
         // Fallback to English if translation is missing
-        let fallbackValue = translations.en;
+        let fallbackValue: any = translations.en;
         for (const fbk of keys) {
           if (!fallbackValue[fbk]) {
             return key; // If even English doesn't have it, return the key
           }
           fallbackValue = fallbackValue[fbk];
         }
-        return fallbackValue as string;
+        // Make sure we're returning a string
+        if (typeof fallbackValue !== 'string') {
+          console.warn(`Translation key ${key} does not resolve to a string`);
+          return key;
+        }
+        return fallbackValue;
       }
       value = value[k];
     }
     
-    return value as string;
+    // Make sure we're returning a string
+    if (typeof value !== 'string') {
+      console.warn(`Translation key ${key} does not resolve to a string`);
+      return key;
+    }
+    return value;
   };
 
   return (
