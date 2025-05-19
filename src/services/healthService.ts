@@ -25,6 +25,10 @@ export const getGrowthRecords = async (babyId: string) => {
 
 // Add growth record
 export const addGrowthRecord = async (growth: Omit<Growth, 'id'>) => {
+  // Get current user
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+
   const { data, error } = await supabase
     .from('growth_records')
     .insert({
@@ -34,6 +38,7 @@ export const addGrowthRecord = async (growth: Omit<Growth, 'id'>) => {
       height: growth.height,
       head_circumference: growth.headCircumference,
       note: growth.note,
+      user_id: user.id, // Adding the user_id field
     })
     .select()
     .single();
@@ -74,6 +79,10 @@ export const getVaccinations = async (babyId: string) => {
 
 // Add vaccination
 export const addVaccination = async (vaccination: Omit<Vaccination, 'id'>) => {
+  // Get current user
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+
   const { data, error } = await supabase
     .from('vaccinations')
     .insert({
@@ -83,6 +92,7 @@ export const addVaccination = async (vaccination: Omit<Vaccination, 'id'>) => {
       next_due_date: vaccination.nextDueDate?.toISOString(),
       batch_number: vaccination.batchNumber,
       note: vaccination.note,
+      user_id: user.id, // Adding the user_id field
     })
     .select()
     .single();
@@ -124,6 +134,10 @@ export const getHealthRecords = async (babyId: string) => {
 
 // Add health record
 export const addHealthRecord = async (healthRecord: Omit<HealthRecord, 'id'>) => {
+  // Get current user
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+
   const { data, error } = await supabase
     .from('health_records')
     .insert({
@@ -134,6 +148,7 @@ export const addHealthRecord = async (healthRecord: Omit<HealthRecord, 'id'>) =>
       medication: healthRecord.medication,
       dosage: healthRecord.dosage,
       note: healthRecord.note,
+      user_id: user.id, // Adding the user_id field
     })
     .select()
     .single();
