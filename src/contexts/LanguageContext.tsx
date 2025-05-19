@@ -40,12 +40,12 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           }
           fallbackValue = fallbackValue[fbk];
         }
-        return fallbackValue;
+        return fallbackValue as string;
       }
       value = value[k];
     }
     
-    return value;
+    return value as string;
   };
 
   return (

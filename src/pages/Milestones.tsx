@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { MockStorage } from "@/services/mockData";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -56,13 +55,13 @@ const MilestonesPage = () => {
   });
   
   const handleSaveMilestone = () => {
-    const newMilestone: Omit<Milestone, '`id`'> = {
+    const newMilestone = {
       babyId: "baby1",
       title,
       date: new Date(date),
       description: description || undefined,
       category,
-      photoUrls: [],
+      photoUrls: [] as string[],
     };
     
     const addedMilestone = MockStorage.addMilestone(newMilestone);
