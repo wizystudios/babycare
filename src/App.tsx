@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 
 import Index from "./pages/Index";
 import Feeding from "./pages/Feeding";
@@ -16,8 +16,24 @@ import Milestones from "./pages/Milestones";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
+import { Loader } from "./components/ui/loader";
 
 const queryClient = new QueryClient();
+
+// Protected route component
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user, isLoading } = useAuth();
+  
+  if (isLoading) {
+    return <div className="flex h-screen items-center justify-center"><Loader /></div>;
+  }
+  
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+  
+  return <>{children}</>;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -28,14 +44,14 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/feeding" element={<Feeding />} />
-              <Route path="/diaper" element={<Diaper />} />
-              <Route path="/sleep" element={<Sleep />} />
-              <Route path="/health" element={<Health />} />
-              <Route path="/milestones" element={<Milestones />} />
-              <Route path="/settings" element={<Settings />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+              <Route path="/feeding" element={<ProtectedRoute><Feeding /></ProtectedRoute>} />
+              <Route path="/diaper" element={<ProtectedRoute><Diaper /></ProtectedRoute>} />
+              <Route path="/sleep" element={<ProtectedRoute><Sleep /></ProtectedRoute>} />
+              <Route path="/health" element={<ProtectedRoute><Health /></ProtectedRoute>} />
+              <Route path="/milestones" element={<ProtectedRoute><Milestones /></ProtectedRoute>} />
+              <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
