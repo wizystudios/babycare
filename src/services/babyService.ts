@@ -44,6 +44,10 @@ export const getBabyById = async (id: string): Promise<Baby> => {
 
 // Add baby
 export const addBaby = async (baby: Omit<Baby, 'id'>): Promise<Baby> => {
+  // Get current user
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+
   const { data, error } = await supabase
     .from('babies')
     .insert({
@@ -53,6 +57,7 @@ export const addBaby = async (baby: Omit<Baby, 'id'>): Promise<Baby> => {
       weight: baby.weight,
       height: baby.height,
       photo_url: baby.photoUrl,
+      user_id: user.id,  // Adding the user_id field
     })
     .select()
     .single();
@@ -72,6 +77,10 @@ export const addBaby = async (baby: Omit<Baby, 'id'>): Promise<Baby> => {
 
 // Update baby
 export const updateBaby = async (baby: Baby): Promise<Baby> => {
+  // Get current user
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+
   const { data, error } = await supabase
     .from('babies')
     .update({
