@@ -1,6 +1,6 @@
 
-import React, { useEffect, useState } from "react";
-import { MockStorage } from "@/services/mockData";
+import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -14,11 +14,14 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { AddIcon } from "@/components/BabyIcons";
 import { getRelativeTimeLabel } from "@/lib/date-utils";
 import { useToast } from "@/components/ui/use-toast";
+import { getDiapersByBabyId, addDiaper } from "@/services/diaperService";
+import { useBaby } from "@/hooks/useBaby";
+import { Loader } from "@/components/ui/loader";
 
 const DiaperPage = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
-  const [diapers, setDiapers] = useState<Diaper[]>([]);
+  const { currentBaby } = useBaby();
   const [dialogOpen, setDialogOpen] = useState(false);
   
   // Form state
@@ -28,11 +31,21 @@ const DiaperPage = () => {
   );
   const [note, setNote] = useState<string>("");
   
-  useEffect(() => {
-    // Load diaper data
-    const diapersData = MockStorage.getDiapers();
-    setDiapers(diapersData);
-  }, []);
+  // Fetch diapers data
+  const { 
+    data: diapers = [], 
+    isLoading,
+    error,
+    refetch
+  } = useQuery({
+    queryKey: ['diapers', currentBaby?.id],
+    queryFn: async () => {
+      if (!currentBaby) return [];
+      return getDiapersByBabyId(currentBaby.id);
+    },
+    enabled: !!currentBaby,
+    staleTime: 60 * 1000, // 1 minute
+  });
   
   // Group diapers by date
   const groupedDiapers: Record<string, Diaper[]> = {};
@@ -45,33 +58,63 @@ const DiaperPage = () => {
     groupedDiapers[dateKey].push(diaper);
   });
   
-  const handleSaveDiaper = () => {
-    const diaperTime = new Date(time);
+  const handleSaveDiaper = async () => {
+    if (!currentBaby) {
+      toast({
+        title: "Error",
+        description: "No baby selected",
+        variant: "destructive"
+      });
+      return;
+    }
     
-    const newDiaper: Omit<Diaper, 'id'> = {
-      babyId: "baby1",
-      type: diaperType,
-      time: diaperTime,
-      note: note || undefined,
-    };
-    
-    const addedDiaper = MockStorage.addDiaper(newDiaper);
-    setDiapers([addedDiaper, ...diapers]);
-    
-    // Reset form
-    setDiaperType("wet");
-    setTime(new Date().toISOString().substring(0, 16));
-    setNote("");
-    
-    // Close dialog
-    setDialogOpen(false);
-    
-    // Show success message
-    toast({
-      title: "Diaper change added",
-      description: "The diaper change has been successfully logged.",
-    });
+    try {
+      const diaperTime = new Date(time);
+      
+      const newDiaper: Omit<Diaper, 'id'> = {
+        babyId: currentBaby.id,
+        type: diaperType,
+        time: diaperTime,
+        note: note || undefined,
+      };
+      
+      await addDiaper(newDiaper);
+      
+      // Refetch diapers
+      refetch();
+      
+      // Reset form
+      setDiaperType("wet");
+      setTime(new Date().toISOString().substring(0, 16));
+      setNote("");
+      
+      // Close dialog
+      setDialogOpen(false);
+      
+      // Show success message
+      toast({
+        title: t("diaper.successTitle"),
+        description: t("diaper.successDescription"),
+      });
+    } catch (error) {
+      console.error("Error adding diaper:", error);
+      toast({
+        title: t("diaper.errorTitle"),
+        description: t("diaper.errorDescription"),
+        variant: "destructive",
+      });
+    }
   };
+
+  if (!currentBaby) {
+    return (
+      <Layout>
+        <div className="p-4 text-center">
+          <p>{t("common.noBabySelected")}</p>
+        </div>
+      </Layout>
+    );
+  }
   
   return (
     <Layout>
@@ -130,7 +173,7 @@ const DiaperPage = () => {
                     id="note"
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
-                    placeholder="Color, consistency, etc."
+                    placeholder={t("diaper.notePlaceholder")}
                   />
                 </div>
                 
@@ -147,16 +190,34 @@ const DiaperPage = () => {
           </Dialog>
         </div>
         
-        <div className="space-y-6">
-          {Object.keys(groupedDiapers).map(dateKey => (
-            <div key={dateKey} className="space-y-3">
-              <h2 className="text-lg font-semibold">{dateKey}</h2>
-              {groupedDiapers[dateKey].map(diaper => (
-                <DiaperEntry key={diaper.id} diaper={diaper} />
-              ))}
-            </div>
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="flex justify-center py-8">
+            <Loader size="large" />
+          </div>
+        ) : error ? (
+          <div className="text-center py-8 text-red-500">
+            <p>{t("common.errorLoading")}</p>
+          </div>
+        ) : diapers.length === 0 ? (
+          <div className="text-center py-8">
+            <p>{t("diaper.noDiapers")}</p>
+            <Button className="mt-4" onClick={() => setDialogOpen(true)}>
+              <AddIcon className="w-4 h-4 mr-2" />
+              {t("diaper.addFirst")}
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {Object.keys(groupedDiapers).map(dateKey => (
+              <div key={dateKey} className="space-y-3">
+                <h2 className="text-lg font-semibold">{dateKey}</h2>
+                {groupedDiapers[dateKey].map(diaper => (
+                  <DiaperEntry key={diaper.id} diaper={diaper} />
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </Layout>
   );

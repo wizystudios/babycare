@@ -36,7 +36,7 @@ export const addSleep = async (sleep: Omit<Sleep, 'id'>): Promise<Sleep> => {
       baby_id: sleep.babyId,
       type: sleep.type,
       start_time: sleep.startTime.toISOString(),
-      end_time: sleep.endTime ? sleep.endTime.toISOString() : null,
+      end_time: sleep.endTime?.toISOString(),
       duration: sleep.duration,
       location: sleep.location,
       mood: sleep.mood,

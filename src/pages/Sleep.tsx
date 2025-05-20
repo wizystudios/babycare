@@ -1,6 +1,6 @@
 
-import React, { useEffect, useState } from "react";
-import { MockStorage } from "@/services/mockData";
+import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -15,11 +15,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AddIcon } from "@/components/BabyIcons";
 import { getRelativeTimeLabel, calculateDuration } from "@/lib/date-utils";
 import { useToast } from "@/components/ui/use-toast";
+import { getSleepsByBabyId, addSleep } from "@/services/sleepService";
+import { useBaby } from "@/hooks/useBaby";
+import { Loader } from "@/components/ui/loader";
 
 const SleepPage = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
-  const [sleeps, setSleeps] = useState<Sleep[]>([]);
+  const { currentBaby } = useBaby();
   const [dialogOpen, setDialogOpen] = useState(false);
   
   // Form state
@@ -32,11 +35,21 @@ const SleepPage = () => {
   const [mood, setMood] = useState<MoodType>("calm");
   const [note, setNote] = useState<string>("");
   
-  useEffect(() => {
-    // Load sleep data
-    const sleepsData = MockStorage.getSleeps();
-    setSleeps(sleepsData);
-  }, []);
+  // Fetch sleeps data
+  const { 
+    data: sleeps = [], 
+    isLoading,
+    error,
+    refetch
+  } = useQuery({
+    queryKey: ['sleeps', currentBaby?.id],
+    queryFn: async () => {
+      if (!currentBaby) return [];
+      return getSleepsByBabyId(currentBaby.id);
+    },
+    enabled: !!currentBaby,
+    staleTime: 60 * 1000, // 1 minute
+  });
   
   // Group sleeps by date
   const groupedSleeps: Record<string, Sleep[]> = {};
@@ -49,49 +62,79 @@ const SleepPage = () => {
     groupedSleeps[dateKey].push(sleep);
   });
   
-  const handleSaveSleep = () => {
-    const startDateTime = new Date(startTime);
-    
-    let endDateTime: Date | undefined;
-    let duration: number | undefined;
-    
-    if (endTime) {
-      endDateTime = new Date(endTime);
-      // Calculate duration in minutes
-      duration = calculateDuration(startDateTime, endDateTime);
+  const handleSaveSleep = async () => {
+    if (!currentBaby) {
+      toast({
+        title: "Error",
+        description: "No baby selected",
+        variant: "destructive"
+      });
+      return;
     }
     
-    const newSleep: Omit<Sleep, 'id'> = {
-      babyId: "baby1",
-      type: sleepType,
-      startTime: startDateTime,
-      endTime: endDateTime,
-      duration,
-      location,
-      mood,
-      note: note || undefined,
-    };
-    
-    const addedSleep = MockStorage.addSleep(newSleep);
-    setSleeps([addedSleep, ...sleeps]);
-    
-    // Reset form
-    setSleepType("nap");
-    setStartTime(new Date().toISOString().substring(0, 16));
-    setEndTime("");
-    setLocation("Crib");
-    setMood("calm");
-    setNote("");
-    
-    // Close dialog
-    setDialogOpen(false);
-    
-    // Show success message
-    toast({
-      title: "Sleep session added",
-      description: "The sleep session has been successfully logged.",
-    });
+    try {
+      const startDateTime = new Date(startTime);
+      
+      let endDateTime: Date | undefined;
+      let duration: number | undefined;
+      
+      if (endTime) {
+        endDateTime = new Date(endTime);
+        // Calculate duration in minutes
+        duration = calculateDuration(startDateTime, endDateTime);
+      }
+      
+      const newSleep: Omit<Sleep, 'id'> = {
+        babyId: currentBaby.id,
+        type: sleepType,
+        startTime: startDateTime,
+        endTime: endDateTime,
+        duration,
+        location,
+        mood,
+        note: note || undefined,
+      };
+      
+      await addSleep(newSleep);
+      
+      // Refetch sleeps
+      refetch();
+      
+      // Reset form
+      setSleepType("nap");
+      setStartTime(new Date().toISOString().substring(0, 16));
+      setEndTime("");
+      setLocation("Crib");
+      setMood("calm");
+      setNote("");
+      
+      // Close dialog
+      setDialogOpen(false);
+      
+      // Show success message
+      toast({
+        title: t("sleep.successTitle"),
+        description: t("sleep.successDescription"),
+      });
+    } catch (error) {
+      console.error("Error adding sleep:", error);
+      toast({
+        title: t("sleep.errorTitle"),
+        description: t("sleep.errorDescription"),
+        variant: "destructive",
+      });
+    }
   };
+
+  if (!currentBaby) {
+    return (
+      <Layout>
+        <div className="p-4 text-center">
+          <p>{t("common.noBabySelected")}</p>
+        </div>
+      </Layout>
+    );
+  }
   
   return (
     <Layout>
@@ -198,16 +241,34 @@ const SleepPage = () => {
           </Dialog>
         </div>
         
-        <div className="space-y-6">
-          {Object.keys(groupedSleeps).map(dateKey => (
-            <div key={dateKey} className="space-y-3">
-              <h2 className="text-lg font-semibold">{dateKey}</h2>
-              {groupedSleeps[dateKey].map(sleep => (
-                <SleepEntry key={sleep.id} sleep={sleep} />
-              ))}
-            </div>
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="flex justify-center py-8">
+            <Loader size="large" />
+          </div>
+        ) : error ? (
+          <div className="text-center py-8 text-red-500">
+            <p>{t("common.errorLoading")}</p>
+          </div>
+        ) : sleeps.length === 0 ? (
+          <div className="text-center py-8">
+            <p>{t("sleep.noSleeps")}</p>
+            <Button className="mt-4" onClick={() => setDialogOpen(true)}>
+              <AddIcon className="w-4 h-4 mr-2" />
+              {t("sleep.addFirst")}
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {Object.keys(groupedSleeps).map(dateKey => (
+              <div key={dateKey} className="space-y-3">
+                <h2 className="text-lg font-semibold">{dateKey}</h2>
+                {groupedSleeps[dateKey].map(sleep => (
+                  <SleepEntry key={sleep.id} sleep={sleep} />
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </Layout>
   );

@@ -8,6 +8,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 
+import Welcome from "./pages/Welcome";
 import Index from "./pages/Index";
 import Feeding from "./pages/Feeding";
 import Diaper from "./pages/Diaper";
@@ -45,7 +46,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
   
   if (!user) {
-    return <Navigate to="/auth" replace />;
+    return <Navigate to="/welcome" replace />;
   }
   
   return <>{children}</>;
@@ -55,12 +56,13 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <ThemeProvider>
-        <LanguageProvider>
+        <LanguageProvider defaultLanguage="sw">
           <AuthProvider>
             <Toaster />
             <Sonner />
             <BrowserRouter>
               <Routes>
+                <Route path="/welcome" element={<Welcome />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
                 <Route path="/add-baby" element={<ProtectedRoute><AddBaby /></ProtectedRoute>} />

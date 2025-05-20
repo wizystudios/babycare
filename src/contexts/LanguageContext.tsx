@@ -8,6 +8,11 @@ type LanguageContextType = {
   t: (key: string) => string;
 };
 
+interface LanguageProviderProps {
+  children: React.ReactNode;
+  defaultLanguage?: Language;
+}
+
 const LanguageContext = createContext<LanguageContextType>({
   language: "en",
   setLanguage: () => {},
@@ -16,10 +21,10 @@ const LanguageContext = createContext<LanguageContextType>({
 
 export const useLanguage = () => useContext(LanguageContext);
 
-export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children, defaultLanguage = "en" }) => {
   const [language, setLanguage] = useState<Language>(() => {
     const savedLanguage = localStorage.getItem("babycare-language");
-    return (savedLanguage as Language) || "en";
+    return (savedLanguage as Language) || defaultLanguage;
   });
 
   useEffect(() => {
@@ -31,11 +36,11 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     let value: any = translations[language];
     
     for (const k of keys) {
-      if (!value[k]) {
+      if (!value || !value[k]) {
         // Fallback to English if translation is missing
         let fallbackValue: any = translations.en;
         for (const fbk of keys) {
-          if (!fallbackValue[fbk]) {
+          if (!fallbackValue || !fallbackValue[fbk]) {
             return key; // If even English doesn't have it, return the key
           }
           fallbackValue = fallbackValue[fbk];
