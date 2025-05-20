@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Layout } from "@/components/layout/Layout";
 import { Card } from "@/components/ui/card";
@@ -28,18 +28,29 @@ const Dashboard = () => {
   const { t } = useLanguage();
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [selectedBaby, setSelectedBaby] = useState<Baby | null>(null);
 
-  // Fetch babies data with improved caching
+  // Fetch babies data with improved caching and error handling
   const { 
     data: babies = [], 
     isLoading: isLoadingBabies,
-    error: babiesError
+    error: babiesError,
+    refetch: refetchBabies
   } = useQuery({
     queryKey: ['babies'],
     queryFn: getBabies,
     enabled: !!user,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1,
+    onError: (error) => {
+      console.error("Error fetching babies:", error);
+      toast({
+        title: "Error loading babies data",
+        description: "Please try again later",
+        variant: "destructive",
+      });
+    }
   });
 
   // Fetch feedings data with optimized loading
@@ -168,6 +179,11 @@ const Dashboard = () => {
   const totalSleepDuration = todaySleeps
     .reduce((sum, sleep) => sum + (sleep.duration || 0), 0);
 
+  // Navigate to add baby form
+  const handleAddBaby = () => {
+    navigate("/add-baby");
+  };
+
   // Initial loading state - only show main loader when babies are loading
   if (isLoadingBabies) {
     return (
@@ -187,11 +203,9 @@ const Dashboard = () => {
           <BottleIcon className="w-16 h-16 mb-4 text-baby-blue opacity-50" />
           <h2 className="text-2xl font-bold mb-2">Welcome to BabyCare Daily</h2>
           <p className="text-gray-500 mb-6">Start by adding your baby's information</p>
-          <Button asChild>
-            <Link to="/settings">
-              <AddIcon className="w-4 h-4 mr-2" />
-              Add Your Baby
-            </Link>
+          <Button onClick={handleAddBaby}>
+            <AddIcon className="w-4 h-4 mr-2" />
+            Add Your Baby
           </Button>
         </div>
       </Layout>
@@ -209,11 +223,9 @@ const Dashboard = () => {
                 <h2 className="font-bold text-2xl">{selectedBaby.name}</h2>
                 <p className="text-gray-600">{getAgeDisplay(selectedBaby.birthDate)}</p>
               </div>
-              <Button variant="outline" className="rounded-full" asChild>
-                <Link to="/settings">
-                  <AddIcon className="w-4 h-4 mr-1" />
-                  {t("dashboard.addNew")}
-                </Link>
+              <Button variant="outline" className="rounded-full" onClick={handleAddBaby}>
+                <AddIcon className="w-4 h-4 mr-1" />
+                {t("dashboard.addNew")}
               </Button>
             </div>
           </Card>

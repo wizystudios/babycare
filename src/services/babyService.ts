@@ -4,9 +4,14 @@ import { Baby } from '@/types/models';
 
 // Get babies
 export const getBabies = async (): Promise<Baby[]> => {
+  // Get current user
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+  
   const { data, error } = await supabase
     .from('babies')
-    .select('*');
+    .select('*')
+    .eq('user_id', user.id);
   
   if (error) throw error;
   
@@ -23,10 +28,15 @@ export const getBabies = async (): Promise<Baby[]> => {
 
 // Get baby by ID
 export const getBabyById = async (id: string): Promise<Baby> => {
+  // Get current user
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+  
   const { data, error } = await supabase
     .from('babies')
     .select('*')
     .eq('id', id)
+    .eq('user_id', user.id)
     .single();
   
   if (error) throw error;
@@ -92,6 +102,7 @@ export const updateBaby = async (baby: Baby): Promise<Baby> => {
       photo_url: baby.photoUrl,
     })
     .eq('id', baby.id)
+    .eq('user_id', user.id)
     .select()
     .single();
   
@@ -110,10 +121,15 @@ export const updateBaby = async (baby: Baby): Promise<Baby> => {
 
 // Delete baby
 export const deleteBaby = async (id: string): Promise<boolean> => {
+  // Get current user
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+  
   const { error } = await supabase
     .from('babies')
     .delete()
-    .eq('id', id);
+    .eq('id', id)
+    .eq('user_id', user.id);
   
   if (error) throw error;
   

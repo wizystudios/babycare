@@ -16,6 +16,7 @@ import Milestones from "./pages/Milestones";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
+import AddBaby from "./pages/AddBaby";
 import { Loader } from "./components/ui/loader";
 
 const queryClient = new QueryClient({
@@ -59,6 +60,7 @@ const App = () => (
             <Routes>
               <Route path="/auth" element={<Auth />} />
               <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+              <Route path="/add-baby" element={<ProtectedRoute><AddBaby /></ProtectedRoute>} />
               <Route path="/feeding" element={<ProtectedRoute><Feeding /></ProtectedRoute>} />
               <Route path="/diaper" element={<ProtectedRoute><Diaper /></ProtectedRoute>} />
               <Route path="/sleep" element={<ProtectedRoute><Sleep /></ProtectedRoute>} />
