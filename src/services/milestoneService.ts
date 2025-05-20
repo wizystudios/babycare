@@ -10,7 +10,10 @@ export const getMilestonesByBabyId = async (babyId: string): Promise<Milestone[]
     .eq('baby_id', babyId)
     .order('date', { ascending: false });
   
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching milestones:', error);
+    throw error;
+  }
   
   return data.map((milestone) => ({
     id: milestone.id,
@@ -42,7 +45,10 @@ export const addMilestone = async (milestone: Omit<Milestone, 'id'>): Promise<Mi
     .select()
     .single();
   
-  if (error) throw error;
+  if (error) {
+    console.error('Error adding milestone:', error);
+    throw error;
+  }
   
   return {
     id: data.id,
@@ -53,4 +59,17 @@ export const addMilestone = async (milestone: Omit<Milestone, 'id'>): Promise<Mi
     category: data.category,
     photoUrls: data.photo_urls || [],
   } as Milestone;
+};
+
+// Delete a milestone
+export const deleteMilestone = async (milestoneId: string): Promise<void> => {
+  const { error } = await supabase
+    .from('milestones')
+    .delete()
+    .eq('id', milestoneId);
+  
+  if (error) {
+    console.error('Error deleting milestone:', error);
+    throw error;
+  }
 };
