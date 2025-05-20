@@ -13,7 +13,8 @@ import {
   BottleIcon, 
   DiaperIcon, 
   SleepIcon, 
-  AddIcon
+  AddIcon,
+  UserIcon
 } from "@/components/BabyIcons";
 import { Baby, Feeding, Diaper, Sleep } from "@/types/models";
 import { formatDuration, getAgeDisplay, isToday } from "@/lib/date-utils";
@@ -23,6 +24,12 @@ import { getBabies } from "@/services/babyService";
 import { Loader } from "@/components/ui/loader";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Dashboard = () => {
   const { t } = useLanguage();
@@ -186,6 +193,11 @@ const Dashboard = () => {
     navigate("/add-baby");
   };
 
+  // Navigate to profile page
+  const handleOpenProfile = () => {
+    navigate("/profile");
+  };
+
   // Initial loading state - only show main loader when babies are loading
   if (isLoadingBabies) {
     return (
@@ -225,10 +237,30 @@ const Dashboard = () => {
                 <h2 className="font-bold text-2xl">{selectedBaby.name}</h2>
                 <p className="text-gray-600">{getAgeDisplay(selectedBaby.birthDate)}</p>
               </div>
-              <Button variant="outline" className="rounded-full" onClick={handleAddBaby}>
-                <AddIcon className="w-4 h-4 mr-1" />
-                {t("dashboard.addNew")}
-              </Button>
+              <div className="flex space-x-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="rounded-full">
+                      <UserIcon className="w-4 h-4 mr-1" />
+                      Account
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={handleOpenProfile}>
+                      My Profile
+                    </DropdownMenuItem>
+                    {babies.length > 1 && (
+                      <DropdownMenuItem>
+                        Switch Baby
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <Button variant="outline" className="rounded-full" onClick={handleAddBaby}>
+                  <AddIcon className="w-4 h-4 mr-1" />
+                  {t("dashboard.addNew")}
+                </Button>
+              </div>
             </div>
           </Card>
 
@@ -241,21 +273,21 @@ const Dashboard = () => {
                 title={t("nav.feeding")}
                 value={totalFeedingAmount > 0 ? `${totalFeedingAmount}ml` : todayFeedings.length.toString()}
                 className="bg-gradient-to-b from-white to-baby-blue/10"
-                onClick={() => {}}
+                onClick={() => {navigate('/feeding')}}
               />
               <SummaryCard 
                 icon={<DiaperIcon className="w-4 h-4 text-baby-mint" />}
                 title={t("nav.diaper")}
                 value={todayDiapers.length.toString()}
                 className="bg-gradient-to-b from-white to-baby-mint/10"
-                onClick={() => {}}
+                onClick={() => {navigate('/diaper')}}
               />
               <SummaryCard 
                 icon={<SleepIcon className="w-4 h-4 text-baby-lavender" />}
                 title={t("nav.sleep")}
                 value={formatDuration(totalSleepDuration)}
                 className="bg-gradient-to-b from-white to-baby-lavender/10"
-                onClick={() => {}}
+                onClick={() => {navigate('/sleep')}}
               />
             </div>
           </div>
@@ -278,7 +310,10 @@ const Dashboard = () => {
               </div>
             ) : (
               <div className="text-center py-4 text-gray-500">
-                No feeding records yet
+                <p>No feeding records yet</p>
+                <Button variant="ghost" className="mt-2" onClick={() => navigate('/feeding')}>
+                  Add feeding record
+                </Button>
               </div>
             )}
           </div>
@@ -301,7 +336,10 @@ const Dashboard = () => {
               </div>
             ) : (
               <div className="text-center py-4 text-gray-500">
-                No diaper records yet
+                <p>No diaper records yet</p>
+                <Button variant="ghost" className="mt-2" onClick={() => navigate('/diaper')}>
+                  Add diaper record
+                </Button>
               </div>
             )}
           </div>
@@ -324,7 +362,10 @@ const Dashboard = () => {
               </div>
             ) : (
               <div className="text-center py-4 text-gray-500">
-                No sleep records yet
+                <p>No sleep records yet</p>
+                <Button variant="ghost" className="mt-2" onClick={() => navigate('/sleep')}>
+                  Add sleep record
+                </Button>
               </div>
             )}
           </div>
