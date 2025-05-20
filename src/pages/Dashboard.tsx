@@ -43,13 +43,15 @@ const Dashboard = () => {
     enabled: !!user,
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 1,
-    onError: (error) => {
-      console.error("Error fetching babies:", error);
-      toast({
-        title: "Error loading babies data",
-        description: "Please try again later",
-        variant: "destructive",
-      });
+    meta: {
+      errorHandler: (error: Error) => {
+        console.error("Error fetching babies:", error);
+        toast({
+          title: "Error loading babies data",
+          description: "Please try again later",
+          variant: "destructive",
+        });
+      }
     }
   });
 
