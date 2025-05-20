@@ -2,12 +2,15 @@
 import React from "react";
 import Dashboard from "./Dashboard";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 const Index = () => {
   return (
-    <LanguageProvider>
-      <Dashboard />
-    </LanguageProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <Dashboard />
+      </LanguageProvider>
+    </ThemeProvider>
   );
 };
 
