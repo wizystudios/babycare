@@ -8,6 +8,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { RegisterForm } from '@/components/auth/RegisterForm';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { BottleIcon } from '@/components/BabyIcons';
 
 const Welcome = () => {
   const { user } = useAuth();
@@ -26,11 +28,8 @@ const Welcome = () => {
       <header className="py-6 px-4 md:px-6 flex justify-center border-b">
         <div className="container max-w-screen-xl flex justify-between items-center">
           <div className="flex items-center">
-            <img 
-              src="/lovable-uploads/35d286c5-a006-4d46-8d1b-5b194dddf7f2.png" 
-              alt="NK Technology Logo" 
-              className="h-8 mr-2" 
-            />
+            {/* BabyCare Logo */}
+            <BottleIcon className="h-8 w-8 text-baby-blue mr-2" />
             <h1 className="text-2xl font-bold text-baby-blue">BabyCare</h1>
           </div>
         </div>
@@ -71,12 +70,23 @@ const Welcome = () => {
               </li>
             </ul>
             <div className="border-t pt-6 text-center">
-              <p className="text-sm mb-2">
+              <p className="text-sm mb-4">
                 Imetengenezwa na timu ya wataalamu wenye uzoefu wa elimu ya watoto na afya
               </p>
-              <p className="text-sm font-semibold">
-                NK Technology
-              </p>
+              <div className="flex justify-center items-center">
+                {/* NK Technology Logo in a round avatar */}
+                <Avatar className="h-12 w-12 mr-2">
+                  <AvatarImage 
+                    src="/lovable-uploads/35d286c5-a006-4d46-8d1b-5b194dddf7f2.png" 
+                    alt="NK Technology Logo" 
+                    className="object-cover"
+                  />
+                  <AvatarFallback>NK</AvatarFallback>
+                </Avatar>
+                <p className="text-sm font-semibold">
+                  NK Technology
+                </p>
+              </div>
             </div>
           </div>
         </div>
