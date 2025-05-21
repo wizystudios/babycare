@@ -57,9 +57,9 @@ export const FeedingInsights: React.FC<FeedingInsightsProps> = ({ feedings }) =>
     return {
       totalFeedings: feedings.length,
       feedingsByType,
-      avgFeedingsPerDay: avgFeedingsPerDay,
-      avgAmount: avgAmount,
-      avgDuration: avgDuration,
+      avgFeedingsPerDay,
+      avgAmount,
+      avgDuration,
       lastWeekFeedings,
       dayRange: daysDifference
     };

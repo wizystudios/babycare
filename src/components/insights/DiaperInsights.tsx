@@ -60,7 +60,7 @@ export const DiaperInsights: React.FC<DiaperInsightsProps> = ({ diapers }) => {
     return {
       totalDiapers: diapers.length,
       diapersByType,
-      avgDiapersPerDay: avgDiapersPerDay,
+      avgDiapersPerDay,
       lastWeekDiapers,
       timeDistribution,
       dayRange: daysDifference
