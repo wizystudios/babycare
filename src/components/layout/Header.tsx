@@ -69,12 +69,22 @@ export const Header = () => {
     <header className="border-b bg-background p-3">
       <div className="container mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <h1 
-            className="text-xl font-bold cursor-pointer text-baby-blue"
+          <div 
+            className="flex items-center cursor-pointer"
             onClick={() => navigate("/")}
           >
-            BabyCare
-          </h1>
+            <Avatar className="h-8 w-8 mr-2">
+              <AvatarImage 
+                src="/lovable-uploads/2a13b9aa-f2eb-4f9b-af50-10ea1112fb20.png" 
+                alt="NK Technology Logo" 
+              />
+              <AvatarFallback>NK</AvatarFallback>
+            </Avatar>
+            <h1 className="text-xl font-bold text-baby-blue">
+              BabyCare
+            </h1>
+          </div>
+          
           {currentBaby && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

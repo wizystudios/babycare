@@ -2,245 +2,183 @@
 import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Feeding } from '@/types/models';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Feeding, FeedingType } from '@/types/models';
-import { format, startOfDay, endOfDay, subDays, differenceInDays } from 'date-fns';
+import { formatDate, getRelativeDateLabel } from '@/lib/date-utils';
 
 interface FeedingInsightsProps {
-  feedings: Feeding[];
+  feedingEntries: Feeding[];
 }
 
-export const FeedingInsights: React.FC<FeedingInsightsProps> = ({ feedings }) => {
+export const FeedingInsights: React.FC<FeedingInsightsProps> = ({ feedingEntries }) => {
   const { t } = useLanguage();
 
-  // Calculate feeding statistics
+  // Calculate statistics from feeding entries
   const stats = useMemo(() => {
-    if (!feedings.length) return null;
+    if (!feedingEntries.length) return { total: 0, totalAmount: 0, averageAmount: 0, typeBreakdown: {}, dailyAvg: 0 };
 
-    // Get the date range
-    const dates = feedings.map(f => f.startTime);
-    const earliestDate = new Date(Math.min(...dates.map(d => d.getTime())));
-    const latestDate = new Date();
-    const daysDifference = Math.max(1, differenceInDays(latestDate, earliestDate));
+    // Sort entries by date for calculations
+    const sortedEntries = [...feedingEntries].sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
+    const total = sortedEntries.length;
     
-    // Feeding counts by type
-    const feedingsByType: Record<string, number> = {};
-    feedings.forEach(feeding => {
-      feedingsByType[feeding.type] = (feedingsByType[feeding.type] || 0) + 1;
+    // Calculate days between first and last entry
+    const firstDate = new Date(sortedEntries[0].time);
+    const lastDate = new Date(sortedEntries[sortedEntries.length - 1].time);
+    const daysDiff = Math.max(1, Math.ceil((lastDate.getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24)));
+
+    // Calculate total and average amounts
+    let totalAmount = 0;
+    const typeBreakdown: Record<string, number> = {};
+    
+    sortedEntries.forEach(feeding => {
+      const amount = Number(feeding.amount) || 0;
+      totalAmount += amount;
+      
+      const type = feeding.type || 'Unknown';
+      typeBreakdown[type] = (typeBreakdown[type] || 0) + 1;
     });
     
-    // Average number of feedings per day
-    const avgFeedingsPerDay = feedings.length / daysDifference;
-    
-    // Average amounts for bottle/formula feedings
-    const bottleFeedings = feedings.filter(f => 
-      (f.type === 'bottle' || f.type === 'formula') && f.amount !== undefined
-    );
-    
-    const avgAmount = bottleFeedings.length > 0 
-      ? bottleFeedings.reduce((sum, f) => sum + (f.amount || 0), 0) / bottleFeedings.length
-      : 0;
-    
-    // Average duration for breastfeedings
-    const breastFeedings = feedings.filter(f => 
-      (f.type === 'breast-left' || f.type === 'breast-right') && f.duration !== undefined
-    );
-    
-    const avgDuration = breastFeedings.length > 0
-      ? breastFeedings.reduce((sum, f) => sum + (f.duration || 0), 0) / breastFeedings.length
-      : 0;
-    
-    // Recent data (last 7 days)
-    const lastWeekStart = subDays(new Date(), 7);
-    const lastWeekFeedings = feedings.filter(f => f.startTime >= lastWeekStart);
-    
+    const averageAmount = total > 0 ? totalAmount / total : 0;
+    const dailyAvg = total / daysDiff;
+
     return {
-      totalFeedings: feedings.length,
-      feedingsByType,
-      avgFeedingsPerDay,
-      avgAmount,
-      avgDuration,
-      lastWeekFeedings,
-      dayRange: daysDifference
+      total,
+      totalAmount,
+      averageAmount,
+      typeBreakdown,
+      dailyAvg
     };
-  }, [feedings]);
+  }, [feedingEntries]);
 
-  // Format feeding data for the pie chart
-  const pieChartData = useMemo(() => {
-    if (!stats) return [];
-    
-    return Object.entries(stats.feedingsByType).map(([type, count]) => ({
-      name: getFeedingTypeName(type as FeedingType),
-      value: count
+  // Prepare data for charts
+  const typeChartData = useMemo(() => {
+    return Object.entries(stats.typeBreakdown).map(([name, value]) => ({
+      name,
+      value: Number(value), // Ensure this is a number
     }));
-  }, [stats]);
+  }, [stats.typeBreakdown]);
 
-  // Format feeding data for the bar chart (last 7 days)
-  const barChartData = useMemo(() => {
-    if (!stats) return [];
+  // Daily breakdown
+  const dailyData = useMemo(() => {
+    const last7Days = new Map<string, { date: string, count: number, amount: number }>();
     
-    const daysMap: Record<string, Record<string, number>> = {};
-    
-    // Initialize days
+    // Initialize last 7 days with 0 counts
     for (let i = 6; i >= 0; i--) {
-      const date = subDays(new Date(), i);
-      const dateKey = format(date, 'MM-dd');
-      daysMap[dateKey] = {
-        date: format(date, 'MMM d'),
-        total: 0,
-        breast: 0,
-        bottle: 0,
-        solid: 0
-      };
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const dateKey = formatDate(date);
+      last7Days.set(dateKey, { date: dateKey, count: 0, amount: 0 });
     }
     
-    // Add feeding counts
-    stats.lastWeekFeedings.forEach(feeding => {
-      const dateKey = format(feeding.startTime, 'MM-dd');
-      if (daysMap[dateKey]) {
-        daysMap[dateKey].total++;
-        
-        if (feeding.type === 'breast-left' || feeding.type === 'breast-right') {
-          daysMap[dateKey].breast++;
-        } else if (feeding.type === 'bottle' || feeding.type === 'formula') {
-          daysMap[dateKey].bottle++;
-        } else if (feeding.type === 'solid') {
-          daysMap[dateKey].solid++;
-        }
+    // Fill in actual counts and amounts
+    feedingEntries.forEach(feeding => {
+      const date = new Date(feeding.time);
+      const dateKey = formatDate(date);
+      
+      if (last7Days.has(dateKey)) {
+        const current = last7Days.get(dateKey)!;
+        const amount = Number(feeding.amount) || 0;
+        last7Days.set(dateKey, { 
+          ...current, 
+          count: current.count + 1,
+          amount: current.amount + amount
+        });
       }
     });
     
-    return Object.values(daysMap);
-  }, [stats]);
+    return Array.from(last7Days.values()).map(item => ({
+      name: getRelativeDateLabel(item.date),
+      count: item.count,
+      amount: item.amount
+    }));
+  }, [feedingEntries]);
 
-  // Helper to get human-readable feeding type names
-  function getFeedingTypeName(type: FeedingType): string {
-    switch(type) {
-      case 'breast-left':
-        return t('feeding.breastLeft');
-      case 'breast-right':
-        return t('feeding.breastRight');
-      case 'bottle':
-        return t('feeding.bottle');
-      case 'formula':
-        return t('feeding.formula');
-      case 'solid':
-        return t('feeding.solid');
-      default:
-        return type;
-    }
-  }
+  // Chart colors
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
-  // Colors for the pie chart
-  const COLORS = ['#8884d8', '#83a6ed', '#8dd1e1', '#82ca9d', '#a4de6c'];
-
-  if (!stats) {
-    return (
+  return (
+    <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>{t('insights.feedingInsights')}</CardTitle>
+          <CardTitle>{t("insights.feedingOverview")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8">
-            <p>{t('insights.notEnoughData')}</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-muted/50 p-4 rounded-lg text-center">
+              <h3 className="text-muted-foreground">{t("insights.totalFeedings")}</h3>
+              <p className="text-3xl font-bold">{stats.total}</p>
+            </div>
+            <div className="bg-muted/50 p-4 rounded-lg text-center">
+              <h3 className="text-muted-foreground">{t("insights.avgPerDay")}</h3>
+              <p className="text-3xl font-bold">{stats.dailyAvg.toFixed(1)}</p>
+            </div>
+            <div className="bg-muted/50 p-4 rounded-lg text-center">
+              <h3 className="text-muted-foreground">{t("insights.avgAmount")}</h3>
+              <p className="text-3xl font-bold">{stats.averageAmount.toFixed(1)} ml</p>
+            </div>
           </div>
         </CardContent>
       </Card>
-    );
-  }
 
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t('insights.feedingInsights')}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-blue-50 p-4 rounded-lg text-center">
-            <p className="text-sm text-blue-600">{t('insights.avgFeedingsPerDay')}</p>
-            <p className="text-2xl font-bold">{stats.avgFeedingsPerDay.toFixed(1)}</p>
-          </div>
-          
-          {stats.avgAmount > 0 && (
-            <div className="bg-green-50 p-4 rounded-lg text-center">
-              <p className="text-sm text-green-600">{t('insights.avgBottleAmount')}</p>
-              <p className="text-2xl font-bold">{stats.avgAmount.toFixed(0)} ml</p>
-            </div>
-          )}
-          
-          {stats.avgDuration > 0 && (
-            <div className="bg-purple-50 p-4 rounded-lg text-center">
-              <p className="text-sm text-purple-600">{t('insights.avgBreastfeedingDuration')}</p>
-              <p className="text-2xl font-bold">{stats.avgDuration.toFixed(0)} min</p>
-            </div>
-          )}
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("insights.feedingTypes")}</CardTitle>
+          </CardHeader>
+          <CardContent className="h-[300px]">
+            {typeChartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={typeChartData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  >
+                    {typeChartData.map((_, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value) => [value, t("insights.count")]} />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex h-full items-center justify-center">
+                <p className="text-muted-foreground">{t("insights.noData")}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Feeding Distribution Pie Chart */}
-          <div>
-            <h3 className="font-medium mb-3 text-center">{t('insights.feedingDistribution')}</h3>
-            <div className="h-[300px]">
-              {pieChartData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={pieChartData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={true}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    >
-                      {pieChartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="h-full flex items-center justify-center">
-                  <p className="text-gray-500">{t('insights.noData')}</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Weekly Feeding Trends */}
-          <div>
-            <h3 className="font-medium mb-3 text-center">{t('insights.weeklyTrends')}</h3>
-            <div className="h-[300px]">
-              {barChartData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={barChartData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="breast" name={t('insights.breastfeeding')} fill="#8884d8" />
-                    <Bar dataKey="bottle" name={t('insights.bottleFeeding')} fill="#82ca9d" />
-                    <Bar dataKey="solid" name={t('insights.solidFood')} fill="#ffc658" />
-                  </BarChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="h-full flex items-center justify-center">
-                  <p className="text-gray-500">{t('insights.noData')}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-6 text-sm">
-          <p className="text-gray-500">
-            {t('insights.basedOnData', { days: stats.dayRange })}
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("insights.last7Days")}</CardTitle>
+          </CardHeader>
+          <CardContent className="h-[300px]">
+            {dailyData.some(d => d.count > 0) ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={dailyData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis allowDecimals={false} />
+                  <Tooltip formatter={(value) => [value, t("insights.feedings")]} />
+                  <Legend />
+                  <Bar dataKey="count" name={t("insights.feedings")} fill="#8884d8" />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex h-full items-center justify-center">
+                <p className="text-muted-foreground">{t("insights.noData")}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 };

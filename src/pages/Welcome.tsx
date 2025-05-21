@@ -77,7 +77,7 @@ const Welcome = () => {
                 {/* NK Technology Logo in a round avatar */}
                 <Avatar className="h-12 w-12 mr-2">
                   <AvatarImage 
-                    src="/lovable-uploads/35d286c5-a006-4d46-8d1b-5b194dddf7f2.png" 
+                    src="/lovable-uploads/2a13b9aa-f2eb-4f9b-af50-10ea1112fb20.png" 
                     alt="NK Technology Logo" 
                     className="object-cover"
                   />
