@@ -8,8 +8,8 @@ type AuthContextType = {
   user: User | null;
   session: Session | null;
   isLoading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<{ error?: any }>;
+  signUp: (email: string, password: string) => Promise<{ error?: any }>;
   signOut: () => Promise<void>;
 };
 
@@ -17,8 +17,8 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   session: null,
   isLoading: true,
-  signIn: async () => {},
-  signUp: async () => {},
+  signIn: async () => ({ error: null }),
+  signUp: async () => ({ error: null }),
   signOut: async () => {},
 });
 
@@ -70,17 +70,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email,
         password,
       });
-      if (error) throw error;
-      toast({
-        title: 'Account created',
-        description: 'Please check your email to verify your account',
-      });
+      
+      if (!error) {
+        toast({
+          title: 'Account created',
+          description: 'Please check your email to verify your account',
+        });
+      }
+      
+      return { error };
     } catch (error: any) {
       toast({
         title: 'Error',
         description: error.message,
         variant: 'destructive',
       });
+      return { error };
     } finally {
       setIsLoading(false);
     }
@@ -93,17 +98,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email,
         password,
       });
-      if (error) throw error;
-      toast({
-        title: 'Welcome back!',
-        description: 'You have successfully signed in',
-      });
+      
+      if (!error) {
+        toast({
+          title: 'Welcome back!',
+          description: 'You have successfully signed in',
+        });
+      }
+      
+      return { error };
     } catch (error: any) {
       toast({
         title: 'Error',
         description: error.message,
         variant: 'destructive',
       });
+      return { error };
     } finally {
       setIsLoading(false);
     }
