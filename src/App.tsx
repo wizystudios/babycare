@@ -20,6 +20,7 @@ import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import AddBaby from "./pages/AddBaby";
 import Profile from "./pages/Profile";
+import Insights from "./pages/Insights";
 import { Loader } from "./components/ui/loader";
 
 const queryClient = new QueryClient({
@@ -72,6 +73,7 @@ const App = () => (
                 <Route path="/sleep" element={<ProtectedRoute><Sleep /></ProtectedRoute>} />
                 <Route path="/health" element={<ProtectedRoute><Health /></ProtectedRoute>} />
                 <Route path="/milestones" element={<ProtectedRoute><Milestones /></ProtectedRoute>} />
+                <Route path="/insights" element={<ProtectedRoute><Insights /></ProtectedRoute>} />
                 <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

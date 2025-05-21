@@ -1,50 +1,74 @@
 
 import React, { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { DiaperEntry } from "@/components/trackers/DiaperEntry";
 import { Diaper, DiaperType } from "@/types/models";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { AddIcon } from "@/components/BabyIcons";
 import { getRelativeTimeLabel } from "@/lib/date-utils";
 import { useToast } from "@/components/ui/use-toast";
 import { getDiapersByBabyId, addDiaper } from "@/services/diaperService";
 import { useBaby } from "@/hooks/useBaby";
 import { Loader } from "@/components/ui/loader";
+import { EnhancedDiaperForm } from "@/components/forms/EnhancedDiaperForm";
+import { StoolColorChart } from "@/components/trackers/StoolColorChart";
+import { Card } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const DiaperPage = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
-  const { currentBaby } = useBaby();
+  const queryClient = useQueryClient();
+  const { currentBaby, babies } = useBaby();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [showColorChart, setShowColorChart] = useState(false);
+  const [selectedBabyId, setSelectedBabyId] = useState<string | null>(null);
   
-  // Form state
-  const [diaperType, setDiaperType] = useState<DiaperType>("wet");
-  const [time, setTime] = useState<string>(
-    new Date().toISOString().substring(0, 16)
-  );
-  const [note, setNote] = useState<string>("");
+  // Initialize selected baby
+  React.useEffect(() => {
+    if (currentBaby && !selectedBabyId) {
+      setSelectedBabyId(currentBaby.id);
+    }
+  }, [currentBaby, selectedBabyId]);
   
   // Fetch diapers data
   const { 
     data: diapers = [], 
     isLoading,
-    error,
-    refetch
+    error
   } = useQuery({
-    queryKey: ['diapers', currentBaby?.id],
+    queryKey: ['diapers', selectedBabyId],
     queryFn: async () => {
-      if (!currentBaby) return [];
-      return getDiapersByBabyId(currentBaby.id);
+      if (!selectedBabyId) return [];
+      return getDiapersByBabyId(selectedBabyId);
     },
-    enabled: !!currentBaby,
+    enabled: !!selectedBabyId,
     staleTime: 60 * 1000, // 1 minute
+  });
+
+  // Add diaper mutation
+  const addDiaperMutation = useMutation({
+    mutationFn: addDiaper,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['diapers', selectedBabyId] });
+      setDialogOpen(false);
+      
+      toast({
+        title: t("diaper.successTitle"),
+        description: t("diaper.successDescription"),
+      });
+    },
+    onError: (error) => {
+      console.error("Error adding diaper:", error);
+      toast({
+        title: t("diaper.errorTitle"),
+        description: t("diaper.errorDescription"),
+        variant: "destructive",
+      });
+    }
   });
   
   // Group diapers by date
@@ -58,8 +82,9 @@ const DiaperPage = () => {
     groupedDiapers[dateKey].push(diaper);
   });
   
-  const handleSaveDiaper = async () => {
-    if (!currentBaby) {
+  // Handle saving diaper
+  const handleSaveDiaper = async (diaperData: Omit<Diaper, 'id'>) => {
+    if (!selectedBabyId) {
       toast({
         title: "Error",
         description: "No baby selected",
@@ -68,45 +93,20 @@ const DiaperPage = () => {
       return;
     }
     
-    try {
-      const diaperTime = new Date(time);
-      
-      const newDiaper: Omit<Diaper, 'id'> = {
-        babyId: currentBaby.id,
-        type: diaperType,
-        time: diaperTime,
-        note: note || undefined,
-      };
-      
-      await addDiaper(newDiaper);
-      
-      // Refetch diapers
-      refetch();
-      
-      // Reset form
-      setDiaperType("wet");
-      setTime(new Date().toISOString().substring(0, 16));
-      setNote("");
-      
-      // Close dialog
-      setDialogOpen(false);
-      
-      // Show success message
-      toast({
-        title: t("diaper.successTitle"),
-        description: t("diaper.successDescription"),
-      });
-    } catch (error) {
-      console.error("Error adding diaper:", error);
-      toast({
-        title: t("diaper.errorTitle"),
-        description: t("diaper.errorDescription"),
-        variant: "destructive",
-      });
-    }
+    const newDiaper = {
+      ...diaperData,
+      babyId: selectedBabyId
+    };
+    
+    addDiaperMutation.mutate(newDiaper);
   };
 
-  if (!currentBaby) {
+  // Handle baby selection change
+  const handleBabyChange = (babyId: string) => {
+    setSelectedBabyId(babyId);
+  };
+
+  if (!selectedBabyId) {
     return (
       <Layout>
         <div className="p-4 text-center">
@@ -119,76 +119,57 @@ const DiaperPage = () => {
   return (
     <Layout>
       <div className="p-4">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-2">
           <h1 className="text-2xl font-bold">{t("diaper.title")}</h1>
           
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <AddIcon className="w-4 h-4 mr-2" />
-                {t("diaper.newDiaper")}
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>{t("diaper.newDiaper")}</DialogTitle>
-              </DialogHeader>
-              
-              <div className="grid gap-4 py-4">
-                <div className="space-y-2">
-                  <Label>{t("diaper.type")}</Label>
-                  <RadioGroup 
-                    value={diaperType} 
-                    onValueChange={(value) => setDiaperType(value as DiaperType)}
-                    className="flex space-x-4"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="wet" id="wet" />
-                      <Label htmlFor="wet">{t("diaper.wet")}</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="dirty" id="dirty" />
-                      <Label htmlFor="dirty">{t("diaper.dirty")}</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="mixed" id="mixed" />
-                      <Label htmlFor="mixed">{t("diaper.mixed")}</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
+          <div className="flex flex-wrap gap-2">
+            {babies.length > 1 && (
+              <Select value={selectedBabyId} onValueChange={handleBabyChange}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select baby" />
+                </SelectTrigger>
+                <SelectContent>
+                  {babies.map(baby => (
+                    <SelectItem key={baby.id} value={baby.id}>
+                      {baby.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            
+            <Button variant="outline" onClick={() => setShowColorChart(!showColorChart)}>
+              {showColorChart ? t("diaper.hideColorChart") : t("diaper.showColorChart")}
+            </Button>
+            
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <AddIcon className="w-4 h-4 mr-2" />
+                  {t("diaper.newDiaper")}
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>{t("diaper.newDiaper")}</DialogTitle>
+                </DialogHeader>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="time">{t("diaper.time")}</Label>
-                  <Input
-                    id="time"
-                    type="datetime-local"
-                    value={time}
-                    onChange={(e) => setTime(e.target.value)}
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="note">{t("diaper.note")}</Label>
-                  <Textarea
-                    id="note"
-                    value={note}
-                    onChange={(e) => setNote(e.target.value)}
-                    placeholder={t("diaper.notePlaceholder")}
-                  />
-                </div>
-                
-                <div className="flex justify-end gap-2">
-                  <Button variant="outline" onClick={() => setDialogOpen(false)}>
-                    {t("diaper.cancel")}
-                  </Button>
-                  <Button onClick={handleSaveDiaper}>
-                    {t("diaper.save")}
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+                <EnhancedDiaperForm 
+                  onSave={handleSaveDiaper}
+                  isLoading={addDiaperMutation.isPending}
+                  onCancel={() => setDialogOpen(false)}
+                  initialValues={{ babyId: selectedBabyId }}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
+        
+        {showColorChart && (
+          <div className="mb-6">
+            <StoolColorChart />
+          </div>
+        )}
         
         {isLoading ? (
           <div className="flex justify-center py-8">
@@ -217,6 +198,15 @@ const DiaperPage = () => {
               </div>
             ))}
           </div>
+        )}
+        
+        {diapers.length > 0 && (
+          <Card className="mt-6 p-4 bg-blue-50 border-blue-200">
+            <p className="text-sm text-blue-700">
+              <span className="font-semibold">{t('diaper.tip')}: </span>
+              {t('diaper.averageDiapers')}
+            </p>
+          </Card>
         )}
       </div>
     </Layout>
