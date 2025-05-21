@@ -1,7 +1,6 @@
-
 import { type } from "os";
 
-export type Language = "en" | "sw";
+export type Language = "en" | "sw" | "fr" | "es" | "zh";
 
 export const translations = {
   en: {
@@ -221,7 +220,7 @@ export const translations = {
       title: "Milestones",
       newMilestone: "New Milestone",
       date: "Date",
-      title: "Title",
+      milestoneTitle: "Title",
       description: "Description",
       category: "Category",
       photo: "Photo",
@@ -515,7 +514,7 @@ export const translations = {
       title: "Hatua Muhimu",
       newMilestone: "Hatua Muhimu Mpya",
       date: "Tarehe",
-      title: "Kichwa",
+      milestoneTitle: "Kichwa",
       description: "Maelezo",
       category: "Kategoria",
       photo: "Picha",

@@ -60,7 +60,7 @@ export const DiaperInsights: React.FC<DiaperInsightsProps> = ({ diapers }) => {
     return {
       totalDiapers: diapers.length,
       diapersByType,
-      avgDiapersPerDay: avgDiapersPerDay.toFixed(1),
+      avgDiapersPerDay: avgDiapersPerDay,
       lastWeekDiapers,
       timeDistribution,
       dayRange: daysDifference
@@ -162,7 +162,7 @@ export const DiaperInsights: React.FC<DiaperInsightsProps> = ({ diapers }) => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="bg-blue-50 p-4 rounded-lg text-center">
             <p className="text-sm text-blue-600">{t('insights.avgDiapersPerDay')}</p>
-            <p className="text-2xl font-bold">{stats.avgDiapersPerDay}</p>
+            <p className="text-2xl font-bold">{stats.avgDiapersPerDay.toFixed(1)}</p>
           </div>
           
           <div className="bg-green-50 p-4 rounded-lg text-center">

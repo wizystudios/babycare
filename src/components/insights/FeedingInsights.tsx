@@ -57,9 +57,9 @@ export const FeedingInsights: React.FC<FeedingInsightsProps> = ({ feedings }) =>
     return {
       totalFeedings: feedings.length,
       feedingsByType,
-      avgFeedingsPerDay: avgFeedingsPerDay.toFixed(1),
-      avgAmount: avgAmount.toFixed(0),
-      avgDuration: avgDuration.toFixed(0),
+      avgFeedingsPerDay: avgFeedingsPerDay,
+      avgAmount: avgAmount,
+      avgDuration: avgDuration,
       lastWeekFeedings,
       dayRange: daysDifference
     };
@@ -158,20 +158,20 @@ export const FeedingInsights: React.FC<FeedingInsightsProps> = ({ feedings }) =>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="bg-blue-50 p-4 rounded-lg text-center">
             <p className="text-sm text-blue-600">{t('insights.avgFeedingsPerDay')}</p>
-            <p className="text-2xl font-bold">{stats.avgFeedingsPerDay}</p>
+            <p className="text-2xl font-bold">{stats.avgFeedingsPerDay.toFixed(1)}</p>
           </div>
           
-          {parseFloat(stats.avgAmount) > 0 && (
+          {stats.avgAmount > 0 && (
             <div className="bg-green-50 p-4 rounded-lg text-center">
               <p className="text-sm text-green-600">{t('insights.avgBottleAmount')}</p>
-              <p className="text-2xl font-bold">{stats.avgAmount} ml</p>
+              <p className="text-2xl font-bold">{stats.avgAmount.toFixed(0)} ml</p>
             </div>
           )}
           
-          {parseFloat(stats.avgDuration) > 0 && (
+          {stats.avgDuration > 0 && (
             <div className="bg-purple-50 p-4 rounded-lg text-center">
               <p className="text-sm text-purple-600">{t('insights.avgBreastfeedingDuration')}</p>
-              <p className="text-2xl font-bold">{stats.avgDuration} min</p>
+              <p className="text-2xl font-bold">{stats.avgDuration.toFixed(0)} min</p>
             </div>
           )}
         </div>
