@@ -14,14 +14,14 @@ interface LanguageProviderProps {
 }
 
 const LanguageContext = createContext<LanguageContextType>({
-  language: "en",
+  language: "sw",
   setLanguage: () => {},
   t: () => "",
 });
 
 export const useLanguage = () => useContext(LanguageContext);
 
-export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children, defaultLanguage = "en" }) => {
+export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children, defaultLanguage = "sw" }) => {
   const [language, setLanguage] = useState<Language>(() => {
     const savedLanguage = localStorage.getItem("babycare-language");
     return (savedLanguage as Language) || defaultLanguage;
@@ -32,6 +32,12 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children, de
   }, [language]);
 
   const t = (key: string): string => {
+    // For real content in Welcome page
+    if (key.startsWith("welcome.") || key.startsWith("auth.")) {
+      // Return the key itself as we're now using direct text instead of translation keys
+      return key;
+    }
+    
     const keys = key.split(".");
     let value: any = translations[language];
     
