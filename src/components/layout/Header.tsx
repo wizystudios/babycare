@@ -138,9 +138,12 @@ export const Header = () => {
                 <AvatarFallback>NK</AvatarFallback>
               </Avatar>
             </motion.div>
-            <h1 className="text-xl font-bold text-baby-blue">
-              BabyCare
-            </h1>
+            <motion.h1 
+              className="text-xl font-bold text-baby-blue"
+              whileHover={{ scale: 1.05 }}
+            >
+              NK Technology
+            </motion.h1>
           </motion.div>
           
           {currentBaby && (

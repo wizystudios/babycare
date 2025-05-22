@@ -11,6 +11,7 @@ import {
   HealthIcon,
   MilestoneIcon,
   SettingsIcon,
+  BabyIcon,
 } from "@/components/BabyIcons";
 
 const navItems = [
@@ -30,6 +31,13 @@ export const BottomNav = () => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 flex items-center justify-around bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 h-16 px-2 sm:px-8 z-50">
+      <div className="absolute left-4 top-1/2 transform -translate-y-1/2 hidden sm:block">
+        <Link to="/" className="flex items-center">
+          <BabyIcon className="w-6 h-6 text-primary" />
+          <span className="ml-1 text-sm font-bold">BabyCare</span>
+        </Link>
+      </div>
+      
       {navItems.map((item) => (
         <Link
           key={item.to}

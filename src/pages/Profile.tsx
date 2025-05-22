@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { Layout } from "@/components/layout/Layout";
@@ -27,21 +27,58 @@ import {
   DialogClose
 } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { supabase } from "@/integrations/supabase/client";
 
 const ProfilePage = () => {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
   const [selectedBaby, setSelectedBaby] = useState<Baby | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   
   // Form state
   const [babyName, setBabyName] = useState("");
   const [babyWeight, setBabyWeight] = useState("");
   const [babyHeight, setBabyHeight] = useState("");
   const [babyNote, setBabyNote] = useState("");
+
+  // Fetch user avatar if available
+  useEffect(() => {
+    async function fetchAvatar() {
+      if (!user) return;
+      
+      try {
+        // Check if user has an avatar in storage
+        const { data, error } = await supabase.storage
+          .from('avatars')
+          .download(`${user.id}.jpg`);
+          
+        if (error || !data) {
+          // No avatar found, use initials (handled by fallback)
+          return;
+        }
+        
+        const url = URL.createObjectURL(data);
+        setAvatarUrl(url);
+        
+      } catch (error) {
+        console.error('Error downloading avatar:', error);
+      }
+    }
+    
+    fetchAvatar();
+    
+    return () => {
+      // Clean up object URL on unmount
+      if (avatarUrl) URL.revokeObjectURL(avatarUrl);
+    };
+  }, [user]);
 
   // Fetch babies data
   const { 
@@ -98,6 +135,55 @@ const ProfilePage = () => {
     }
   });
 
+  // Handle avatar upload
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!user || !event.target.files || event.target.files.length === 0) {
+      return;
+    }
+    
+    const file = event.target.files[0];
+    setIsUploading(true);
+    
+    try {
+      // Create avatars bucket if it doesn't exist
+      const { error: createBucketError } = await supabase.storage.createBucket('avatars', {
+        public: false,
+        fileSizeLimit: 1024 * 1024 * 2, // 2MB
+      });
+      
+      // Upload file to Supabase storage
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(`${user.id}.jpg`, file, {
+          cacheControl: '3600',
+          upsert: true,
+          contentType: file.type,
+        });
+        
+      if (uploadError) {
+        throw uploadError;
+      }
+      
+      // Get the public URL of the uploaded file
+      const url = URL.createObjectURL(file);
+      setAvatarUrl(url);
+      
+      toast({
+        title: "Avatar uploaded",
+        description: "Your profile picture has been updated successfully",
+      });
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      toast({
+        title: "Upload failed",
+        description: "There was an error uploading your profile picture",
+        variant: "destructive"
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   // Open edit dialog with baby data
   const handleEditBaby = (baby: Baby) => {
     setSelectedBaby(baby);
@@ -142,6 +228,25 @@ const ProfilePage = () => {
     }
   };
 
+  // Get initials from email for fallback avatar
+  const getInitials = (email: string) => {
+    return email.substring(0, 2).toUpperCase();
+  };
+
+  // Get background color from email for fallback avatar
+  const getAvatarColor = (email: string) => {
+    let hash = 0;
+    for (let i = 0; i < email.length; i++) {
+      hash = email.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    let color = '#';
+    for (let i = 0; i < 3; i++) {
+      const value = (hash >> (i * 8)) & 0xFF;
+      color += ('00' + value.toString(16)).substr(-2);
+    }
+    return color;
+  };
+
   if (isLoadingBabies) {
     return (
       <Layout>
@@ -159,11 +264,39 @@ const ProfilePage = () => {
         
         <Card className="p-4">
           <div className="flex flex-col sm:flex-row items-center gap-4">
-            <Avatar className="w-20 h-20">
-              <AvatarFallback className="bg-primary text-lg">
-                {user?.email?.slice(0, 2).toUpperCase() || "U"}
-              </AvatarFallback>
-            </Avatar>
+            <div className="relative">
+              <Avatar className="w-20 h-20">
+                {avatarUrl ? (
+                  <AvatarImage src={avatarUrl} alt={user?.email || "User"} />
+                ) : (
+                  <AvatarFallback style={{ backgroundColor: getAvatarColor(user?.email || '') }}>
+                    {getInitials(user?.email || "U")}
+                  </AvatarFallback>
+                )}
+              </Avatar>
+              
+              {isUploading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full">
+                  <Loader size="small" className="text-white" />
+                </div>
+              )}
+              
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="absolute -bottom-2 -right-2 rounded-full w-8 h-8 p-1"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <span className="text-lg">+</span>
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarUpload}
+              />
+            </div>
             <div className="flex-1">
               <h2 className="text-xl font-semibold">{user?.email}</h2>
               <p className="text-gray-500 text-sm">Member since {formatDate(new Date(user?.created_at || ""))}</p>

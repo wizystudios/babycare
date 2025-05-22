@@ -11,9 +11,11 @@ import { FeedingInsights } from '@/components/insights/FeedingInsights';
 import { DiaperInsights } from '@/components/insights/DiaperInsights';
 import { getInsightsData } from '@/services/insightService';
 import { Loader } from '@/components/ui/loader';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, BookOpen } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 const Insights = () => {
   const { t } = useLanguage();
@@ -124,6 +126,7 @@ const Insights = () => {
             <TabsTrigger value="growth">{t('insights.growth')}</TabsTrigger>
             <TabsTrigger value="feeding">{t('insights.feeding')}</TabsTrigger>
             <TabsTrigger value="diaper">{t('insights.diaper')}</TabsTrigger>
+            <TabsTrigger value="knowledge">{t('insights.knowledge')}</TabsTrigger>
           </TabsList>
           
           <TabsContent value="growth">
@@ -169,6 +172,145 @@ const Insights = () => {
                   <p className="text-sm text-gray-500">{t('insights.recordDiaperPrompt')}</p>
                 </div>
               )}
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="knowledge">
+            <div className="space-y-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center">
+                  <BookOpen className="w-5 h-5 mr-2" />
+                  <CardTitle>{t('insights.babyCareTips')}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="item-1">
+                      <AccordionTrigger>
+                        <div className="flex items-center">
+                          <span className="mr-2">🍼</span> 
+                          {t('insights.feedingTips')}
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="space-y-4">
+                          <p>{t('insights.feedingTip1')}</p>
+                          <p>{t('insights.feedingTip2')}</p>
+                          <p>{t('insights.feedingTip3')}</p>
+                          <p>{t('insights.feedingTip4')}</p>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                    
+                    <AccordionItem value="item-2">
+                      <AccordionTrigger>
+                        <div className="flex items-center">
+                          <span className="mr-2">💤</span> 
+                          {t('insights.sleepTips')}
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="space-y-4">
+                          <p>{t('insights.sleepTip1')}</p>
+                          <p>{t('insights.sleepTip2')}</p>
+                          <p>{t('insights.sleepTip3')}</p>
+                          <p>{t('insights.sleepTip4')}</p>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                    
+                    <AccordionItem value="item-3">
+                      <AccordionTrigger>
+                        <div className="flex items-center">
+                          <span className="mr-2">🧩</span> 
+                          {t('insights.developmentTips')}
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="space-y-4">
+                          <p>{t('insights.developmentTip1')}</p>
+                          <p>{t('insights.developmentTip2')}</p>
+                          <p>{t('insights.developmentTip3')}</p>
+                          <p>{t('insights.developmentTip4')}</p>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                    
+                    <AccordionItem value="item-4">
+                      <AccordionTrigger>
+                        <div className="flex items-center">
+                          <span className="mr-2">🏥</span> 
+                          {t('insights.healthTips')}
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="space-y-4">
+                          <p>{t('insights.healthTip1')}</p>
+                          <p>{t('insights.healthTip2')}</p>
+                          <p>{t('insights.healthTip3')}</p>
+                          <p>{t('insights.healthTip4')}</p>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                    
+                    <AccordionItem value="item-5">
+                      <AccordionTrigger>
+                        <div className="flex items-center">
+                          <span className="mr-2">👶</span> 
+                          {t('insights.parentingTips')}
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="space-y-4">
+                          <p>{t('insights.parentingTip1')}</p>
+                          <p>{t('insights.parentingTip2')}</p>
+                          <p>{t('insights.parentingTip3')}</p>
+                          <p>{t('insights.parentingTip4')}</p>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>{t('insights.commonQuestions')}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="faq-1">
+                      <AccordionTrigger>{t('insights.faqQuestion1')}</AccordionTrigger>
+                      <AccordionContent>
+                        <p>{t('insights.faqAnswer1')}</p>
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="faq-2">
+                      <AccordionTrigger>{t('insights.faqQuestion2')}</AccordionTrigger>
+                      <AccordionContent>
+                        <p>{t('insights.faqAnswer2')}</p>
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="faq-3">
+                      <AccordionTrigger>{t('insights.faqQuestion3')}</AccordionTrigger>
+                      <AccordionContent>
+                        <p>{t('insights.faqAnswer3')}</p>
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="faq-4">
+                      <AccordionTrigger>{t('insights.faqQuestion4')}</AccordionTrigger>
+                      <AccordionContent>
+                        <p>{t('insights.faqAnswer4')}</p>
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="faq-5">
+                      <AccordionTrigger>{t('insights.faqQuestion5')}</AccordionTrigger>
+                      <AccordionContent>
+                        <p>{t('insights.faqAnswer5')}</p>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
         </Tabs>

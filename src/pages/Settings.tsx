@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Language } from "@/lib/i18n/translations";
 import { SettingsIcon, BabyIcon } from "@/components/BabyIcons";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -22,34 +22,43 @@ const SettingsPage = () => {
   const { t, language, setLanguage } = useLanguage();
   const { theme, setTheme } = useTheme();
   const { user, signOut } = useAuth();
+  const { toast } = useToast();
+  
   const [units, setUnits] = useState<"metric" | "imperial">("metric");
   const [notifications, setNotifications] = useState<boolean>(true);
   const [supportEmail, setSupportEmail] = useState<string>("");
   const [supportMessage, setSupportMessage] = useState<string>("");
+  
+  // Set user email in support form if available
+  useEffect(() => {
+    if (user?.email) {
+      setSupportEmail(user.email);
+    }
+  }, [user]);
   
   const handleLanguageChange = (newLanguage: Language) => {
     setLanguage(newLanguage);
     
     // Show success message
     toast({
-      title: "Language updated",
-      description: `The app language has been changed to ${getLanguageName(newLanguage)}.`,
+      title: t("settings.languageUpdated"),
+      description: `${t("settings.languageChangedTo")} ${getLanguageName(newLanguage)}.`,
     });
   };
   
   const handleExportData = () => {
     // In a real app, this would generate a file for download
     toast({
-      title: "Data export initiated",
-      description: "Your data will be prepared for download shortly.",
+      title: t("settings.dataExportInitiated"),
+      description: t("settings.dataExportDescription"),
     });
   };
   
   const handleSendSupportEmail = () => {
-    if (!supportEmail.trim() || !supportMessage.trim()) {
+    if (!supportMessage.trim()) {
       toast({
-        title: "Please fill all fields",
-        description: "Email and message are required.",
+        title: t("settings.pleaseFillAllFields"),
+        description: t("settings.messageRequired"),
         variant: "destructive"
       });
       return;
@@ -57,8 +66,8 @@ const SettingsPage = () => {
     
     // In a real app, this would send an email
     toast({
-      title: "Message sent",
-      description: "Your support request has been sent. We'll get back to you soon.",
+      title: t("settings.messageSent"),
+      description: t("settings.supportRequestSent"),
     });
     
     // Reset form
@@ -69,7 +78,7 @@ const SettingsPage = () => {
   const getLanguageName = (code: Language): string => {
     const names: Record<Language, string> = {
       en: "English",
-      sw: "Swahili",
+      sw: "Kiswahili",
       fr: "Français",
       es: "Español",
       zh: "中文",
@@ -84,9 +93,9 @@ const SettingsPage = () => {
         
         <Tabs defaultValue="preferences">
           <TabsList className="mb-6">
-            <TabsTrigger value="preferences">Preferences</TabsTrigger>
-            <TabsTrigger value="help">Help & Support</TabsTrigger>
-            <TabsTrigger value="about">About</TabsTrigger>
+            <TabsTrigger value="preferences">{t("settings.preferences")}</TabsTrigger>
+            <TabsTrigger value="help">{t("settings.helpSupport")}</TabsTrigger>
+            <TabsTrigger value="about">{t("settings.about")}</TabsTrigger>
           </TabsList>
           
           <TabsContent value="preferences">
@@ -161,7 +170,7 @@ const SettingsPage = () => {
                     checked={notifications}
                     onCheckedChange={setNotifications}
                   />
-                  <Label htmlFor="notifications">{t("settings.notifications")}</Label>
+                  <Label htmlFor="notifications">{t("settings.enableNotifications")}</Label>
                 </div>
               </div>
               
@@ -178,59 +187,49 @@ const SettingsPage = () => {
               <div>
                 <h2 className="text-lg font-semibold mb-3 flex items-center">
                   <HelpCircle className="w-5 h-5 mr-2" />
-                  Help & Instructions
+                  {t("settings.helpInstructions")}
                 </h2>
                 
                 <Accordion type="single" collapsible className="w-full">
                   <AccordionItem value="item-1">
-                    <AccordionTrigger>How do I add a new baby?</AccordionTrigger>
+                    <AccordionTrigger>{t("settings.howAddBaby")}</AccordionTrigger>
                     <AccordionContent>
-                      To add a new baby, tap on the "Add Your Baby" button from the home screen or Profile page. 
-                      Fill in your baby's details including name, birth date, gender, and optionally weight and height.
-                      You can also add a photo if you wish. Once you save, your baby will be added to your account.
+                      {t("settings.howAddBabyAnswer")}
                     </AccordionContent>
                   </AccordionItem>
                   
                   <AccordionItem value="item-2">
-                    <AccordionTrigger>How do I track feedings?</AccordionTrigger>
+                    <AccordionTrigger>{t("settings.howTrackFeedings")}</AccordionTrigger>
                     <AccordionContent>
-                      Go to the "Feeding" page from the bottom navigation. Tap the "New Feeding" button to record 
-                      a new feeding. You can select the type (breast, bottle, formula, or solid), 
-                      enter the start and end times, amount (for bottle/formula), and add any notes.
+                      {t("settings.howTrackFeedingsAnswer")}
                     </AccordionContent>
                   </AccordionItem>
                   
                   <AccordionItem value="item-3">
-                    <AccordionTrigger>How do I track diapers?</AccordionTrigger>
+                    <AccordionTrigger>{t("settings.howTrackDiapers")}</AccordionTrigger>
                     <AccordionContent>
-                      Navigate to the "Diaper" page from the bottom navigation. Tap the "New Diaper" button and 
-                      record the type (wet, dirty, or mixed), time, and any notes you want to add.
+                      {t("settings.howTrackDiapersAnswer")}
                     </AccordionContent>
                   </AccordionItem>
                   
                   <AccordionItem value="item-4">
-                    <AccordionTrigger>How do I track sleep?</AccordionTrigger>
+                    <AccordionTrigger>{t("settings.howTrackSleep")}</AccordionTrigger>
                     <AccordionContent>
-                      Go to the "Sleep" page and tap "New Sleep" to record sleep sessions. 
-                      You can specify if it's a nap or night sleep, along with start and end times. 
-                      Optionally, add location, mood, and notes.
+                      {t("settings.howTrackSleepAnswer")}
                     </AccordionContent>
                   </AccordionItem>
                   
                   <AccordionItem value="item-5">
-                    <AccordionTrigger>How do I record milestones?</AccordionTrigger>
+                    <AccordionTrigger>{t("settings.howRecordMilestones")}</AccordionTrigger>
                     <AccordionContent>
-                      Navigate to the "Milestones" page and tap "New Milestone". Add a title, date, 
-                      category (e.g., Social, Motor Skills), and an optional description. 
-                      This helps you keep track of your baby's development achievements.
+                      {t("settings.howRecordMilestonesAnswer")}
                     </AccordionContent>
                   </AccordionItem>
                   
                   <AccordionItem value="item-6">
-                    <AccordionTrigger>Can I use the app for multiple babies?</AccordionTrigger>
+                    <AccordionTrigger>{t("settings.canUseMultipleBabies")}</AccordionTrigger>
                     <AccordionContent>
-                      Yes! You can add multiple babies to your account and track information for each separately. 
-                      Use the dropdown menu on each tracking page to switch between babies.
+                      {t("settings.canUseMultipleBabiesAnswer")}
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
@@ -239,34 +238,41 @@ const SettingsPage = () => {
               <div>
                 <h2 className="text-lg font-semibold mb-3 flex items-center">
                   <Mail className="w-5 h-5 mr-2" />
-                  Contact Support
+                  {t("settings.contactSupport")}
                 </h2>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Your Email</Label>
+                    <Label htmlFor="email">{t("settings.yourEmail")}</Label>
                     <Input 
                       id="email" 
                       type="email" 
-                      placeholder="Enter your email"
+                      placeholder={t("settings.enterEmail")}
                       value={supportEmail}
                       onChange={(e) => setSupportEmail(e.target.value)}
+                      readOnly={!!user?.email}
+                      className={user?.email ? "bg-gray-100" : ""}
                     />
+                    {user?.email && (
+                      <p className="text-xs text-muted-foreground">
+                        {t("settings.usingAccountEmail")}
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="message">Message</Label>
+                    <Label htmlFor="message">{t("settings.message")}</Label>
                     <Textarea 
                       id="message" 
-                      placeholder="How can we help you?"
+                      placeholder={t("settings.howCanWeHelp")}
                       rows={4}
                       value={supportMessage}
                       onChange={(e) => setSupportMessage(e.target.value)}
                     />
                   </div>
                   <Button onClick={handleSendSupportEmail}>
-                    Send Message
+                    {t("settings.sendMessage")}
                   </Button>
                   <div className="pt-4 text-sm text-muted-foreground">
-                    <p>You can also email us directly at:</p>
+                    <p>{t("settings.emailUsDirectly")}</p>
                     <a href="mailto:babycare000001@gmail.com" className="text-primary hover:underline">
                       babycare000001@gmail.com
                     </a>
@@ -282,40 +288,35 @@ const SettingsPage = () => {
                 <div className="flex items-center justify-center flex-col">
                   <BabyIcon className="w-20 h-20 text-primary mb-2" />
                   <h3 className="font-bold text-2xl">BabyCare</h3>
-                  <p className="text-sm text-gray-500">Version 1.0.0</p>
-                  <p className="text-xs text-gray-400 mt-1">© 2025 BabyCare</p>
+                  <p className="text-sm text-gray-500">{t("settings.version")} 1.0.0</p>
+                  <p className="text-xs text-gray-400 mt-1">© 2025 BabyCare by NK Technology</p>
                 </div>
               </div>
               
               <div>
-                <h3 className="font-semibold text-lg mb-2">About BabyCare</h3>
+                <h3 className="font-semibold text-lg mb-2">{t("settings.aboutBabyCare")}</h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  BabyCare is a comprehensive baby tracking application designed to help parents 
-                  monitor their baby's daily activities and development. Track feedings, diapers, 
-                  sleep patterns, growth, health records, and milestones all in one place.
+                  {t("settings.aboutBabyCareDescription")}
                 </p>
               </div>
               
               <div>
-                <h3 className="font-semibold text-lg mb-2">Privacy Policy</h3>
+                <h3 className="font-semibold text-lg mb-2">{t("settings.privacyPolicy")}</h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-2">
-                  At BabyCare, we take your privacy seriously. The data you enter about your baby is 
-                  securely stored and is only accessible by you. We do not share or sell your data to 
-                  third parties.
+                  {t("settings.privacyPolicyDescription")}
                 </p>
                 <Button variant="link" className="px-0">
-                  Read Full Privacy Policy
+                  {t("settings.readFullPrivacyPolicy")}
                 </Button>
               </div>
               
               <div>
-                <h3 className="font-semibold text-lg mb-2">Terms of Service</h3>
+                <h3 className="font-semibold text-lg mb-2">{t("settings.termsOfService")}</h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-2">
-                  By using BabyCare, you agree to our terms of service. These terms outline how 
-                  the application should be used and your rights as a user.
+                  {t("settings.termsOfServiceDescription")}
                 </p>
                 <Button variant="link" className="px-0">
-                  Read Terms of Service
+                  {t("settings.readTermsOfService")}
                 </Button>
               </div>
             </Card>
