@@ -69,7 +69,12 @@ export default {
 					mint: '#c5e8c8',
 					lavender: '#E6E6FA',
 					yellow: '#FFFFE0',
-					cream: '#FFFDD0'
+					cream: '#FFFDD0',
+					primary: 'hsl(var(--baby-primary))',
+					secondary: 'hsl(var(--baby-secondary))',
+					tertiary: 'hsl(var(--baby-tertiary))',
+					neutral: 'hsl(var(--baby-neutral))',
+					dark: 'hsl(var(--baby-dark))',
 				}
 			},
 			borderRadius: {

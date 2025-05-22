@@ -110,11 +110,11 @@
 }
 
 .baby-card {
-  @apply bg-white dark:bg-gray-800 rounded-xl shadow-md border border-baby-blue/20 transition-all hover:shadow-lg;
+  @apply bg-white dark:bg-gray-800 rounded-xl shadow-md border border-baby-primary/20 transition-all hover:shadow-lg;
 }
 
 .baby-button {
-  @apply bg-baby-blue text-white hover:bg-baby-blue/90 transition-colors;
+  @apply bg-baby-primary text-white hover:bg-baby-primary/90 transition-colors;
 }
 
 /* Animation utilities */
@@ -148,4 +148,21 @@
     opacity: 1;
     transform: scale(1);
   }
+}
+
+/* Additional BabyCare color variables based on the logo */
+:root {
+  --baby-primary: 199 80% 55%;      /* Main blue from logo */
+  --baby-secondary: 320 70% 70%;    /* Pink accent color */
+  --baby-tertiary: 142 50% 75%;     /* Mint green accent */
+  --baby-neutral: 210 15% 90%;      /* Light neutral gray */
+  --baby-dark: 210 30% 15%;         /* Dark shade for text */
+}
+
+.dark {
+  --baby-primary: 199 70% 60%;      /* Brighter blue for dark mode */
+  --baby-secondary: 320 60% 65%;    /* Slightly muted pink for dark mode */
+  --baby-tertiary: 142 40% 60%;     /* Darker mint for dark mode */
+  --baby-neutral: 210 15% 20%;      /* Dark neutral gray */
+  --baby-dark: 210 20% 85%;         /* Light shade for text in dark mode */
 }

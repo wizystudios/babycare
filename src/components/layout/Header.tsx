@@ -7,10 +7,12 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useBaby } from "@/hooks/useBaby";
 import { Sun, Moon, Plus, LogOut, Settings, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
 
 export const Header = () => {
   const { t, language, setLanguage } = useLanguage();
@@ -19,6 +21,7 @@ export const Header = () => {
   const { currentBaby, babies, switchBaby } = useBaby();
   const navigate = useNavigate();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [logoDialogOpen, setLogoDialogOpen] = useState(false);
   
   // Fetch user avatar if available
   useEffect(() => {
@@ -107,7 +110,7 @@ export const Header = () => {
 
   return (
     <motion.header 
-      className="border-b bg-baby-blue/10 p-3 sticky top-0 z-10 shadow-sm"
+      className="border-b bg-gradient-to-r from-primary/15 to-baby-blue/20 p-3 sticky top-0 z-10 shadow-sm"
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.3 }}
@@ -119,38 +122,77 @@ export const Header = () => {
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 0.4, delay: 0.1 }}
         >
-          <motion.div 
-            className="flex items-center cursor-pointer"
-            onClick={() => navigate("/")}
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
-          >
-            <motion.div 
-              whileHover={{ rotate: 10 }}
-              transition={{ duration: 0.2 }}
-              className="mr-2"
-            >
-              <Avatar className="h-10 w-10 rounded-full border-2 border-baby-blue">
-                <AvatarImage 
-                  src="/lovable-uploads/190ad50d-84e9-4e84-9dc0-fd0434e12d8e.png" 
-                  alt="BabyCare Logo" 
-                  className="object-contain p-0.5"
-                />
-                <AvatarFallback className="bg-baby-blue text-white font-bold">BC</AvatarFallback>
-              </Avatar>
-            </motion.div>
-            <motion.h1 
-              className="text-xl font-bold text-baby-blue"
-              whileHover={{ scale: 1.05 }}
-            >
-              BabyCare
-            </motion.h1>
-          </motion.div>
+          <Dialog open={logoDialogOpen} onOpenChange={setLogoDialogOpen}>
+            <DialogTrigger asChild>
+              <motion.div 
+                className="flex items-center cursor-pointer"
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              >
+                <motion.div 
+                  whileHover={{ rotate: 10 }}
+                  transition={{ duration: 0.2 }}
+                  className="mr-2"
+                >
+                  <div className="h-11 w-11 rounded-full bg-white p-0.5 shadow-md border-2 border-baby-primary flex items-center justify-center overflow-hidden">
+                    <img 
+                      src="/lovable-uploads/190ad50d-84e9-4e84-9dc0-fd0434e12d8e.png" 
+                      alt="BabyCare Logo" 
+                      className="h-full w-full object-contain"
+                    />
+                  </div>
+                </motion.div>
+                <motion.h1 
+                  className="text-xl font-bold text-baby-primary"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  BabyCare
+                </motion.h1>
+              </motion.div>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle className="text-baby-primary text-xl">About BabyCare</DialogTitle>
+                <DialogDescription>
+                  Your complete solution for baby care tracking and monitoring
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex flex-col items-center space-y-4 p-4">
+                <div className="w-32 h-32 rounded-full bg-white p-2 shadow-lg border-4 border-baby-primary flex items-center justify-center overflow-hidden">
+                  <img 
+                    src="/lovable-uploads/190ad50d-84e9-4e84-9dc0-fd0434e12d8e.png" 
+                    alt="BabyCare Logo" 
+                    className="h-full w-full object-contain"
+                  />
+                </div>
+                <div className="text-center space-y-3">
+                  <h2 className="text-2xl font-bold text-baby-primary">BabyCare Daily</h2>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Track your baby's feeding, diaper changes, sleep patterns, health records, and milestones all in one place. 
+                    Our comprehensive app helps you monitor your baby's development and ensure their well-being.
+                  </p>
+                  <p className="text-baby-secondary font-medium">
+                    Designed with love for parents and caregivers.
+                  </p>
+                </div>
+                <Button 
+                  onClick={() => setLogoDialogOpen(false)}
+                  className="bg-baby-primary hover:bg-baby-primary/90 text-white"
+                >
+                  Close
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
           
           {currentBaby && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="ml-2 animate-fade-in bg-white/80 text-baby-blue border-baby-blue/30 hover:bg-baby-blue/5">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="ml-2 animate-fade-in bg-white/80 text-baby-primary border-baby-primary/30 hover:bg-baby-primary/5"
+                >
                   {currentBaby.name}
                 </Button>
               </DropdownMenuTrigger>
@@ -159,13 +201,13 @@ export const Header = () => {
                   <DropdownMenuItem 
                     key={baby.id} 
                     onClick={() => switchBaby(baby.id)}
-                    className={baby.id === currentBaby.id ? "bg-baby-blue/10 text-baby-blue font-medium" : ""}
+                    className={baby.id === currentBaby.id ? "bg-baby-primary/10 text-baby-primary font-medium" : ""}
                   >
                     {baby.name}
                   </DropdownMenuItem>
                 ))}
                 <DropdownMenuItem onClick={handleAddBaby}>
-                  <Plus className="mr-2 h-4 w-4 text-baby-blue" />
+                  <Plus className="mr-2 h-4 w-4 text-baby-primary" />
                   {t("nav.addBaby")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -189,7 +231,7 @@ export const Header = () => {
               size="icon"
               onClick={handleThemeToggle}
               title={theme === "dark" ? t("common.lightMode") : t("common.darkMode")}
-              className="text-baby-blue hover:bg-baby-blue/10"
+              className="text-baby-primary hover:bg-baby-primary/10"
             >
               {theme === "dark" ? (
                 <Sun className="h-5 w-5" />
@@ -208,7 +250,10 @@ export const Header = () => {
               variant="ghost" 
               size="sm"
               onClick={handleLanguageToggle}
-              className="text-baby-blue hover:bg-baby-blue/10"
+              className={cn(
+                "font-medium hover:bg-baby-primary/10",
+                language === "en" ? "text-baby-primary" : "text-baby-secondary"
+              )}
             >
               {language === "en" ? "SW" : "EN"}
             </Button>
@@ -221,7 +266,7 @@ export const Header = () => {
                   whileHover={{ scale: 1.1 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
-                  <Avatar className="h-8 w-8 cursor-pointer border-2 border-baby-blue/30">
+                  <Avatar className="h-9 w-9 cursor-pointer border-2 border-baby-primary/50">
                     {avatarUrl ? (
                       <AvatarImage src={avatarUrl} alt={user.email || "User"} />
                     ) : (
@@ -234,15 +279,15 @@ export const Header = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="animate-scale-in">
                 <DropdownMenuItem onClick={handleOpenProfile}>
-                  <User className="mr-2 h-4 w-4 text-baby-blue" />
+                  <User className="mr-2 h-4 w-4 text-baby-primary" />
                   {t("nav.profile")}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleOpenSettings}>
-                  <Settings className="mr-2 h-4 w-4 text-baby-blue" />
+                  <Settings className="mr-2 h-4 w-4 text-baby-primary" />
                   {t("nav.settings")}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleSignOut}>
-                  <LogOut className="mr-2 h-4 w-4 text-baby-blue" />
+                  <LogOut className="mr-2 h-4 w-4 text-baby-primary" />
                   {t("nav.signOut")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
