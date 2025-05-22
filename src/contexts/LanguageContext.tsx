@@ -30,31 +30,39 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children, de
   useEffect(() => {
     localStorage.setItem("babycare-language", language);
     // Update the document title based on the selected language
-    document.title = language === "sw" ? "BabyCare | NK Technology" : "BabyCare | NK Technology";
+    document.title = "BabyCare";
   }, [language]);
 
+  // Improved translation function with better nested key support and logging
   const t = (key: string): string => {
-    // For settings page content, make sure we're using translations
-    if (key.startsWith("settings.")) {
+    try {
+      // Split the key by dots to access nested translations
       const keys = key.split(".");
       let value: any = translations[language];
       
+      // Try to find the translation in the current language
       for (const k of keys) {
         if (!value || !value[k]) {
-          // Fallback to English if translation is missing
+          // Translation not found in current language, fallback to English
           let fallbackValue: any = translations.en;
+          
           for (const fbk of keys) {
             if (!fallbackValue || !fallbackValue[fbk]) {
-              return key; // If even English doesn't have it, return the key
+              console.warn(`Translation key not found: ${key}`);
+              return key; // Return the key as fallback
             }
             fallbackValue = fallbackValue[fbk];
           }
-          // Make sure we're returning a string
-          if (typeof fallbackValue !== 'string') {
-            console.warn(`Translation key ${key} does not resolve to a string`);
-            return key;
+          
+          // Return the English version if available
+          if (typeof fallbackValue === 'string') {
+            if (language !== 'en') {
+              console.info(`Using English fallback for key: ${key}`);
+            }
+            return fallbackValue;
           }
-          return fallbackValue;
+          
+          return key;
         }
         value = value[k];
       }
@@ -64,44 +72,12 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children, de
         console.warn(`Translation key ${key} does not resolve to a string`);
         return key;
       }
+      
       return value;
-    }
-    
-    // For welcome and auth pages, return the key itself
-    if (key.startsWith("welcome.") || key.startsWith("auth.")) {
+    } catch (error) {
+      console.error(`Error translating key: ${key}`, error);
       return key;
     }
-    
-    // For all other keys
-    const keys = key.split(".");
-    let value: any = translations[language];
-    
-    for (const k of keys) {
-      if (!value || !value[k]) {
-        // Fallback to English if translation is missing
-        let fallbackValue: any = translations.en;
-        for (const fbk of keys) {
-          if (!fallbackValue || !fallbackValue[fbk]) {
-            return key; // If even English doesn't have it, return the key
-          }
-          fallbackValue = fallbackValue[fbk];
-        }
-        // Make sure we're returning a string
-        if (typeof fallbackValue !== 'string') {
-          console.warn(`Translation key ${key} does not resolve to a string`);
-          return key;
-        }
-        return fallbackValue;
-      }
-      value = value[k];
-    }
-    
-    // Make sure we're returning a string
-    if (typeof value !== 'string') {
-      console.warn(`Translation key ${key} does not resolve to a string`);
-      return key;
-    }
-    return value;
   };
 
   return (

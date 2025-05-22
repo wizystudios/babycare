@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -133,16 +132,16 @@ export const Header = () => {
               <Avatar className="h-8 w-8">
                 <AvatarImage 
                   src="/lovable-uploads/2a13b9aa-f2eb-4f9b-af50-10ea1112fb20.png" 
-                  alt="NK Technology Logo" 
+                  alt="BabyCare Logo" 
                 />
-                <AvatarFallback>NK</AvatarFallback>
+                <AvatarFallback>BC</AvatarFallback>
               </Avatar>
             </motion.div>
             <motion.h1 
               className="text-xl font-bold text-baby-blue"
               whileHover={{ scale: 1.05 }}
             >
-              NK Technology
+              BabyCare
             </motion.h1>
           </motion.div>
           
