@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Diaper } from '@/types/models';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { formatDate, getRelativeDateLabel } from '@/lib/date-utils';
+import { formatDate, getRelativeTimeLabel } from '@/lib/date-utils';
 
 interface DiaperInsightsProps {
   diaperEntries: Diaper[];
@@ -86,7 +86,7 @@ export const DiaperInsights: React.FC<DiaperInsightsProps> = ({ diaperEntries })
     });
     
     return Array.from(last7Days.values()).map(item => ({
-      name: getRelativeDateLabel(item.date),
+      name: getRelativeTimeLabel(new Date(item.date)),
       count: item.count
     }));
   }, [diaperEntries]);

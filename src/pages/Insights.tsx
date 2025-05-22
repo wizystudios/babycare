@@ -147,7 +147,7 @@ const Insights = () => {
           <TabsContent value="feeding">
             <div className="space-y-6">
               {hasFeedingData ? (
-                <FeedingInsights feedings={insightsData.feedings} />
+                <FeedingInsights feedingEntries={insightsData.feedings} />
               ) : (
                 <div className="bg-gray-50 p-6 rounded-lg text-center">
                   <h3 className="text-lg font-semibold mb-2">{t('insights.noFeedingDataTitle')}</h3>
@@ -161,7 +161,7 @@ const Insights = () => {
           <TabsContent value="diaper">
             <div className="space-y-6">
               {hasDiaperData ? (
-                <DiaperInsights diapers={insightsData.diapers} />
+                <DiaperInsights diaperEntries={insightsData.diapers} />
               ) : (
                 <div className="bg-gray-50 p-6 rounded-lg text-center">
                   <h3 className="text-lg font-semibold mb-2">{t('insights.noDiaperDataTitle')}</h3>

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Feeding } from '@/types/models';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { formatDate, getRelativeDateLabel } from '@/lib/date-utils';
+import { formatDate, getRelativeTimeLabel } from '@/lib/date-utils';
 
 interface FeedingInsightsProps {
   feedingEntries: Feeding[];
@@ -18,12 +18,12 @@ export const FeedingInsights: React.FC<FeedingInsightsProps> = ({ feedingEntries
     if (!feedingEntries.length) return { total: 0, totalAmount: 0, averageAmount: 0, typeBreakdown: {}, dailyAvg: 0 };
 
     // Sort entries by date for calculations
-    const sortedEntries = [...feedingEntries].sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
+    const sortedEntries = [...feedingEntries].sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
     const total = sortedEntries.length;
     
     // Calculate days between first and last entry
-    const firstDate = new Date(sortedEntries[0].time);
-    const lastDate = new Date(sortedEntries[sortedEntries.length - 1].time);
+    const firstDate = new Date(sortedEntries[0].startTime);
+    const lastDate = new Date(sortedEntries[sortedEntries.length - 1].startTime);
     const daysDiff = Math.max(1, Math.ceil((lastDate.getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24)));
 
     // Calculate total and average amounts
@@ -72,7 +72,7 @@ export const FeedingInsights: React.FC<FeedingInsightsProps> = ({ feedingEntries
     
     // Fill in actual counts and amounts
     feedingEntries.forEach(feeding => {
-      const date = new Date(feeding.time);
+      const date = new Date(feeding.startTime);
       const dateKey = formatDate(date);
       
       if (last7Days.has(dateKey)) {
@@ -87,7 +87,7 @@ export const FeedingInsights: React.FC<FeedingInsightsProps> = ({ feedingEntries
     });
     
     return Array.from(last7Days.values()).map(item => ({
-      name: getRelativeDateLabel(item.date),
+      name: getRelativeTimeLabel(new Date(item.date)),
       count: item.count,
       amount: item.amount
     }));

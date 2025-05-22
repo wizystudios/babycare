@@ -175,7 +175,7 @@ export function EnhancedFeedingForm({
     }
     
     if (timerPauses > 0) {
-      enhancedNote = `${enhancedNote ? enhancedNote + '\n' : ''}Paused for burping: ${timerPauses} times`;
+      enhancedNote = `${enhancedNote ? enhancedNote + '\n' : ''}${t('feeding.pausedForBurpingNote')}`;
     }
 
     const feedingData: Omit<Feeding, 'id'> = {
