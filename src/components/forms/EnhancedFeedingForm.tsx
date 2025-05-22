@@ -438,7 +438,7 @@ export function EnhancedFeedingForm({
               
               {timerPauses > 0 && (
                 <div className="mt-4 text-sm">
-                  {t('feeding.pausedTimes', { count: timerPauses })}
+                  {t('feeding.pausedTimes')}
                 </div>
               )}
             </div>
