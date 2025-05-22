@@ -21,7 +21,9 @@ import Auth from "./pages/Auth";
 import AddBaby from "./pages/AddBaby";
 import Profile from "./pages/Profile";
 import Insights from "./pages/Insights";
+import ResetPassword from "./pages/ResetPassword";
 import { Loader } from "./components/ui/loader";
+import { useEffect } from "react";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -53,18 +55,30 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+// Set document title component
+const AppTitleManager = () => {
+  // Set document title
+  useEffect(() => {
+    document.title = "BabyCare Daily";
+  }, []);
+  
+  return null;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <ThemeProvider>
         <LanguageProvider defaultLanguage="sw">
           <AuthProvider>
+            <AppTitleManager />
             <Toaster />
             <Sonner />
             <BrowserRouter>
               <Routes>
                 <Route path="/welcome" element={<Welcome />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
                 <Route path="/add-baby" element={<ProtectedRoute><AddBaby /></ProtectedRoute>} />
                 <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
