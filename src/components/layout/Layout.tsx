@@ -11,7 +11,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
-      <main className="flex-1 pb-20 overflow-auto">{children}</main>
+      <main className="flex-1 pb-20 overflow-auto bg-gradient-to-b from-baby-blue/5 to-transparent">
+        {children}
+      </main>
       <BottomNav />
     </div>
   );

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -106,7 +107,7 @@ export const Header = () => {
 
   return (
     <motion.header 
-      className="border-b bg-background p-3 sticky top-0 z-10 shadow-sm"
+      className="border-b bg-baby-blue/10 p-3 sticky top-0 z-10 shadow-sm"
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.3 }}
@@ -129,12 +130,13 @@ export const Header = () => {
               transition={{ duration: 0.2 }}
               className="mr-2"
             >
-              <Avatar className="h-8 w-8">
+              <Avatar className="h-10 w-10 rounded-full border-2 border-baby-blue">
                 <AvatarImage 
-                  src="/lovable-uploads/2a13b9aa-f2eb-4f9b-af50-10ea1112fb20.png" 
+                  src="/lovable-uploads/190ad50d-84e9-4e84-9dc0-fd0434e12d8e.png" 
                   alt="BabyCare Logo" 
+                  className="object-contain p-0.5"
                 />
-                <AvatarFallback>BC</AvatarFallback>
+                <AvatarFallback className="bg-baby-blue text-white font-bold">BC</AvatarFallback>
               </Avatar>
             </motion.div>
             <motion.h1 
@@ -148,7 +150,7 @@ export const Header = () => {
           {currentBaby && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="ml-2 animate-fade-in">
+                <Button variant="outline" size="sm" className="ml-2 animate-fade-in bg-white/80 text-baby-blue border-baby-blue/30 hover:bg-baby-blue/5">
                   {currentBaby.name}
                 </Button>
               </DropdownMenuTrigger>
@@ -157,13 +159,13 @@ export const Header = () => {
                   <DropdownMenuItem 
                     key={baby.id} 
                     onClick={() => switchBaby(baby.id)}
-                    className={baby.id === currentBaby.id ? "bg-muted" : ""}
+                    className={baby.id === currentBaby.id ? "bg-baby-blue/10 text-baby-blue font-medium" : ""}
                   >
                     {baby.name}
                   </DropdownMenuItem>
                 ))}
                 <DropdownMenuItem onClick={handleAddBaby}>
-                  <Plus className="mr-2 h-4 w-4" />
+                  <Plus className="mr-2 h-4 w-4 text-baby-blue" />
                   {t("nav.addBaby")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -187,6 +189,7 @@ export const Header = () => {
               size="icon"
               onClick={handleThemeToggle}
               title={theme === "dark" ? t("common.lightMode") : t("common.darkMode")}
+              className="text-baby-blue hover:bg-baby-blue/10"
             >
               {theme === "dark" ? (
                 <Sun className="h-5 w-5" />
@@ -205,6 +208,7 @@ export const Header = () => {
               variant="ghost" 
               size="sm"
               onClick={handleLanguageToggle}
+              className="text-baby-blue hover:bg-baby-blue/10"
             >
               {language === "en" ? "SW" : "EN"}
             </Button>
@@ -217,7 +221,7 @@ export const Header = () => {
                   whileHover={{ scale: 1.1 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
-                  <Avatar className="h-8 w-8 cursor-pointer">
+                  <Avatar className="h-8 w-8 cursor-pointer border-2 border-baby-blue/30">
                     {avatarUrl ? (
                       <AvatarImage src={avatarUrl} alt={user.email || "User"} />
                     ) : (
@@ -230,15 +234,15 @@ export const Header = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="animate-scale-in">
                 <DropdownMenuItem onClick={handleOpenProfile}>
-                  <User className="mr-2 h-4 w-4" />
+                  <User className="mr-2 h-4 w-4 text-baby-blue" />
                   {t("nav.profile")}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleOpenSettings}>
-                  <Settings className="mr-2 h-4 w-4" />
+                  <Settings className="mr-2 h-4 w-4 text-baby-blue" />
                   {t("nav.settings")}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleSignOut}>
-                  <LogOut className="mr-2 h-4 w-4" />
+                  <LogOut className="mr-2 h-4 w-4 text-baby-blue" />
                   {t("nav.signOut")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
