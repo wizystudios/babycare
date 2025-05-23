@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -136,7 +135,7 @@ export const Header = () => {
                 >
                   <div className="h-11 w-11 rounded-full bg-white p-0.5 shadow-md border-2 border-baby-primary flex items-center justify-center overflow-hidden">
                     <img 
-                      src="/lovable-uploads/190ad50d-84e9-4e84-9dc0-fd0434e12d8e.png" 
+                      src="/lovable-uploads/b7205a62-6702-4855-9178-d6cbe95eac27.png" 
                       alt="BabyCare Logo" 
                       className="h-full w-full object-contain"
                     />
@@ -160,7 +159,7 @@ export const Header = () => {
               <div className="flex flex-col items-center space-y-4 p-4">
                 <div className="w-32 h-32 rounded-full bg-white p-2 shadow-lg border-4 border-baby-primary flex items-center justify-center overflow-hidden">
                   <img 
-                    src="/lovable-uploads/190ad50d-84e9-4e84-9dc0-fd0434e12d8e.png" 
+                    src="/lovable-uploads/b7205a62-6702-4855-9178-d6cbe95eac27.png" 
                     alt="BabyCare Logo" 
                     className="h-full w-full object-contain"
                   />

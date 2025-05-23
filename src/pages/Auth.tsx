@@ -69,7 +69,7 @@ const Auth = () => {
         >
           <div className="h-36 w-36 rounded-full bg-white p-3 shadow-lg border-2 border-baby-primary flex items-center justify-center overflow-hidden mb-6">
             <img 
-              src="/lovable-uploads/35d286c5-a006-4d46-8d1b-5b194dddf7f2.png" 
+              src="/lovable-uploads/b7205a62-6702-4855-9178-d6cbe95eac27.png" 
               alt="BabyCare Logo" 
               className="h-full w-full object-contain"
             />
