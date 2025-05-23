@@ -6,8 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Layout } from '@/components/layout/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Avatar } from '@/components/ui/avatar';
-import { BottleIcon } from '@/components/BabyIcons';
 import { motion } from 'framer-motion';
 
 const Welcome = () => {
@@ -15,6 +13,18 @@ const Welcome = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [step, setStep] = useState<'intro' | 'auth'>('intro');
+  
+  // Initial splash effect - only show on first load
+  const [showSplash, setShowSplash] = useState(true);
+  
+  useEffect(() => {
+    // Show splash for 2.5 seconds then transition to regular content
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 2500);
+    
+    return () => clearTimeout(timer);
+  }, []);
   
   // If user is already logged in, redirect to dashboard
   useEffect(() => {
@@ -45,8 +55,47 @@ const Welcome = () => {
     }
   };
 
+  if (showSplash) {
+    return (
+      <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-baby-blue/30 to-background/90">
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="flex flex-col items-center"
+        >
+          <div className="h-36 w-36 rounded-full bg-white p-3 shadow-lg border-2 border-baby-primary flex items-center justify-center overflow-hidden mb-6">
+            <img 
+              src="/lovable-uploads/35d286c5-a006-4d46-8d1b-5b194dddf7f2.png" 
+              alt="BabyCare Logo" 
+              className="h-full w-full object-contain"
+            />
+          </div>
+          
+          <motion.h1 
+            className="text-3xl font-bold text-baby-primary text-center mb-2"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+          >
+            BabyCare Daily
+          </motion.h1>
+          
+          <motion.p
+            className="text-sm text-muted-foreground"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8, duration: 0.5 }}
+          >
+            From NK Technology
+          </motion.p>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
-    <Layout hideNavigation={true}>
+    <Layout hideNavigation={true} showFooterAttribution={true}>
       <div className="min-h-screen flex flex-col bg-gradient-to-b from-baby-blue/20 to-background/90">
         <header className="py-6 px-4 md:px-6 flex justify-center">
           <motion.div 
@@ -213,10 +262,6 @@ const Welcome = () => {
             </motion.div>
           )}
         </main>
-
-        <footer className="py-4 px-6 text-center text-sm text-gray-500">
-          <p>© 2025 BabyCare - Haki zote zimehifadhiwa</p>
-        </footer>
       </div>
     </Layout>
   );

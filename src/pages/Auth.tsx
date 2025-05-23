@@ -9,17 +9,30 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Loader } from '@/components/ui/loader';
-import { BottleIcon } from '@/components/BabyIcons';
 import { Layout } from '@/components/layout/Layout';
 import { motion } from 'framer-motion';
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [logoDialogOpen, setLogoDialogOpen] = useState(false);
   const { signIn, signUp, user, isLoading } = useAuth();
   const navigate = useNavigate();
   const { t } = useLanguage();
+
+  // Initial splash screen effect
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    // Show splash screen for 2.5 seconds then fade out
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 2500);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -45,6 +58,45 @@ const Auth = () => {
     );
   }
 
+  if (showSplash) {
+    return (
+      <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-baby-blue/30 to-background/90">
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="flex flex-col items-center"
+        >
+          <div className="h-36 w-36 rounded-full bg-white p-3 shadow-lg border-2 border-baby-primary flex items-center justify-center overflow-hidden mb-6">
+            <img 
+              src="/lovable-uploads/35d286c5-a006-4d46-8d1b-5b194dddf7f2.png" 
+              alt="BabyCare Logo" 
+              className="h-full w-full object-contain"
+            />
+          </div>
+          
+          <motion.h1 
+            className="text-3xl font-bold text-baby-primary text-center mb-2"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+          >
+            BabyCare Daily
+          </motion.h1>
+          
+          <motion.p
+            className="text-sm text-muted-foreground"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8, duration: 0.5 }}
+          >
+            From NK Technology
+          </motion.p>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
     <Layout hideNavigation={true}>
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-baby-blue/20 to-background/90 p-4">
@@ -54,12 +106,21 @@ const Auth = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <Link to="/welcome" className="flex items-center justify-center mb-6">
+          <Link 
+            to="#" 
+            className="flex items-center justify-center mb-6"
+            onClick={(e) => {
+              e.preventDefault();
+              setLogoDialogOpen(true);
+            }}
+          >
             <motion.div 
               className="h-16 w-16 rounded-full bg-white p-1.5 shadow-md border-2 border-baby-primary flex items-center justify-center overflow-hidden"
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               transition={{ duration: 0.5 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
               <img 
                 src="/lovable-uploads/35d286c5-a006-4d46-8d1b-5b194dddf7f2.png" 
@@ -179,8 +240,37 @@ const Auth = () => {
               </div>
             </CardFooter>
           </Card>
+
+          <div className="mt-5 text-center text-sm text-muted-foreground">
+            <p>© 2025 BabyCare by NK Technology</p>
+          </div>
         </motion.div>
       </div>
+
+      {/* Logo Dialog */}
+      <Dialog open={logoDialogOpen} onOpenChange={setLogoDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <div className="flex flex-col items-center justify-center p-4">
+            <div className="h-24 w-24 rounded-full bg-white p-2 shadow-md border-2 border-baby-primary flex items-center justify-center overflow-hidden mb-4">
+              <img 
+                src="/lovable-uploads/35d286c5-a006-4d46-8d1b-5b194dddf7f2.png" 
+                alt="BabyCare Logo" 
+                className="h-full w-full object-contain"
+              />
+            </div>
+            
+            <h2 className="text-xl font-bold text-baby-primary text-center mb-2">BabyCare Daily</h2>
+            
+            <p className="text-center text-muted-foreground mb-4">
+              BabyCare Daily helps you track your baby's daily activities, growth, and milestones. Designed to make parenting easier with intuitive tracking and helpful insights.
+            </p>
+
+            <p className="text-sm font-medium text-muted-foreground">
+              Developed by NK Technology
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };

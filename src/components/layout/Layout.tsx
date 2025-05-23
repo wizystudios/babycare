@@ -6,9 +6,14 @@ import { BottomNav } from "./BottomNav";
 interface LayoutProps {
   children: ReactNode;
   hideNavigation?: boolean;
+  showFooterAttribution?: boolean;
 }
 
-export const Layout: React.FC<LayoutProps> = ({ children, hideNavigation = false }) => {
+export const Layout: React.FC<LayoutProps> = ({ 
+  children, 
+  hideNavigation = false,
+  showFooterAttribution = false
+}) => {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {!hideNavigation && <Header />}
@@ -16,6 +21,11 @@ export const Layout: React.FC<LayoutProps> = ({ children, hideNavigation = false
         {children}
       </main>
       {!hideNavigation && <BottomNav />}
+      {showFooterAttribution && (
+        <footer className="py-2 px-4 text-center text-xs text-muted-foreground">
+          <p>© 2025 BabyCare by NK Technology</p>
+        </footer>
+      )}
     </div>
   );
 };
