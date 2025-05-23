@@ -98,8 +98,8 @@ export const BottomNav = () => {
               )}
             />
             <span className={cn(
-              isMobile ? "text-[8px]" : "text-[10px]", 
-              "mt-0.5 truncate max-w-[40px] sm:max-w-none text-center"
+              isMobile ? "text-[7px]" : "text-[10px]", 
+              "mt-0.5 truncate max-w-[38px] sm:max-w-none text-center"
             )}>
               {t(item.label)}
             </span>
