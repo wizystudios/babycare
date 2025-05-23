@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -12,6 +13,7 @@ import { Sun, Moon, Plus, LogOut, Settings, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const Header = () => {
   const { t, language, setLanguage } = useLanguage();
@@ -21,6 +23,7 @@ export const Header = () => {
   const navigate = useNavigate();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [logoDialogOpen, setLogoDialogOpen] = useState(false);
+  const isMobile = useIsMobile();
   
   // Fetch user avatar if available
   useEffect(() => {
@@ -109,14 +112,14 @@ export const Header = () => {
 
   return (
     <motion.header 
-      className="border-b bg-gradient-to-r from-primary/15 to-baby-blue/20 p-3 sticky top-0 z-10 shadow-sm"
+      className="border-b bg-gradient-to-r from-primary/15 to-baby-blue/20 p-2 sm:p-3 sticky top-0 z-10 shadow-sm"
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
       <div className="container mx-auto flex items-center justify-between">
         <motion.div 
-          className="flex items-center space-x-2"
+          className="flex items-center space-x-1 sm:space-x-2"
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 0.4, delay: 0.1 }}
@@ -133,7 +136,10 @@ export const Header = () => {
                   transition={{ duration: 0.2 }}
                   className="mr-2"
                 >
-                  <div className="h-11 w-11 rounded-full bg-white p-0.5 shadow-md border-2 border-baby-primary flex items-center justify-center overflow-hidden">
+                  <div className={cn(
+                    "rounded-full bg-white p-0.5 shadow-md border-2 border-baby-primary flex items-center justify-center overflow-hidden",
+                    isMobile ? "h-8 w-8" : "h-11 w-11"
+                  )}>
                     <img 
                       src="/lovable-uploads/b7205a62-6702-4855-9178-d6cbe95eac27.png" 
                       alt="BabyCare Logo" 
@@ -142,10 +148,13 @@ export const Header = () => {
                   </div>
                 </motion.div>
                 <motion.h1 
-                  className="text-xl font-bold text-baby-primary"
+                  className={cn(
+                    "font-bold text-baby-primary",
+                    isMobile ? "text-base" : "text-xl"
+                  )}
                   whileHover={{ scale: 1.05 }}
                 >
-                  BabyCare
+                  {!isMobile ? "BabyCare" : ""}
                 </motion.h1>
               </motion.div>
             </DialogTrigger>
@@ -189,8 +198,11 @@ export const Header = () => {
               <DropdownMenuTrigger asChild>
                 <Button 
                   variant="outline" 
-                  size="sm" 
-                  className="ml-2 animate-fade-in bg-white/80 text-baby-primary border-baby-primary/30 hover:bg-baby-primary/5"
+                  size={isMobile ? "xs" : "sm"}
+                  className={cn(
+                    "ml-1 sm:ml-2 animate-fade-in bg-white/80 text-baby-primary border-baby-primary/30 hover:bg-baby-primary/5",
+                    isMobile ? "text-xs px-2" : ""
+                  )}
                 >
                   {currentBaby.name}
                 </Button>
@@ -215,48 +227,52 @@ export const Header = () => {
         </motion.div>
 
         <motion.div 
-          className="flex items-center space-x-2"
+          className="flex items-center space-x-1 sm:space-x-2"
           initial={{ x: 20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 0.4, delay: 0.1 }}
         >
-          <motion.div
-            variants={iconVariants}
-            initial="initial"
-            whileHover="hover"
-          >
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={handleThemeToggle}
-              title={theme === "dark" ? t("common.lightMode") : t("common.darkMode")}
-              className="text-baby-primary hover:bg-baby-primary/10"
+          {!isMobile && (
+            <motion.div
+              variants={iconVariants}
+              initial="initial"
+              whileHover="hover"
             >
-              {theme === "dark" ? (
-                <Sun className="h-5 w-5" />
-              ) : (
-                <Moon className="h-5 w-5" />
-              )}
-            </Button>
-          </motion.div>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={handleThemeToggle}
+                title={theme === "dark" ? t("common.lightMode") : t("common.darkMode")}
+                className="text-baby-primary hover:bg-baby-primary/10"
+              >
+                {theme === "dark" ? (
+                  <Sun className="h-5 w-5" />
+                ) : (
+                  <Moon className="h-5 w-5" />
+                )}
+              </Button>
+            </motion.div>
+          )}
 
-          <motion.div
-            variants={iconVariants}
-            initial="initial"
-            whileHover="hover"
-          >
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={handleLanguageToggle}
-              className={cn(
-                "font-medium hover:bg-baby-primary/10",
-                language === "en" ? "text-baby-primary" : "text-baby-secondary"
-              )}
+          {!isMobile && (
+            <motion.div
+              variants={iconVariants}
+              initial="initial"
+              whileHover="hover"
             >
-              {language === "en" ? "SW" : "EN"}
-            </Button>
-          </motion.div>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={handleLanguageToggle}
+                className={cn(
+                  "font-medium hover:bg-baby-primary/10",
+                  language === "en" ? "text-baby-primary" : "text-baby-secondary"
+                )}
+              >
+                {language === "en" ? "SW" : "EN"}
+              </Button>
+            </motion.div>
+          )}
 
           {user && (
             <DropdownMenu>
@@ -265,7 +281,10 @@ export const Header = () => {
                   whileHover={{ scale: 1.1 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
-                  <Avatar className="h-9 w-9 cursor-pointer border-2 border-baby-primary/50">
+                  <Avatar className={cn(
+                    "cursor-pointer border-2 border-baby-primary/50",
+                    isMobile ? "h-8 w-8" : "h-9 w-9"
+                  )}>
                     {avatarUrl ? (
                       <AvatarImage src={avatarUrl} alt={user.email || "User"} />
                     ) : (
@@ -285,6 +304,24 @@ export const Header = () => {
                   <Settings className="mr-2 h-4 w-4 text-baby-primary" />
                   {t("nav.settings")}
                 </DropdownMenuItem>
+                {isMobile && (
+                  <>
+                    <DropdownMenuItem onClick={handleThemeToggle}>
+                      {theme === "dark" ? (
+                        <Sun className="mr-2 h-4 w-4 text-baby-primary" />
+                      ) : (
+                        <Moon className="mr-2 h-4 w-4 text-baby-primary" />
+                      )}
+                      {theme === "dark" ? t("common.lightMode") : t("common.darkMode")}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleLanguageToggle}>
+                      <span className="mr-2 w-4 h-4 inline-flex items-center justify-center text-baby-primary font-bold text-xs">
+                        {language === "en" ? "SW" : "EN"}
+                      </span>
+                      {language === "en" ? "Switch to Swahili" : "Switch to English"}
+                    </DropdownMenuItem>
+                  </>
+                )}
                 <DropdownMenuItem onClick={handleSignOut}>
                   <LogOut className="mr-2 h-4 w-4 text-baby-primary" />
                   {t("nav.signOut")}

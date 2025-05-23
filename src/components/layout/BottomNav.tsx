@@ -13,6 +13,7 @@ import {
   SettingsIcon,
 } from "@/components/BabyIcons";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const navItems = [
   { to: "/", icon: HomeIcon, label: "nav.home" },
@@ -29,9 +30,10 @@ export const BottomNav = () => {
   const { t } = useLanguage();
   const currentPath = location.pathname;
   const [logoDialogOpen, setLogoDialogOpen] = React.useState(false);
+  const isMobile = useIsMobile();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 flex items-center justify-around bg-gradient-to-r from-white to-baby-blue/10 dark:from-gray-900 dark:to-baby-primary/20 border-t border-baby-primary/20 h-16 px-2 sm:px-8 z-50 shadow-md">
+    <nav className="fixed bottom-0 left-0 right-0 flex items-center justify-around bg-gradient-to-r from-white to-baby-blue/10 dark:from-gray-900 dark:to-baby-primary/20 border-t border-baby-primary/20 h-16 px-1 sm:px-8 z-50 shadow-md">
       <div className="absolute left-4 top-1/2 transform -translate-y-1/2 hidden sm:block">
         <Dialog open={logoDialogOpen} onOpenChange={setLogoDialogOpen}>
           <DialogTrigger asChild>
@@ -76,26 +78,34 @@ export const BottomNav = () => {
         </Dialog>
       </div>
       
-      {navItems.map((item) => (
-        <Link
-          key={item.to}
-          to={item.to}
-          className={cn(
-            "flex flex-col items-center justify-center px-2 py-1 rounded-md transition-colors",
-            currentPath === item.to
-              ? "text-baby-primary font-medium"
-              : "text-gray-500 hover:text-baby-primary"
-          )}
-        >
-          <item.icon
+      {/* Improved mobile navigation layout */}
+      <div className="flex items-center justify-around w-full">
+        {navItems.map((item) => (
+          <Link
+            key={item.to}
+            to={item.to}
             className={cn(
-              "w-6 h-6",
-              currentPath === item.to ? "text-baby-primary" : "text-gray-500"
+              "flex flex-col items-center justify-center px-1 py-1 rounded-md transition-colors",
+              currentPath === item.to
+                ? "text-baby-primary font-medium"
+                : "text-gray-500 hover:text-baby-primary"
             )}
-          />
-          <span className="text-[10px] mt-1">{t(item.label)}</span>
-        </Link>
-      ))}
+          >
+            <item.icon
+              className={cn(
+                isMobile ? "w-5 h-5" : "w-6 h-6",
+                currentPath === item.to ? "text-baby-primary" : "text-gray-500"
+              )}
+            />
+            <span className={cn(
+              isMobile ? "text-[8px]" : "text-[10px]", 
+              "mt-0.5 truncate max-w-[40px] sm:max-w-none text-center"
+            )}>
+              {t(item.label)}
+            </span>
+          </Link>
+        ))}
+      </div>
     </nav>
   );
 };
