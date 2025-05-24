@@ -31,7 +31,7 @@ const queryClient = new QueryClient({
     queries: {
       refetchOnWindowFocus: false,
       retry: 1,
-      staleTime: 30000, // 30 seconds
+      staleTime: 30000,
     },
   },
 });
@@ -40,7 +40,6 @@ const queryClient = new QueryClient({
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isLoading } = useAuth();
   
-  // Only show loader if authentication is still being determined
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -56,9 +55,31 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+// Admin route component
+const AdminRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user, isLoading, isAdmin } = useAuth();
+  
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader />
+      </div>
+    );
+  }
+  
+  if (!user) {
+    return <Navigate to="/welcome" replace />;
+  }
+  
+  if (!isAdmin()) {
+    return <Navigate to="/" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
 // Set document title component
 const AppTitleManager = () => {
-  // Set document title
   useEffect(() => {
     document.title = "BabyCare Daily";
   }, []);
@@ -90,7 +111,7 @@ const App = () => (
                 <Route path="/milestones" element={<ProtectedRoute><Milestones /></ProtectedRoute>} />
                 <Route path="/insights" element={<ProtectedRoute><Insights /></ProtectedRoute>} />
                 <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-                <Route path="/admin" element={<ProtectedRoute><AdminManagement /></ProtectedRoute>} />
+                <Route path="/admin" element={<AdminRoute><AdminManagement /></AdminRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

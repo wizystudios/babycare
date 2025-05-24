@@ -1,86 +1,167 @@
-
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Baby } from '@/types/models';
-import { getBabies } from '@/services/babyService';
-import { useToast } from '@/components/ui/use-toast';
-import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useBaby = () => {
-  const [currentBaby, setCurrentBaby] = useState<Baby | null>(null);
-  const { toast } = useToast();
-
-  // Fetch babies using React Query for better caching and loading states
-  const { 
-    data: babies = [], 
-    isLoading, 
-    error,
-    refetch
-  } = useQuery({
-    queryKey: ['babies'],
-    queryFn: getBabies,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
+  const { user } = useAuth();
+  const [babies, setBabies] = useState<Baby[]>([]);
+  const [selectedBaby, setSelectedBaby] = useState<Baby | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (babies.length > 0 && !currentBaby) {
-      // Set current baby from local storage or use the first baby
-      const savedBabyId = localStorage.getItem('currentBabyId');
-      if (savedBabyId && babies.some(baby => baby.id === savedBabyId)) {
-        setCurrentBaby(babies.find(baby => baby.id === savedBabyId) || null);
-      } else if (babies.length > 0) {
-        setCurrentBaby(babies[0]);
-        localStorage.setItem('currentBabyId', babies[0].id);
-      }
+    if (user) {
+      fetchBabies();
     }
-  }, [babies, currentBaby]);
+  }, [user]);
 
-  const switchBaby = (babyId: string) => {
-    const baby = babies.find(b => b.id === babyId);
-    if (baby) {
-      setCurrentBaby(baby);
-      localStorage.setItem('currentBabyId', baby.id);
+  const fetchBabies = async () => {
+    if (!user) return;
+    
+    try {
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from('babies')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const fetchedBabies = (data || []).map(baby => ({
+        ...baby,
+        birthDate: new Date(baby.birth_date)
+      }));
+
+      setBabies(fetchedBabies);
       
-      toast({
-        title: `Switched to ${baby.name}`,
-        description: "You are now viewing data for this baby",
-      });
+      // Set selected baby (first one if none selected, or keep current if still exists)
+      if (fetchedBabies.length > 0) {
+        if (!selectedBaby || !fetchedBabies.find(b => b.id === selectedBaby.id)) {
+          setSelectedBaby(fetchedBabies[0]);
+        }
+      } else {
+        setSelectedBaby(null);
+      }
+    } catch (error) {
+      console.error('Error fetching babies:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Generate an avatar URL or initial for a baby
-  const getBabyAvatar = (baby: Baby) => {
-    if (baby.photoUrl) {
-      return baby.photoUrl;
+  const addBaby = async (babyData: Omit<Baby, 'id'>) => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('babies')
+        .insert([
+          {
+            name: babyData.name,
+            birth_date: babyData.birthDate.toISOString(),
+            gender: babyData.gender,
+            weight: babyData.weight,
+            height: babyData.height,
+            photo_url: babyData.photoUrl,
+            user_id: user.id
+          }
+        ])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const newBaby = {
+        ...data,
+        birthDate: new Date(data.birth_date)
+      };
+
+      setBabies(prev => [newBaby, ...prev]);
+      setSelectedBaby(newBaby);
+      
+      return newBaby;
+    } catch (error) {
+      console.error('Error adding baby:', error);
+      throw error;
     }
-    
-    // Create a color based on the baby's name
-    const stringToColor = (str: string) => {
-      let hash = 0;
-      for (let i = 0; i < str.length; i++) {
-        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  };
+
+  const selectBaby = (baby: Baby) => {
+    console.log('Selecting baby:', baby.name);
+    setSelectedBaby(baby);
+  };
+
+  const updateBaby = async (babyId: string, updates: Partial<Baby>) => {
+    if (!user) return;
+
+    try {
+      const updateData: any = { ...updates };
+      if (updates.birthDate) {
+        updateData.birth_date = updates.birthDate.toISOString();
+        delete updateData.birthDate;
       }
-      let color = '#';
-      for (let i = 0; i < 3; i++) {
-        const value = (hash >> (i * 8)) & 0xFF;
-        color += ('00' + value.toString(16)).substr(-2);
+
+      const { data, error } = await supabase
+        .from('babies')
+        .update(updateData)
+        .eq('id', babyId)
+        .eq('user_id', user.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const updatedBaby = {
+        ...data,
+        birthDate: new Date(data.birth_date)
+      };
+
+      setBabies(prev => prev.map(baby => baby.id === babyId ? updatedBaby : baby));
+      
+      if (selectedBaby?.id === babyId) {
+        setSelectedBaby(updatedBaby);
       }
-      return color;
-    };
-    
-    const backgroundColor = stringToColor(baby.name);
-    return {
-      initials: baby.name.substring(0, 2).toUpperCase(),
-      backgroundColor
-    };
+
+      return updatedBaby;
+    } catch (error) {
+      console.error('Error updating baby:', error);
+      throw error;
+    }
+  };
+
+  const deleteBaby = async (babyId: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('babies')
+        .delete()
+        .eq('id', babyId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setBabies(prev => prev.filter(baby => baby.id !== babyId));
+      
+      if (selectedBaby?.id === babyId) {
+        const remainingBabies = babies.filter(baby => baby.id !== babyId);
+        setSelectedBaby(remainingBabies.length > 0 ? remainingBabies[0] : null);
+      }
+    } catch (error) {
+      console.error('Error deleting baby:', error);
+      throw error;
+    }
   };
 
   return {
     babies,
-    currentBaby,
+    selectedBaby,
     isLoading,
-    error,
-    switchBaby,
-    getBabyAvatar,
-    refetchBabies: refetch
+    addBaby,
+    selectBaby,
+    updateBaby,
+    deleteBaby,
+    refreshBabies: fetchBabies
   };
 };

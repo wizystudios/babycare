@@ -1,4 +1,3 @@
-
 import { type } from "os";
 
 export type Language = "en" | "sw" | "fr" | "es" | "zh";
@@ -237,19 +236,36 @@ export const translations = {
       title: "Settings",
       language: "Language",
       theme: "Theme",
-      notification: "Notification",
-      account: "Account",
+      notifications: "Notifications",
       privacy: "Privacy",
-      help: "Help",
+      help: "Help & Support",
       about: "About",
-      version: "Version",
-      logout: "Logout",
-      howAddBabyAnswer: "To add a baby, go to the dashboard and click 'Add New' button, then fill in your baby's details including name, birth date, and optional photo.",
-      howTrackFeedingsAnswer: "Track feedings by going to the Feeding section and tapping 'New Feeding'. Select the type (breast, bottle, formula), set start/end times, and add amounts or notes.",
-      howTrackDiapersAnswer: "Record diaper changes in the Diaper section by tapping 'New Diaper'. Choose the type (wet, dirty, mixed), set the time, and add any notes about rash or concerns.",
-      howTrackSleepAnswer: "Log sleep sessions in the Sleep section by creating a 'New Sleep' entry. Set start/end times, location, and your baby's mood before and after sleep.",
-      howRecordMilestonesAnswer: "Capture special moments in the Milestones section. Add the date, title, description, category, and photos to commemorate your baby's achievements.",
-      canUseMultipleBabiesAnswer: "Yes! You can add multiple babies to track all your children. Use the baby selector in the dashboard to switch between different babies' records.",
+      signOut: "Sign Out",
+      
+      // Help section
+      howAddBaby: "How do I add a baby?",
+      howAddBabyAnswer: "Go to your profile page and click 'Add Baby'. Fill in your baby's information including name, birth date, and gender. You can also add a photo.",
+      
+      howTrackFeedings: "How do I track feedings?",
+      howTrackFeedingsAnswer: "Go to the Feeding page and tap the '+' button. Select the feeding type (breast, bottle, formula, or solid), set the time, duration, and amount if applicable.",
+      
+      howTrackDiapers: "How do I track diaper changes?",
+      howTrackDiapersAnswer: "Visit the Diaper page and tap '+' to log a diaper change. Select the type (wet, dirty, or mixed) and add any notes about consistency or color if needed.",
+      
+      howTrackSleep: "How do I track sleep?",
+      howTrackSleepAnswer: "On the Sleep page, tap '+' to start tracking sleep. You can record naps or nighttime sleep, including start/end times and your baby's mood when waking up.",
+      
+      howRecordMilestones: "How do I record milestones?",
+      howRecordMilestonesAnswer: "Go to the Milestones page and tap '+' to add a new milestone. Include the milestone title, date achieved, description, and you can attach photos to celebrate the moment.",
+      
+      canUseMultipleBabies: "Can I track multiple babies?",
+      canUseMultipleBabiesAnswer: "Yes! You can add multiple babies to your account. Use the baby selector at the top of the app to switch between different babies and track their individual progress.",
+      
+      dataPrivacy: "Is my data private and secure?",
+      dataPrivacyAnswer: "Yes, your data is encrypted and stored securely. We never share your personal information with third parties without your consent.",
+      
+      exportData: "Can I export my data?",
+      exportDataAnswer: "Yes, you can generate and download reports of your baby's data from the Insights page. Reports can be generated for different time periods and data types."
     },
     growth: {
       chartTitle: "Growth Chart",
@@ -549,19 +565,36 @@ export const translations = {
       title: "Mipangilio",
       language: "Lugha",
       theme: "Mandhari",
-      notification: "Taarifa",
-      account: "Akaunti",
+      notifications: "Arifa",
       privacy: "Faragha",
-      help: "Msaada",
+      help: "Msaada na Uongozi",
       about: "Kuhusu",
-      version: "Toleo",
-      logout: "Toka",
-      howAddBabyAnswer: "Kuongeza mtoto, nenda kwenye dashibodi na bofya kitufe cha 'Ongeza Mpya', kisha jaza maelezo ya mtoto wako ikiwemo jina, tarehe ya kuzaliwa, na picha ya hiari.",
-      howTrackFeedingsAnswer: "Fuatilia ulishaji kwa kwenda kwenye sehemu ya Kulisha na kubonyeza 'Ulishaji Mpya'. Chagua aina (titi, chupa, formula), weka muda wa kuanza/kumaliza, na ongeza kiasi au maelezo.",
-      howTrackDiapersAnswer: "Rekodi mabadiliko ya nepi katika sehemu ya Nepi kwa kubonyeza 'Nepi Mpya'. Chagua aina (majimaji, kinyesi, mchanganyiko), weka muda, na ongeza maelezo yoyote kuhusu upele au wasiwasi.",
-      howTrackSleepAnswer: "Rekodi vipindi vya usingizi katika sehemu ya Usingizi kwa kuunda ingizo la 'Usingizi Mpya'. Weka muda wa kuanza/kumaliza, mahali, na hali ya mtoto wako kabla na baada ya usingizi.",
-      howRecordMilestonesAnswer: "Kumbuka nyakati maalum katika sehemu ya Hatua Muhimu. Ongeza tarehe, kichwa, maelezo, kategoria, na picha za kukumbuka mafanikio ya mtoto wako.",
-      canUseMultipleBabiesAnswer: "Ndiyo! Unaweza kuongeza watoto wengi kufuatilia watoto wako wote. Tumia kichagua-mtoto kwenye dashibodi kubadili kati ya rekodi za watoto tofauti.",
+      signOut: "Toka",
+      
+      // Help section
+      howAddBaby: "Je, ninaongezaje mtoto?",
+      howAddBabyAnswer: "Nenda kwenye ukurasa wa wasifu wako na ubofye 'Ongeza Mtoto'. Jaza taarifa za mtoto wako ikiwa ni pamoja na jina, tarehe ya kuzaliwa, na jinsia. Unaweza pia kuongeza picha.",
+      
+      howTrackFeedings: "Je, ninafuatiliaje kulisha?",
+      howTrackFeedingsAnswer: "Nenda kwenye ukurasa wa Kulisha na gusa kitufe cha '+'. Chagua aina ya kulisha (ziwa, chupa, formula, au chakula kigumu), weka muda, mrefu, na kiasi ikiwa inahitajika.",
+      
+      howTrackDiapers: "Je, ninafuatiliaje kubadilisha nepi?",
+      howTrackDiapersAnswer: "Tembelea ukurasa wa Nepi na gusa '+' kurekodi mabadiliko ya nepi. Chagua aina (mbichi, chafu, au mchanganyiko) na ongeza maelezo yoyote kuhusu uthabiti au rangi ikiwa inahitajika.",
+      
+      howTrackSleep: "Je, ninafuatiliaje usingizi?",
+      howTrackSleepAnswer: "Kwenye ukurasa wa Usingizi, gusa '+' kuanza kufuatilia usingizi. Unaweza kurekodi kulala kwa muda mfupi au usingizi wa usiku, ikiwa ni pamoja na muda wa kuanza/kumaliza na hali ya mtoto wako wakati wa kuamka.",
+      
+      howRecordMilestones: "Je, ninarekodiaje hatua muhimu?",
+      howRecordMilestonesAnswer: "Nenda kwenye ukurasa wa Hatua Muhimu na gusa '+' kuongeza hatua mpya muhimu. Jumuisha kichwa cha hatua muhimu, tarehe ya kufikia, maelezo, na unaweza kuambatisha picha kusherehekea wakati huo.",
+      
+      canUseMultipleBabies: "Je, ninaweza kufuatilia watoto wengi?",
+      canUseMultipleBabiesAnswer: "Ndio! Unaweza kuongeza watoto wengi kwenye akaunti yako. Tumia kichaguzi cha mtoto juu ya programu kubadilisha kati ya watoto tofauti na kufuatilia maendeleo yao ya kibinafsi.",
+      
+      dataPrivacy: "Je, data yangu ni ya faragha na salama?",
+      dataPrivacyAnswer: "Ndio, data yako imefichwa na kuhifadhiwa kwa usalama. Hatushiriki kamwe taarifa zako za kibinafsi na wahusika wa tatu bila ridhaa yako.",
+      
+      exportData: "Je, ninaweza kuhamisha data yangu?",
+      exportDataAnswer: "Ndio, unaweza kutengeneza na kupakua ripoti za data ya mtoto wako kutoka ukurasa wa Maarifa. Ripoti zinaweza kutengenezwa kwa vipindi tofauti vya muda na aina za data."
     },
     growth: {
       chartTitle: "Chati ya Ukuaji",

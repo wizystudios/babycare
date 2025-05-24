@@ -4,22 +4,28 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 
+type UserRole = 'admin' | 'parent' | 'medical_expert';
+
 type AuthContextType = {
   user: User | null;
   session: Session | null;
+  userRole: UserRole | null;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<{ error?: any }>;
-  signUp: (email: string, password: string) => Promise<{ error?: any }>;
+  signUp: (email: string, password: string, userData: any) => Promise<{ error?: any }>;
   signOut: () => Promise<void>;
+  isAdmin: () => boolean;
 };
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   session: null,
+  userRole: null,
   isLoading: true,
   signIn: async () => ({ error: null }),
   signUp: async () => ({ error: null }),
   signOut: async () => {},
+  isAdmin: () => false,
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -27,33 +33,58 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { toast } = useToast();
   
-  // Auth state initialization - optimized to avoid unnecessary re-renders
+  // Fetch user role
+  const fetchUserRole = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .single();
+      
+      if (error) throw error;
+      setUserRole(data.role);
+    } catch (error) {
+      console.error('Error fetching user role:', error);
+      setUserRole('parent'); // Default role
+    }
+  };
+  
+  // Auth state initialization
   useEffect(() => {
     let mounted = true;
     
-    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, currentSession) => {
+      async (event, currentSession) => {
         if (!mounted) return;
         
-        // Only update if there's a meaningful change
         if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
           setSession(currentSession);
           setUser(currentSession?.user ?? null);
+          
+          if (currentSession?.user) {
+            await fetchUserRole(currentSession.user.id);
+          } else {
+            setUserRole(null);
+          }
           setIsLoading(false);
         }
       }
     );
 
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+    supabase.auth.getSession().then(async ({ data: { session: currentSession } }) => {
       if (!mounted) return;
       
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
+      
+      if (currentSession?.user) {
+        await fetchUserRole(currentSession.user.id);
+      }
       setIsLoading(false);
     });
 
@@ -63,12 +94,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, userData: any) => {
     try {
       setIsLoading(true);
       const { error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: userData
+        }
       });
       
       if (!error) {
@@ -139,15 +173,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const isAdmin = () => userRole === 'admin';
+
   return (
     <AuthContext.Provider
       value={{
         user,
         session,
+        userRole,
         isLoading,
         signIn,
         signUp,
         signOut,
+        isAdmin,
       }}
     >
       {children}

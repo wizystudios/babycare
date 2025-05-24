@@ -45,6 +45,30 @@ export type Database = {
         }
         Relationships: []
       }
+      countries: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          name: string
+          phone_code: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          name: string
+          phone_code: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          name?: string
+          phone_code?: string
+        }
+        Relationships: []
+      }
       diapers: {
         Row: {
           baby_id: string
@@ -79,6 +103,56 @@ export type Database = {
             columns: ["baby_id"]
             isOneToOne: false
             referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      doctors: {
+        Row: {
+          available: boolean | null
+          created_at: string
+          created_by: string | null
+          email: string | null
+          experience: string | null
+          hospital_id: string | null
+          id: string
+          name: string
+          phone: string | null
+          specialization: string
+          user_id: string | null
+        }
+        Insert: {
+          available?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          experience?: string | null
+          hospital_id?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          specialization: string
+          user_id?: string | null
+        }
+        Update: {
+          available?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          experience?: string | null
+          hospital_id?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          specialization?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_doctors_hospital"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "hospitals"
             referencedColumns: ["id"]
           },
         ]
@@ -221,6 +295,42 @@ export type Database = {
           },
         ]
       }
+      hospitals: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          email: string | null
+          id: string
+          location: string
+          name: string
+          phone: string | null
+          services: string[] | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          email?: string | null
+          id?: string
+          location: string
+          name: string
+          phone?: string | null
+          services?: string[] | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          email?: string | null
+          id?: string
+          location?: string
+          name?: string
+          phone?: string | null
+          services?: string[] | null
+        }
+        Relationships: []
+      }
       milestones: {
         Row: {
           baby_id: string
@@ -264,6 +374,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      profiles: {
+        Row: {
+          country: string | null
+          country_code: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          country?: string | null
+          country_code?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          country?: string | null
+          country_code?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       sleeps: {
         Row: {
@@ -315,6 +455,27 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       vaccinations: {
         Row: {
           baby_id: string
@@ -364,10 +525,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _user_id: string
+          _role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "parent" | "medical_expert"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -482,6 +649,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "parent", "medical_expert"],
+    },
   },
 } as const

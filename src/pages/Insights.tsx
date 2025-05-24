@@ -1,32 +1,78 @@
 
 import React from "react";
 import { Layout } from "@/components/layout/Layout";
+import { FeedingInsights } from "@/components/insights/FeedingInsights";
+import { DiaperInsights } from "@/components/insights/DiaperInsights";
+import { ChatComponent } from "@/components/chat/ChatComponent";
+import { GraphComponent } from "@/components/charts/GraphComponent";
+import { ReportGenerator } from "@/components/reports/ReportGenerator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { GraphComponent } from "@/components/charts/GraphComponent";
-import ChatComponent from "@/components/chat/ChatComponent";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useBaby } from "@/hooks/useBaby";
 
-const InsightsPage = () => {
-  const isMobile = useIsMobile();
-  
+const Insights = () => {
+  const { selectedBaby } = useBaby();
+
+  if (!selectedBaby) {
+    return (
+      <Layout>
+        <div className="p-4">
+          <div className="text-center py-8">
+            <h2 className="text-xl font-semibold mb-2">No Baby Selected</h2>
+            <p className="text-gray-600">Please add a baby to view insights.</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
-      <div className="space-y-6 p-4">
-        <h1 className="text-2xl font-bold text-baby-primary">BabyCare Insights</h1>
-        
-        <Tabs defaultValue="graphs" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="graphs">Analytics</TabsTrigger>
-            <TabsTrigger value="support">Support Chat</TabsTrigger>
+      <div className="p-4 space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-baby-primary">Insights & Reports</h1>
+          <p className="text-sm text-gray-600">Data insights for {selectedBaby.name}</p>
+        </div>
+
+        <Tabs defaultValue="insights" className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="insights">Insights</TabsTrigger>
+            <TabsTrigger value="charts">Charts</TabsTrigger>
+            <TabsTrigger value="reports">Reports</TabsTrigger>
+            <TabsTrigger value="chat">AI Chat</TabsTrigger>
           </TabsList>
-          
-          <TabsContent value="graphs" className="pt-4">
-            <GraphComponent />
+
+          <TabsContent value="insights" className="space-y-6">
+            <div className="grid gap-6">
+              <FeedingInsights />
+              <DiaperInsights />
+            </div>
           </TabsContent>
-          
-          <TabsContent value="support" className="pt-4">
-            <ChatComponent />
+
+          <TabsContent value="charts" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Growth & Activity Charts</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <GraphComponent />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="reports" className="space-y-6">
+            <ReportGenerator babyId={selectedBaby.id} />
+          </TabsContent>
+
+          <TabsContent value="chat" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>AI Baby Care Assistant</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ChatComponent />
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
@@ -34,4 +80,4 @@ const InsightsPage = () => {
   );
 };
 
-export default InsightsPage;
+export default Insights;
