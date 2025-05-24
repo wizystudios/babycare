@@ -13,6 +13,8 @@ export const useBaby = () => {
   useEffect(() => {
     if (user) {
       fetchBabies();
+    } else {
+      setIsLoading(false);
     }
   }, [user]);
 
@@ -33,10 +35,12 @@ export const useBaby = () => {
         id: baby.id,
         name: baby.name,
         birthDate: new Date(baby.birth_date),
-        gender: baby.gender as "male" | "female" | "other", // Type cast to fix gender type issue
-        weight: baby.weight,
-        height: baby.height,
-        photoUrl: baby.photo_url,
+        gender: (baby.gender === 'male' || baby.gender === 'female' || baby.gender === 'other') 
+          ? baby.gender as "male" | "female" | "other" 
+          : 'other' as "male" | "female" | "other",
+        weight: baby.weight || 0,
+        height: baby.height || 0,
+        photoUrl: baby.photo_url || '',
       }));
 
       setBabies(fetchedBabies);
@@ -82,10 +86,12 @@ export const useBaby = () => {
         id: data.id,
         name: data.name,
         birthDate: new Date(data.birth_date),
-        gender: data.gender as "male" | "female" | "other", // Type cast
-        weight: data.weight,
-        height: data.height,
-        photoUrl: data.photo_url,
+        gender: (data.gender === 'male' || data.gender === 'female' || data.gender === 'other') 
+          ? data.gender as "male" | "female" | "other" 
+          : 'other' as "male" | "female" | "other",
+        weight: data.weight || 0,
+        height: data.height || 0,
+        photoUrl: data.photo_url || '',
       };
 
       setBabies(prev => [newBaby, ...prev]);
@@ -103,10 +109,10 @@ export const useBaby = () => {
     setSelectedBaby(baby);
   };
 
-  // Add switchBaby function for compatibility
   const switchBaby = (babyId: string) => {
     const baby = babies.find(b => b.id === babyId);
     if (baby) {
+      console.log('Switching to baby:', baby.name);
       setSelectedBaby(baby);
     }
   };
@@ -135,10 +141,12 @@ export const useBaby = () => {
         id: data.id,
         name: data.name,
         birthDate: new Date(data.birth_date),
-        gender: data.gender as "male" | "female" | "other", // Type cast
-        weight: data.weight,
-        height: data.height,
-        photoUrl: data.photo_url,
+        gender: (data.gender === 'male' || data.gender === 'female' || data.gender === 'other') 
+          ? data.gender as "male" | "female" | "other" 
+          : 'other' as "male" | "female" | "other",
+        weight: data.weight || 0,
+        height: data.height || 0,
+        photoUrl: data.photo_url || '',
       };
 
       setBabies(prev => prev.map(baby => baby.id === babyId ? updatedBaby : baby));
@@ -181,11 +189,11 @@ export const useBaby = () => {
   return {
     babies,
     selectedBaby,
-    currentBaby: selectedBaby, // Add currentBaby alias for compatibility
+    currentBaby: selectedBaby,
     isLoading,
     addBaby,
     selectBaby,
-    switchBaby, // Add switchBaby function
+    switchBaby,
     updateBaby,
     deleteBaby,
     refreshBabies: fetchBabies

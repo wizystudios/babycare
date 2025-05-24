@@ -46,7 +46,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .eq('user_id', userId)
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.log('No role found for user, defaulting to parent');
+        setUserRole('parent');
+        return;
+      }
       setUserRole(data.role);
     } catch (error) {
       console.error('Error fetching user role:', error);
@@ -58,35 +62,57 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     let mounted = true;
     
+    const initializeAuth = async () => {
+      try {
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        
+        if (!mounted) return;
+        
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        
+        if (currentSession?.user) {
+          await fetchUserRole(currentSession.user.id);
+        } else {
+          setUserRole(null);
+        }
+        
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        if (mounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
         if (!mounted) return;
+        
+        console.log('Auth state changed:', event);
         
         if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
           setSession(currentSession);
           setUser(currentSession?.user ?? null);
           
           if (currentSession?.user) {
-            await fetchUserRole(currentSession.user.id);
+            // Use setTimeout to prevent potential deadlock
+            setTimeout(() => {
+              fetchUserRole(currentSession.user.id);
+            }, 0);
           } else {
             setUserRole(null);
           }
-          setIsLoading(false);
+          
+          if (event !== 'TOKEN_REFRESHED') {
+            setIsLoading(false);
+          }
         }
       }
     );
 
-    supabase.auth.getSession().then(async ({ data: { session: currentSession } }) => {
-      if (!mounted) return;
-      
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
-      
-      if (currentSession?.user) {
-        await fetchUserRole(currentSession.user.id);
-      }
-      setIsLoading(false);
-    });
+    initializeAuth();
 
     return () => {
       mounted = false;
