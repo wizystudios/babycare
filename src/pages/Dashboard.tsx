@@ -174,10 +174,26 @@ const Dashboard = () => {
     }
   }, [babiesError, toast]);
 
-  // Calculate today's stats
-  const todayFeedings = feedings.filter(feeding => isToday(feeding.startTime));
-  const todayDiapers = diapers.filter(diaper => isToday(diaper.time));
-  const todaySleeps = sleeps.filter(sleep => isToday(sleep.startTime));
+  // Calculate today's stats - properly filter by today's date
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const todayFeedings = feedings.filter(feeding => {
+    const feedingDate = new Date(feeding.startTime);
+    return feedingDate >= today && feedingDate < tomorrow;
+  });
+
+  const todayDiapers = diapers.filter(diaper => {
+    const diaperDate = new Date(diaper.time);
+    return diaperDate >= today && diaperDate < tomorrow;
+  });
+
+  const todaySleeps = sleeps.filter(sleep => {
+    const sleepDate = new Date(sleep.startTime);
+    return sleepDate >= today && sleepDate < tomorrow;
+  });
 
   // Calculate total feeding amount for today
   const totalFeedingAmount = todayFeedings
@@ -187,6 +203,12 @@ const Dashboard = () => {
   // Calculate total sleep duration for today
   const totalSleepDuration = todaySleeps
     .reduce((sum, sleep) => sum + (sleep.duration || 0), 0);
+
+  console.log('Today feedings:', todayFeedings);
+  console.log('Today diapers:', todayDiapers);
+  console.log('Today sleeps:', todaySleeps);
+  console.log('Total feeding amount:', totalFeedingAmount);
+  console.log('Total sleep duration:', totalSleepDuration);
 
   // Navigate to add baby form
   const handleAddBaby = () => {
@@ -254,6 +276,9 @@ const Dashboard = () => {
                         Switch Baby
                       </DropdownMenuItem>
                     )}
+                    <DropdownMenuItem onClick={() => navigate('/admin')}>
+                      Admin Panel
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
                 <Button variant="outline" className="rounded-full" onClick={handleAddBaby}>

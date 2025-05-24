@@ -28,7 +28,7 @@ export const Layout: React.FC<LayoutProps> = ({
       {!hideNavigation && <BottomNav />}
       {showFooterAttribution && (
         <footer className="py-2 px-4 text-center text-xs text-muted-foreground">
-          <p>© 2025 BabyCare by NK Technology</p>
+          <p>© 2025 BabyCare by KN Technology</p>
         </footer>
       )}
     </div>

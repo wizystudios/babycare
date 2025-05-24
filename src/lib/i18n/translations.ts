@@ -1,3 +1,4 @@
+
 import { type } from "os";
 
 export type Language = "en" | "sw" | "fr" | "es" | "zh";
@@ -39,6 +40,11 @@ export const translations = {
       logoutSuccess: "Logout successful",
       logoutError: "Failed to logout",
       welcomeBack: "Welcome Back",
+      signIn: "Sign In",
+      signUp: "Sign Up",
+      signInGoogle: "Sign in with Google",
+      backToWelcome: "Back to Welcome",
+      loginDescription: "Enter your credentials to access your account",
     },
     nav: {
       home: "Home",
@@ -238,6 +244,12 @@ export const translations = {
       about: "About",
       version: "Version",
       logout: "Logout",
+      howAddBabyAnswer: "To add a baby, go to the dashboard and click 'Add New' button, then fill in your baby's details including name, birth date, and optional photo.",
+      howTrackFeedingsAnswer: "Track feedings by going to the Feeding section and tapping 'New Feeding'. Select the type (breast, bottle, formula), set start/end times, and add amounts or notes.",
+      howTrackDiapersAnswer: "Record diaper changes in the Diaper section by tapping 'New Diaper'. Choose the type (wet, dirty, mixed), set the time, and add any notes about rash or concerns.",
+      howTrackSleepAnswer: "Log sleep sessions in the Sleep section by creating a 'New Sleep' entry. Set start/end times, location, and your baby's mood before and after sleep.",
+      howRecordMilestonesAnswer: "Capture special moments in the Milestones section. Add the date, title, description, category, and photos to commemorate your baby's achievements.",
+      canUseMultipleBabiesAnswer: "Yes! You can add multiple babies to track all your children. Use the baby selector in the dashboard to switch between different babies' records.",
     },
     growth: {
       chartTitle: "Growth Chart",
@@ -295,6 +307,13 @@ export const translations = {
       basedOnData: "Based on {{days}} days of tracking data",
       notEnoughData: "Not enough data to show insights",
       noData: "No data available",
+    },
+    dashboard: {
+      todaySummary: "Today's Summary",
+      recentFeedings: "Recent Feedings",
+      recentDiapers: "Recent Diapers",
+      recentSleep: "Recent Sleep",
+      addNew: "Add New",
     }
   },
   sw: {
@@ -333,6 +352,11 @@ export const translations = {
       logoutSuccess: "Umetoka kwa ufanisi",
       logoutError: "Imeshindwa kutoka",
       welcomeBack: "Karibu Tena",
+      signIn: "Ingia",
+      signUp: "Jisajili",
+      signInGoogle: "Ingia na Google",
+      backToWelcome: "Rudi Nyumbani",
+      loginDescription: "Weka taarifa zako za kuingia",
     },
     nav: {
       home: "Nyumbani",
@@ -532,6 +556,12 @@ export const translations = {
       about: "Kuhusu",
       version: "Toleo",
       logout: "Toka",
+      howAddBabyAnswer: "Kuongeza mtoto, nenda kwenye dashibodi na bofya kitufe cha 'Ongeza Mpya', kisha jaza maelezo ya mtoto wako ikiwemo jina, tarehe ya kuzaliwa, na picha ya hiari.",
+      howTrackFeedingsAnswer: "Fuatilia ulishaji kwa kwenda kwenye sehemu ya Kulisha na kubonyeza 'Ulishaji Mpya'. Chagua aina (titi, chupa, formula), weka muda wa kuanza/kumaliza, na ongeza kiasi au maelezo.",
+      howTrackDiapersAnswer: "Rekodi mabadiliko ya nepi katika sehemu ya Nepi kwa kubonyeza 'Nepi Mpya'. Chagua aina (majimaji, kinyesi, mchanganyiko), weka muda, na ongeza maelezo yoyote kuhusu upele au wasiwasi.",
+      howTrackSleepAnswer: "Rekodi vipindi vya usingizi katika sehemu ya Usingizi kwa kuunda ingizo la 'Usingizi Mpya'. Weka muda wa kuanza/kumaliza, mahali, na hali ya mtoto wako kabla na baada ya usingizi.",
+      howRecordMilestonesAnswer: "Kumbuka nyakati maalum katika sehemu ya Hatua Muhimu. Ongeza tarehe, kichwa, maelezo, kategoria, na picha za kukumbuka mafanikio ya mtoto wako.",
+      canUseMultipleBabiesAnswer: "Ndiyo! Unaweza kuongeza watoto wengi kufuatilia watoto wako wote. Tumia kichagua-mtoto kwenye dashibodi kubadili kati ya rekodi za watoto tofauti.",
     },
     growth: {
       chartTitle: "Chati ya Ukuaji",
@@ -589,6 +619,13 @@ export const translations = {
       basedOnData: "Kulingana na siku {{days}} za data ya ufuatiliaji",
       notEnoughData: "Hakuna data ya kutosha kuonyesha ufahamu",
       noData: "Hakuna data inayopatikana",
+    },
+    dashboard: {
+      todaySummary: "Muhtasari wa Leo",
+      recentFeedings: "Ulishaji wa Hivi Karibuni",
+      recentDiapers: "Nepi za Hivi Karibuni",
+      recentSleep: "Usingizi wa Hivi Karibuni",
+      addNew: "Ongeza Mpya",
     }
   }
 };

@@ -22,6 +22,7 @@ import AddBaby from "./pages/AddBaby";
 import Profile from "./pages/Profile";
 import Insights from "./pages/Insights";
 import ResetPassword from "./pages/ResetPassword";
+import AdminManagement from "./pages/AdminManagement";
 import { Loader } from "./components/ui/loader";
 import { useEffect } from "react";
 
@@ -89,6 +90,7 @@ const App = () => (
                 <Route path="/milestones" element={<ProtectedRoute><Milestones /></ProtectedRoute>} />
                 <Route path="/insights" element={<ProtectedRoute><Insights /></ProtectedRoute>} />
                 <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+                <Route path="/admin" element={<ProtectedRoute><AdminManagement /></ProtectedRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
