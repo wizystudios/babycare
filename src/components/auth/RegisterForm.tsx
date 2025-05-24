@@ -8,11 +8,24 @@ import { Loader } from '@/components/ui/loader';
 import { useToast } from '@/components/ui/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { CountrySelect } from '@/components/forms/CountrySelect';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+interface Country {
+  id: string;
+  name: string;
+  code: string;
+  phone_code: string;
+}
 
 export const RegisterForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [role, setRole] = useState<'parent' | 'admin'>('parent');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -22,7 +35,7 @@ export const RegisterForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !password || !confirmPassword) {
+    if (!email || !password || !confirmPassword || !fullName) {
       toast({
         title: t("auth.error"),
         description: t("auth.fillAllFields"),
@@ -52,7 +65,13 @@ export const RegisterForm = () => {
     setIsLoading(true);
     
     try {
-      const { error } = await signUp(email, password);
+      const { error } = await signUp(email, password, {
+        full_name: fullName,
+        country: selectedCountry?.name,
+        country_code: selectedCountry?.phone_code,
+        phone: phoneNumber,
+        role: role
+      });
       
       if (error) {
         throw error;
@@ -63,8 +82,6 @@ export const RegisterForm = () => {
         description: t("auth.registrationSuccess"),
       });
       
-      // Depending on whether email confirmation is required
-      // We might navigate the user to a different page
       navigate('/');
     } catch (error: any) {
       console.error('Registration error:', error);
@@ -90,6 +107,18 @@ export const RegisterForm = () => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
+        <Label htmlFor="fullName">{t("auth.fullName")}</Label>
+        <Input 
+          id="fullName" 
+          type="text" 
+          placeholder="Enter your full name" 
+          value={fullName} 
+          onChange={(e) => setFullName(e.target.value)}
+          required
+        />
+      </div>
+
+      <div className="space-y-2">
         <Label htmlFor="email">{t("auth.email")}</Label>
         <Input 
           id="email" 
@@ -97,6 +126,7 @@ export const RegisterForm = () => {
           placeholder="example@email.com" 
           value={email} 
           onChange={(e) => setEmail(e.target.value)}
+          required
         />
       </div>
       
@@ -107,6 +137,7 @@ export const RegisterForm = () => {
           type="password" 
           value={password} 
           onChange={(e) => setPassword(e.target.value)}
+          required
         />
         <p className="text-xs text-gray-500">{t("auth.passwordRequirements")}</p>
       </div>
@@ -118,7 +149,28 @@ export const RegisterForm = () => {
           type="password" 
           value={confirmPassword} 
           onChange={(e) => setConfirmPassword(e.target.value)}
+          required
         />
+      </div>
+
+      <CountrySelect
+        onCountryChange={setSelectedCountry}
+        onPhoneChange={setPhoneNumber}
+        selectedCountry={selectedCountry}
+        phoneNumber={phoneNumber}
+      />
+
+      <div className="space-y-2">
+        <Label htmlFor="role">Role</Label>
+        <Select value={role} onValueChange={(value) => setRole(value as 'parent' | 'admin')}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select role" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="parent">Parent</SelectItem>
+            <SelectItem value="admin">Admin</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
       
       <Button type="submit" className="w-full" disabled={isLoading}>

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -22,17 +21,17 @@ const DiaperPage = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { currentBaby, babies } = useBaby();
+  const { selectedBaby, babies } = useBaby(); // Use selectedBaby instead of currentBaby
   const [dialogOpen, setDialogOpen] = useState(false);
   const [showColorChart, setShowColorChart] = useState(false);
   const [selectedBabyId, setSelectedBabyId] = useState<string | null>(null);
   
   // Initialize selected baby
   React.useEffect(() => {
-    if (currentBaby && !selectedBabyId) {
-      setSelectedBabyId(currentBaby.id);
+    if (selectedBaby && !selectedBabyId) {
+      setSelectedBabyId(selectedBaby.id);
     }
-  }, [currentBaby, selectedBabyId]);
+  }, [selectedBaby, selectedBabyId]);
   
   // Fetch diapers data
   const { 

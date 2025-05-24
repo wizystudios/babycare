@@ -1,5 +1,6 @@
 
 import React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Layout } from "@/components/layout/Layout";
 import { FeedingInsights } from "@/components/insights/FeedingInsights";
 import { DiaperInsights } from "@/components/insights/DiaperInsights";
@@ -9,9 +10,25 @@ import { ReportGenerator } from "@/components/reports/ReportGenerator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useBaby } from "@/hooks/useBaby";
+import { getFeedingsByBabyId } from "@/services/feedingService";
+import { getDiapersByBabyId } from "@/services/diaperService";
 
 const Insights = () => {
   const { selectedBaby } = useBaby();
+
+  // Fetch feeding data for insights
+  const { data: feedingEntries = [] } = useQuery({
+    queryKey: ['feedings', selectedBaby?.id],
+    queryFn: () => selectedBaby ? getFeedingsByBabyId(selectedBaby.id) : Promise.resolve([]),
+    enabled: !!selectedBaby,
+  });
+
+  // Fetch diaper data for insights
+  const { data: diaperEntries = [] } = useQuery({
+    queryKey: ['diapers', selectedBaby?.id],
+    queryFn: () => selectedBaby ? getDiapersByBabyId(selectedBaby.id) : Promise.resolve([]),
+    enabled: !!selectedBaby,
+  });
 
   if (!selectedBaby) {
     return (
@@ -44,8 +61,8 @@ const Insights = () => {
 
           <TabsContent value="insights" className="space-y-6">
             <div className="grid gap-6">
-              <FeedingInsights />
-              <DiaperInsights />
+              <FeedingInsights feedingEntries={feedingEntries} />
+              <DiaperInsights diaperEntries={diaperEntries} />
             </div>
           </TabsContent>
 

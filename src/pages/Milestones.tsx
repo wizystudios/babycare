@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -30,7 +29,7 @@ const milestoneCategories = [
 const MilestonesPage = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
-  const { currentBaby } = useBaby();
+  const { selectedBaby } = useBaby(); // Use selectedBaby instead of currentBaby
   const [dialogOpen, setDialogOpen] = useState(false);
   
   // Form state
@@ -43,9 +42,9 @@ const MilestonesPage = () => {
 
   // Fetch milestones data from Supabase
   const { data: milestones, isLoading, error, refetch } = useQuery({
-    queryKey: ['milestones', currentBaby?.id],
-    queryFn: () => currentBaby ? getMilestonesByBabyId(currentBaby.id) : Promise.resolve([]),
-    enabled: !!currentBaby,
+    queryKey: ['milestones', selectedBaby?.id],
+    queryFn: () => selectedBaby ? getMilestonesByBabyId(selectedBaby.id) : Promise.resolve([]),
+    enabled: !!selectedBaby,
   });
   
   // Group milestones by category
@@ -62,7 +61,7 @@ const MilestonesPage = () => {
   }
   
   const handleSaveMilestone = async () => {
-    if (!currentBaby) {
+    if (!selectedBaby) {
       toast({
         title: t("error.noBabySelected"),
         description: t("error.selectBabyFirst"),
@@ -73,7 +72,7 @@ const MilestonesPage = () => {
 
     try {
       const newMilestone = {
-        babyId: currentBaby.id,
+        babyId: selectedBaby.id,
         title,
         date: new Date(date),
         description: description || undefined,

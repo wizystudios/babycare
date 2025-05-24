@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -22,7 +21,7 @@ import { Loader } from "@/components/ui/loader";
 const SleepPage = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
-  const { currentBaby } = useBaby();
+  const { selectedBaby } = useBaby(); // Use selectedBaby instead of currentBaby
   const [dialogOpen, setDialogOpen] = useState(false);
   
   // Form state
@@ -42,12 +41,12 @@ const SleepPage = () => {
     error,
     refetch
   } = useQuery({
-    queryKey: ['sleeps', currentBaby?.id],
+    queryKey: ['sleeps', selectedBaby?.id],
     queryFn: async () => {
-      if (!currentBaby) return [];
-      return getSleepsByBabyId(currentBaby.id);
+      if (!selectedBaby) return [];
+      return getSleepsByBabyId(selectedBaby.id);
     },
-    enabled: !!currentBaby,
+    enabled: !!selectedBaby,
     staleTime: 60 * 1000, // 1 minute
   });
   
@@ -63,7 +62,7 @@ const SleepPage = () => {
   });
   
   const handleSaveSleep = async () => {
-    if (!currentBaby) {
+    if (!selectedBaby) {
       toast({
         title: "Error",
         description: "No baby selected",
@@ -85,7 +84,7 @@ const SleepPage = () => {
       }
       
       const newSleep: Omit<Sleep, 'id'> = {
-        babyId: currentBaby.id,
+        babyId: selectedBaby.id,
         type: sleepType,
         startTime: startDateTime,
         endTime: endDateTime,
@@ -126,7 +125,7 @@ const SleepPage = () => {
     }
   };
 
-  if (!currentBaby) {
+  if (!selectedBaby) {
     return (
       <Layout>
         <div className="p-4 text-center">

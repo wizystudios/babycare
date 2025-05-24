@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Baby } from '@/types/models';
 import { useAuth } from '@/contexts/AuthContext';
@@ -29,8 +30,13 @@ export const useBaby = () => {
       if (error) throw error;
 
       const fetchedBabies = (data || []).map(baby => ({
-        ...baby,
-        birthDate: new Date(baby.birth_date)
+        id: baby.id,
+        name: baby.name,
+        birthDate: new Date(baby.birth_date),
+        gender: baby.gender as "male" | "female" | "other", // Type cast to fix gender type issue
+        weight: baby.weight,
+        height: baby.height,
+        photoUrl: baby.photo_url,
       }));
 
       setBabies(fetchedBabies);
@@ -72,9 +78,14 @@ export const useBaby = () => {
 
       if (error) throw error;
 
-      const newBaby = {
-        ...data,
-        birthDate: new Date(data.birth_date)
+      const newBaby: Baby = {
+        id: data.id,
+        name: data.name,
+        birthDate: new Date(data.birth_date),
+        gender: data.gender as "male" | "female" | "other", // Type cast
+        weight: data.weight,
+        height: data.height,
+        photoUrl: data.photo_url,
       };
 
       setBabies(prev => [newBaby, ...prev]);
@@ -90,6 +101,14 @@ export const useBaby = () => {
   const selectBaby = (baby: Baby) => {
     console.log('Selecting baby:', baby.name);
     setSelectedBaby(baby);
+  };
+
+  // Add switchBaby function for compatibility
+  const switchBaby = (babyId: string) => {
+    const baby = babies.find(b => b.id === babyId);
+    if (baby) {
+      setSelectedBaby(baby);
+    }
   };
 
   const updateBaby = async (babyId: string, updates: Partial<Baby>) => {
@@ -112,9 +131,14 @@ export const useBaby = () => {
 
       if (error) throw error;
 
-      const updatedBaby = {
-        ...data,
-        birthDate: new Date(data.birth_date)
+      const updatedBaby: Baby = {
+        id: data.id,
+        name: data.name,
+        birthDate: new Date(data.birth_date),
+        gender: data.gender as "male" | "female" | "other", // Type cast
+        weight: data.weight,
+        height: data.height,
+        photoUrl: data.photo_url,
       };
 
       setBabies(prev => prev.map(baby => baby.id === babyId ? updatedBaby : baby));
@@ -157,9 +181,11 @@ export const useBaby = () => {
   return {
     babies,
     selectedBaby,
+    currentBaby: selectedBaby, // Add currentBaby alias for compatibility
     isLoading,
     addBaby,
     selectBaby,
+    switchBaby, // Add switchBaby function
     updateBaby,
     deleteBaby,
     refreshBabies: fetchBabies
