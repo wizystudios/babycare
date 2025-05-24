@@ -84,7 +84,7 @@ export const CountrySelect: React.FC<CountrySelectProps> = ({
           <Label htmlFor="phone">Phone Number</Label>
           <div className="flex">
             <div className="flex items-center px-3 bg-gray-100 border border-r-0 rounded-l-md">
-              <span className="text-sm font-medium">{selectedCountry.phone_code}</span>
+              <span className="text-sm font-medium text-gray-900">{selectedCountry.phone_code}</span>
             </div>
             <Input
               id="phone"

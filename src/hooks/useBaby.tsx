@@ -110,10 +110,13 @@ export const useBaby = () => {
   };
 
   const switchBaby = (babyId: string) => {
+    console.log('Switching to baby ID:', babyId);
     const baby = babies.find(b => b.id === babyId);
     if (baby) {
-      console.log('Switching to baby:', baby.name);
+      console.log('Found baby, switching to:', baby.name);
       setSelectedBaby(baby);
+    } else {
+      console.log('Baby not found with ID:', babyId);
     }
   };
 

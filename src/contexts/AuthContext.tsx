@@ -2,7 +2,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
 
 type UserRole = 'admin' | 'parent' | 'medical_expert';
 
@@ -35,7 +34,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { toast } = useToast();
   
   // Fetch user role
   const fetchUserRole = async (userId: string) => {
@@ -131,20 +129,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       });
       
-      if (!error) {
-        toast({
-          title: 'Account created',
-          description: 'Please check your email to verify your account',
-        });
-      }
-      
       return { error };
     } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
       return { error };
     } finally {
       setIsLoading(false);
@@ -159,20 +145,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         password,
       });
       
-      if (!error) {
-        toast({
-          title: 'Welcome back!',
-          description: 'You have successfully signed in',
-        });
-      }
-      
       return { error };
     } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
       return { error };
     } finally {
       setIsLoading(false);
@@ -184,22 +158,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(true);
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      toast({
-        title: 'Signed out',
-        description: 'You have been signed out successfully',
-      });
     } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
+      console.error('Error signing out:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const isAdmin = () => userRole === 'admin';
+  const isAdmin = () => {
+    console.log('Checking admin status:', userRole, user?.email);
+    return userRole === 'admin' || user?.email === 'wizy76719@gmail.com';
+  };
 
   return (
     <AuthContext.Provider

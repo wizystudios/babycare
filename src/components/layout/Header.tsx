@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,7 +8,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useBaby } from "@/hooks/useBaby";
-import { Sun, Moon, Plus, LogOut, Settings, User } from "lucide-react";
+import { Sun, Moon, Plus, LogOut, Settings, User, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -18,8 +17,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 export const Header = () => {
   const { t, language, setLanguage } = useLanguage();
   const { theme, setTheme } = useTheme();
-  const { user, signOut } = useAuth();
-  const { currentBaby, babies, switchBaby } = useBaby();
+  const { user, signOut, isAdmin } = useAuth();
+  const { selectedBaby, babies, switchBaby } = useBaby();
   const navigate = useNavigate();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [logoDialogOpen, setLogoDialogOpen] = useState(false);
@@ -67,6 +66,13 @@ export const Header = () => {
 
   const handleOpenSettings = () => {
     navigate("/settings");
+  };
+
+  const handleOpenAdmin = () => {
+    console.log('Admin button clicked, isAdmin:', isAdmin());
+    if (isAdmin()) {
+      navigate("/admin");
+    }
   };
 
   const handleSignOut = async () => {
@@ -193,7 +199,7 @@ export const Header = () => {
             </DialogContent>
           </Dialog>
           
-          {currentBaby && (
+          {selectedBaby && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
@@ -204,15 +210,18 @@ export const Header = () => {
                     isMobile ? "text-xs px-2" : ""
                   )}
                 >
-                  {currentBaby.name}
+                  {selectedBaby.name}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="animate-scale-in">
                 {babies.map((baby) => (
                   <DropdownMenuItem 
                     key={baby.id} 
-                    onClick={() => switchBaby(baby.id)}
-                    className={baby.id === currentBaby.id ? "bg-baby-primary/10 text-baby-primary font-medium" : ""}
+                    onClick={() => {
+                      console.log('Switching to baby:', baby.name, baby.id);
+                      switchBaby(baby.id);
+                    }}
+                    className={baby.id === selectedBaby.id ? "bg-baby-primary/10 text-baby-primary font-medium" : ""}
                   >
                     {baby.name}
                   </DropdownMenuItem>
@@ -300,6 +309,12 @@ export const Header = () => {
                   <User className="mr-2 h-4 w-4 text-baby-primary" />
                   {t("nav.profile")}
                 </DropdownMenuItem>
+                {isAdmin() && (
+                  <DropdownMenuItem onClick={handleOpenAdmin}>
+                    <Shield className="mr-2 h-4 w-4 text-baby-primary" />
+                    Admin Panel
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={handleOpenSettings}>
                   <Settings className="mr-2 h-4 w-4 text-baby-primary" />
                   {t("nav.settings")}
