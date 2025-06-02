@@ -77,7 +77,7 @@ const AdminManagement = () => {
         .from('doctors')
         .select(`
           *,
-          hospitals(name)
+          hospitals!doctors_hospital_id_fkey(name)
         `)
         .order('created_at', { ascending: false });
       
