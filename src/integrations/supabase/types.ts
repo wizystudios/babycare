@@ -149,6 +149,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "doctors_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "hospitals"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "fk_doctors_hospital"
             columns: ["hospital_id"]
             isOneToOne: false
@@ -368,6 +375,47 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "milestones_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          baby_id: string
+          created_at: string | null
+          id: string
+          message: string
+          scheduled_time: string
+          sent: boolean | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          baby_id: string
+          created_at?: string | null
+          id?: string
+          message: string
+          scheduled_time: string
+          sent?: boolean | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          baby_id?: string
+          created_at?: string | null
+          id?: string
+          message?: string
+          scheduled_time?: string
+          sent?: boolean | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_baby_id_fkey"
             columns: ["baby_id"]
             isOneToOne: false
             referencedRelation: "babies"

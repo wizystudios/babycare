@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, User, Building, Phone, Mail, MapPin } from 'lucide-react';
+import { Plus, User, Building, Phone, Mail, MapPin, Users, FileDown, Bell } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { ActionMenu } from '@/components/ui/ActionMenu';
@@ -37,15 +37,27 @@ interface Hospital {
   description: string;
 }
 
+interface UserProfile {
+  id: string;
+  full_name: string;
+  phone: string;
+  country: string;
+  email: string;
+  created_at: string;
+  role: string;
+}
+
 const AdminManagement = () => {
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [hospitals, setHospitals] = useState<Hospital[]>([]);
+  const [users, setUsers] = useState<UserProfile[]>([]);
   const [showAddDoctor, setShowAddDoctor] = useState(false);
   const [showAddHospital, setShowAddHospital] = useState(false);
   const [editingDoctor, setEditingDoctor] = useState<Doctor | null>(null);
   const [editingHospital, setEditingHospital] = useState<Hospital | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const [newDoctor, setNewDoctor] = useState({
     name: '',
@@ -67,10 +79,29 @@ const AdminManagement = () => {
 
   useEffect(() => {
     if (isAdmin()) {
-      fetchDoctors();
-      fetchHospitals();
+      fetchData();
     }
   }, [user]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      await Promise.all([
+        fetchDoctors(),
+        fetchHospitals(),
+        fetchUsers()
+      ]);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load admin data',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchDoctors = async () => {
     try {
@@ -103,22 +134,120 @@ const AdminManagement = () => {
     }
   };
 
-  const handleAddDoctor = async () => {
-    if (!newDoctor.name || !newDoctor.specialization || !newDoctor.hospital_id) {
+  const fetchUsers = async () => {
+    try {
+      // Fetch user profiles with roles
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select(`
+          id,
+          full_name,
+          phone,
+          country,
+          created_at
+        `)
+        .order('created_at', { ascending: false });
+
+      if (profilesError) throw profilesError;
+
+      // Fetch user roles
+      const { data: roles, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id, role');
+
+      if (rolesError) throw rolesError;
+
+      // Combine profiles with roles
+      const usersWithRoles = (profiles || []).map(profile => {
+        const userRole = roles?.find(role => role.user_id === profile.id);
+        return {
+          ...profile,
+          role: userRole?.role || 'parent',
+          email: '', // We can't access auth.users directly, so email will be empty
+        };
+      });
+
+      setUsers(usersWithRoles);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
+
+  const validateDoctorForm = () => {
+    if (!newDoctor.name.trim()) {
       toast({
-        title: 'Error',
-        description: 'Please fill in all required fields',
+        title: 'Validation Error',
+        description: 'Doctor name is required',
         variant: 'destructive',
       });
-      return;
+      return false;
     }
+    if (!newDoctor.specialization) {
+      toast({
+        title: 'Validation Error',
+        description: 'Specialization is required',
+        variant: 'destructive',
+      });
+      return false;
+    }
+    if (!newDoctor.hospital_id) {
+      toast({
+        title: 'Validation Error',
+        description: 'Hospital selection is required',
+        variant: 'destructive',
+      });
+      return false;
+    }
+    if (newDoctor.email && !/\S+@\S+\.\S+/.test(newDoctor.email)) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please enter a valid email address',
+        variant: 'destructive',
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const validateHospitalForm = () => {
+    if (!newHospital.name.trim()) {
+      toast({
+        title: 'Validation Error',
+        description: 'Hospital name is required',
+        variant: 'destructive',
+      });
+      return false;
+    }
+    if (!newHospital.location.trim()) {
+      toast({
+        title: 'Validation Error',
+        description: 'Location is required',
+        variant: 'destructive',
+      });
+      return false;
+    }
+    if (newHospital.email && !/\S+@\S+\.\S+/.test(newHospital.email)) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please enter a valid email address',
+        variant: 'destructive',
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const handleAddDoctor = async () => {
+    if (!validateDoctorForm()) return;
 
     try {
+      setLoading(true);
       const { error } = await supabase
         .from('doctors')
         .insert([{
           ...newDoctor,
-          created_by: user?.id
+          created_by: user?.id,
+          available: true
         }]);
       
       if (error) throw error;
@@ -137,7 +266,7 @@ const AdminManagement = () => {
         experience: ''
       });
       setShowAddDoctor(false);
-      fetchDoctors();
+      await fetchDoctors();
     } catch (error) {
       console.error('Error adding doctor:', error);
       toast({
@@ -145,25 +274,21 @@ const AdminManagement = () => {
         description: 'Failed to add doctor',
         variant: 'destructive',
       });
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleAddHospital = async () => {
-    if (!newHospital.name || !newHospital.location) {
-      toast({
-        title: 'Error',
-        description: 'Please fill in all required fields',
-        variant: 'destructive',
-      });
-      return;
-    }
+    if (!validateHospitalForm()) return;
 
     try {
+      setLoading(true);
       const { error } = await supabase
         .from('hospitals')
         .insert([{
           ...newHospital,
-          services: newHospital.services.split(',').map(s => s.trim()),
+          services: newHospital.services.split(',').map(s => s.trim()).filter(s => s),
           created_by: user?.id
         }]);
       
@@ -183,7 +308,7 @@ const AdminManagement = () => {
         description: ''
       });
       setShowAddHospital(false);
-      fetchHospitals();
+      await fetchHospitals();
     } catch (error) {
       console.error('Error adding hospital:', error);
       toast({
@@ -191,11 +316,14 @@ const AdminManagement = () => {
         description: 'Failed to add hospital',
         variant: 'destructive',
       });
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDeleteDoctor = async (doctorId: string) => {
     try {
+      setLoading(true);
       const { error } = await supabase
         .from('doctors')
         .delete()
@@ -208,7 +336,7 @@ const AdminManagement = () => {
         description: 'Doctor deleted successfully',
       });
       
-      fetchDoctors();
+      await fetchDoctors();
     } catch (error) {
       console.error('Error deleting doctor:', error);
       toast({
@@ -216,11 +344,14 @@ const AdminManagement = () => {
         description: 'Failed to delete doctor',
         variant: 'destructive',
       });
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDeleteHospital = async (hospitalId: string) => {
     try {
+      setLoading(true);
       const { error } = await supabase
         .from('hospitals')
         .delete()
@@ -233,7 +364,7 @@ const AdminManagement = () => {
         description: 'Hospital deleted successfully',
       });
       
-      fetchHospitals();
+      await fetchHospitals();
     } catch (error) {
       console.error('Error deleting hospital:', error);
       toast({
@@ -241,6 +372,8 @@ const AdminManagement = () => {
         description: 'Failed to delete hospital',
         variant: 'destructive',
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -256,9 +389,69 @@ const AdminManagement = () => {
       
       if (error) throw error;
       
-      fetchDoctors();
+      await fetchDoctors();
     } catch (error) {
       console.error('Error updating doctor availability:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to update doctor availability',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const generateReport = async () => {
+    try {
+      setLoading(true);
+      // Generate a simple report with current statistics
+      const report = {
+        generatedAt: new Date().toISOString(),
+        totalDoctors: doctors.length,
+        availableDoctors: doctors.filter(d => d.available).length,
+        totalHospitals: hospitals.length,
+        totalUsers: users.length,
+        usersByRole: {
+          admin: users.filter(u => u.role === 'admin').length,
+          parent: users.filter(u => u.role === 'parent').length,
+          medical_expert: users.filter(u => u.role === 'medical_expert').length,
+        },
+        doctors: doctors.map(d => ({
+          name: d.name,
+          specialization: d.specialization,
+          hospital: d.hospital?.name,
+          available: d.available
+        })),
+        hospitals: hospitals.map(h => ({
+          name: h.name,
+          location: h.location,
+          services: h.services
+        }))
+      };
+
+      // Create and download the report
+      const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `admin-report-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: 'Success',
+        description: 'Report generated and downloaded successfully',
+      });
+    } catch (error) {
+      console.error('Error generating report:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to generate report',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -278,23 +471,36 @@ const AdminManagement = () => {
       <div className="p-4 space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-baby-primary">Admin Management</h1>
-          <Badge variant="outline" className="text-baby-primary">
-            Admin Panel
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Button 
+              onClick={generateReport}
+              variant="outline"
+              disabled={loading}
+              className="flex items-center gap-2"
+            >
+              <FileDown className="w-4 h-4" />
+              Download Report
+            </Button>
+            <Badge variant="outline" className="text-baby-primary">
+              Admin Panel
+            </Badge>
+          </div>
         </div>
 
         <Tabs defaultValue="doctors" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="doctors">Medical Experts</TabsTrigger>
             <TabsTrigger value="hospitals">Hospitals</TabsTrigger>
+            <TabsTrigger value="users">Users</TabsTrigger>
           </TabsList>
 
           <TabsContent value="doctors" className="pt-4">
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold">Medical Experts</h2>
+                <h2 className="text-xl font-semibold">Medical Experts ({doctors.length})</h2>
                 <Button 
                   onClick={() => setShowAddDoctor(true)}
+                  disabled={loading}
                   className="bg-baby-primary hover:bg-baby-primary/90"
                 >
                   <Plus className="w-4 h-4 mr-2" />
@@ -310,16 +516,17 @@ const AdminManagement = () => {
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="doctor-name">Full Name</Label>
+                        <Label htmlFor="doctor-name">Full Name *</Label>
                         <Input
                           id="doctor-name"
                           value={newDoctor.name}
                           onChange={(e) => setNewDoctor({...newDoctor, name: e.target.value})}
                           placeholder="Dr. John Doe"
+                          required
                         />
                       </div>
                       <div>
-                        <Label htmlFor="doctor-specialization">Specialization</Label>
+                        <Label htmlFor="doctor-specialization">Specialization *</Label>
                         <Select onValueChange={(value) => setNewDoctor({...newDoctor, specialization: value})}>
                           <SelectTrigger>
                             <SelectValue placeholder="Select specialization" />
@@ -334,7 +541,7 @@ const AdminManagement = () => {
                         </Select>
                       </div>
                       <div>
-                        <Label htmlFor="doctor-hospital">Hospital</Label>
+                        <Label htmlFor="doctor-hospital">Hospital *</Label>
                         <Select onValueChange={(value) => setNewDoctor({...newDoctor, hospital_id: value})}>
                           <SelectTrigger>
                             <SelectValue placeholder="Select hospital" />
@@ -378,8 +585,12 @@ const AdminManagement = () => {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button onClick={handleAddDoctor} className="bg-baby-primary hover:bg-baby-primary/90">
-                        Add Doctor
+                      <Button 
+                        onClick={handleAddDoctor} 
+                        disabled={loading}
+                        className="bg-baby-primary hover:bg-baby-primary/90"
+                      >
+                        {loading ? 'Adding...' : 'Add Doctor'}
                       </Button>
                       <Button variant="outline" onClick={() => setShowAddDoctor(false)}>
                         Cancel
@@ -403,16 +614,22 @@ const AdminManagement = () => {
                             <p className="text-baby-primary font-medium">{doctor.specialization}</p>
                             <p className="text-sm text-gray-600">{doctor.hospital?.name}</p>
                             <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                              <span className="flex items-center gap-1">
-                                <Phone className="w-3 h-3" />
-                                {doctor.phone}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Mail className="w-3 h-3" />
-                                {doctor.email}
-                              </span>
+                              {doctor.phone && (
+                                <span className="flex items-center gap-1">
+                                  <Phone className="w-3 h-3" />
+                                  {doctor.phone}
+                                </span>
+                              )}
+                              {doctor.email && (
+                                <span className="flex items-center gap-1">
+                                  <Mail className="w-3 h-3" />
+                                  {doctor.email}
+                                </span>
+                              )}
                             </div>
-                            <p className="text-sm text-gray-600 mt-1">Experience: {doctor.experience}</p>
+                            {doctor.experience && (
+                              <p className="text-sm text-gray-600 mt-1">Experience: {doctor.experience}</p>
+                            )}
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-2">
@@ -429,6 +646,7 @@ const AdminManagement = () => {
                             variant="outline"
                             size="sm"
                             onClick={() => toggleDoctorAvailability(doctor.id)}
+                            disabled={loading}
                           >
                             Toggle Status
                           </Button>
@@ -444,9 +662,10 @@ const AdminManagement = () => {
           <TabsContent value="hospitals" className="pt-4">
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold">Hospitals</h2>
+                <h2 className="text-xl font-semibold">Hospitals ({hospitals.length})</h2>
                 <Button 
                   onClick={() => setShowAddHospital(true)}
+                  disabled={loading}
                   className="bg-baby-primary hover:bg-baby-primary/90"
                 >
                   <Plus className="w-4 h-4 mr-2" />
@@ -462,21 +681,23 @@ const AdminManagement = () => {
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="hospital-name">Hospital Name</Label>
+                        <Label htmlFor="hospital-name">Hospital Name *</Label>
                         <Input
                           id="hospital-name"
                           value={newHospital.name}
                           onChange={(e) => setNewHospital({...newHospital, name: e.target.value})}
                           placeholder="Children's Hospital"
+                          required
                         />
                       </div>
                       <div>
-                        <Label htmlFor="hospital-location">Location</Label>
+                        <Label htmlFor="hospital-location">Location *</Label>
                         <Input
                           id="hospital-location"
                           value={newHospital.location}
                           onChange={(e) => setNewHospital({...newHospital, location: e.target.value})}
                           placeholder="City, Country"
+                          required
                         />
                       </div>
                       <div>
@@ -519,8 +740,12 @@ const AdminManagement = () => {
                       />
                     </div>
                     <div className="flex gap-2">
-                      <Button onClick={handleAddHospital} className="bg-baby-primary hover:bg-baby-primary/90">
-                        Add Hospital
+                      <Button 
+                        onClick={handleAddHospital} 
+                        disabled={loading}
+                        className="bg-baby-primary hover:bg-baby-primary/90"
+                      >
+                        {loading ? 'Adding...' : 'Add Hospital'}
                       </Button>
                       <Button variant="outline" onClick={() => setShowAddHospital(false)}>
                         Cancel
@@ -546,29 +771,91 @@ const AdminManagement = () => {
                               {hospital.location}
                             </p>
                             <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                              <span className="flex items-center gap-1">
-                                <Phone className="w-3 h-3" />
-                                {hospital.phone}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Mail className="w-3 h-3" />
-                                {hospital.email}
-                              </span>
+                              {hospital.phone && (
+                                <span className="flex items-center gap-1">
+                                  <Phone className="w-3 h-3" />
+                                  {hospital.phone}
+                                </span>
+                              )}
+                              {hospital.email && (
+                                <span className="flex items-center gap-1">
+                                  <Mail className="w-3 h-3" />
+                                  {hospital.email}
+                                </span>
+                              )}
                             </div>
-                            <div className="flex flex-wrap gap-1 mt-2">
-                              {hospital.services?.map((service, index) => (
-                                <Badge key={index} variant="outline" className="text-xs">
-                                  {service}
-                                </Badge>
-                              ))}
-                            </div>
-                            <p className="text-sm text-gray-600 mt-2">{hospital.description}</p>
+                            {hospital.services && hospital.services.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mt-2">
+                                {hospital.services.map((service, index) => (
+                                  <Badge key={index} variant="outline" className="text-xs">
+                                    {service}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                            {hospital.description && (
+                              <p className="text-sm text-gray-600 mt-2">{hospital.description}</p>
+                            )}
                           </div>
                         </div>
                         <ActionMenu
                           onEdit={() => setEditingHospital(hospital)}
                           onDelete={() => handleDeleteHospital(hospital.id)}
                         />
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="users" className="pt-4">
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold">Users ({users.length})</h2>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline">Admin: {users.filter(u => u.role === 'admin').length}</Badge>
+                  <Badge variant="outline">Parents: {users.filter(u => u.role === 'parent').length}</Badge>
+                  <Badge variant="outline">Medical Experts: {users.filter(u => u.role === 'medical_expert').length}</Badge>
+                </div>
+              </div>
+
+              <div className="grid gap-4">
+                {users.map((user) => (
+                  <Card key={user.id} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start space-x-4">
+                          <div className="w-12 h-12 bg-baby-blue/20 rounded-full flex items-center justify-center">
+                            <Users className="w-6 h-6 text-baby-primary" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-lg">{user.full_name || 'Unknown User'}</h3>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Badge variant={user.role === 'admin' ? 'default' : user.role === 'medical_expert' ? 'secondary' : 'outline'}>
+                                {user.role}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                              {user.phone && (
+                                <span className="flex items-center gap-1">
+                                  <Phone className="w-3 h-3" />
+                                  {user.phone}
+                                </span>
+                              )}
+                              {user.country && (
+                                <span className="flex items-center gap-1">
+                                  <MapPin className="w-3 h-3" />
+                                  {user.country}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-600 mt-1">
+                              Joined: {new Date(user.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
