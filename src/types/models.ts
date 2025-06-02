@@ -88,3 +88,42 @@ export interface HealthRecord {
   dosage?: string;
   note?: string;
 }
+
+// Admin-specific interfaces
+export interface Doctor {
+  id: string;
+  name: string;
+  specialization: string;
+  hospital_id: string | null;
+  phone: string | null;
+  email: string | null;
+  experience: string | null;
+  available: boolean;
+  created_at: string;
+  created_by: string | null;
+  user_id: string | null;
+  hospitals?: {
+    name: string;
+  } | null;
+}
+
+export interface Hospital {
+  id: string;
+  name: string;
+  location: string;
+  phone: string | null;
+  email: string | null;
+  services: string[] | null;
+  description: string | null;
+  created_at: string;
+  created_by: string | null;
+}
+
+export interface UserProfile {
+  id: string;
+  full_name: string | null;
+  phone: string | null;
+  country: string | null;
+  created_at: string;
+  role: string;
+}

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,38 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { ActionMenu } from '@/components/ui/ActionMenu';
 import { useToast } from '@/components/ui/use-toast';
-
-interface Doctor {
-  id: string;
-  name: string;
-  specialization: string;
-  hospital_id: string;
-  phone: string;
-  email: string;
-  experience: string;
-  available: boolean;
-  hospital?: { name: string };
-}
-
-interface Hospital {
-  id: string;
-  name: string;
-  location: string;
-  phone: string;
-  email: string;
-  services: string[];
-  description: string;
-}
-
-interface UserProfile {
-  id: string;
-  full_name: string;
-  phone: string;
-  country: string;
-  email: string;
-  created_at: string;
-  role: string;
-}
+import { Doctor, Hospital, UserProfile } from '@/types/models';
 
 const AdminManagement = () => {
   const { user, isAdmin } = useAuth();
@@ -109,7 +77,7 @@ const AdminManagement = () => {
         .from('doctors')
         .select(`
           *,
-          hospital:hospitals(name)
+          hospitals(name)
         `)
         .order('created_at', { ascending: false });
       
@@ -163,7 +131,6 @@ const AdminManagement = () => {
         return {
           ...profile,
           role: userRole?.role || 'parent',
-          email: '', // We can't access auth.users directly, so email will be empty
         };
       });
 
@@ -418,7 +385,7 @@ const AdminManagement = () => {
         doctors: doctors.map(d => ({
           name: d.name,
           specialization: d.specialization,
-          hospital: d.hospital?.name,
+          hospital: d.hospitals?.name,
           available: d.available
         })),
         hospitals: hospitals.map(h => ({
@@ -612,7 +579,7 @@ const AdminManagement = () => {
                           <div className="flex-1">
                             <h3 className="font-semibold text-lg">{doctor.name}</h3>
                             <p className="text-baby-primary font-medium">{doctor.specialization}</p>
-                            <p className="text-sm text-gray-600">{doctor.hospital?.name}</p>
+                            <p className="text-sm text-gray-600">{doctor.hospitals?.name}</p>
                             <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
                               {doctor.phone && (
                                 <span className="flex items-center gap-1">
