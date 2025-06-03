@@ -40,7 +40,7 @@ const DoctorSearch = () => {
   const [doctors, setDoctors] = useState<DoctorWithReviews[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [specialization, setSpecialization] = useState('');
+  const [specialization, setSpecialization] = useState('all');
   const [selectedDoctor, setSelectedDoctor] = useState<DoctorWithReviews | null>(null);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
@@ -178,7 +178,7 @@ const DoctorSearch = () => {
   const filteredDoctors = doctors.filter(doctor => {
     const matchesSearch = doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          doctor.specialization.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesSpecialization = !specialization || doctor.specialization === specialization;
+    const matchesSpecialization = specialization === 'all' || doctor.specialization === specialization;
     return matchesSearch && matchesSpecialization;
   });
 
@@ -238,7 +238,7 @@ const DoctorSearch = () => {
               <SelectValue placeholder="Filter by specialization" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Specializations</SelectItem>
+              <SelectItem value="all">All Specializations</SelectItem>
               {specializations.map(spec => (
                 <SelectItem key={spec} value={spec}>{spec}</SelectItem>
               ))}
