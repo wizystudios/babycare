@@ -53,19 +53,26 @@ const DoctorSearch = () => {
     try {
       setLoading(true);
       
-      // First fetch doctors with hospitals
+      // Fetch doctors first
       const { data: doctorsData, error: doctorsError } = await supabase
         .from('doctors')
-        .select(`
-          *,
-          hospitals(name)
-        `)
+        .select('*')
         .eq('available', true)
         .order('name');
 
       if (doctorsError) throw doctorsError;
 
-      // Then fetch reviews separately and join with profiles
+      // Fetch hospitals data separately
+      const { data: hospitalsData, error: hospitalsError } = await supabase
+        .from('hospitals')
+        .select('id, name');
+
+      if (hospitalsError) throw hospitalsError;
+
+      // Create a map of hospitals
+      const hospitalsMap = new Map(hospitalsData?.map(hospital => [hospital.id, hospital]) || []);
+
+      // Fetch reviews separately and join with profiles
       const { data: reviewsData, error: reviewsError } = await supabase
         .from('doctor_reviews')
         .select(`
@@ -104,18 +111,21 @@ const DoctorSearch = () => {
         });
       });
 
-      // Combine doctors with their reviews and calculate stats
-      const doctorsWithStats = (doctorsData || []).map(doctor => {
+      // Combine doctors with their reviews, hospitals, and calculate stats
+      const doctorsWithStats: DoctorWithReviews[] = (doctorsData || []).map(doctor => {
         const reviews = reviewsByDoctor.get(doctor.id) || [];
         const avgRating = reviews.length > 0 
           ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length 
           : 0;
         
+        const hospital = doctor.hospital_id ? hospitalsMap.get(doctor.hospital_id) || null : null;
+        
         return {
           ...doctor,
           doctor_reviews: reviews,
           avgRating: Math.round(avgRating * 10) / 10,
-          reviewCount: reviews.length
+          reviewCount: reviews.length,
+          hospitals: hospital
         };
       });
 
