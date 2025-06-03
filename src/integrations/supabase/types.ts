@@ -107,6 +107,44 @@ export type Database = {
           },
         ]
       }
+      doctor_reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          doctor_id: string
+          id: string
+          rating: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          doctor_id: string
+          id?: string
+          rating: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          doctor_id?: string
+          id?: string
+          rating?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doctor_reviews_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       doctors: {
         Row: {
           available: boolean | null
@@ -425,29 +463,35 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
           country: string | null
           country_code: string | null
           created_at: string
           full_name: string | null
           id: string
+          nationality: string | null
           phone: string | null
           updated_at: string
         }
         Insert: {
+          avatar_url?: string | null
           country?: string | null
           country_code?: string | null
           created_at?: string
           full_name?: string | null
           id: string
+          nationality?: string | null
           phone?: string | null
           updated_at?: string
         }
         Update: {
+          avatar_url?: string | null
           country?: string | null
           country_code?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
+          nationality?: string | null
           phone?: string | null
           updated_at?: string
         }
@@ -502,6 +546,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_feedback: {
+        Row: {
+          category: string | null
+          created_at: string
+          id: string
+          message: string
+          status: string | null
+          subject: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          message: string
+          status?: string | null
+          subject: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          message?: string
+          status?: string | null
+          subject?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
