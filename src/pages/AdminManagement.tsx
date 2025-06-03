@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,6 +14,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ActionMenu } from '@/components/ui/ActionMenu';
 import { useToast } from '@/components/ui/use-toast';
 import { Doctor, Hospital, UserProfile } from '@/types/models';
+
+type UserRole = 'admin' | 'parent' | 'medical_expert';
 
 const AdminManagement = () => {
   const { user, isAdmin } = useAuth();
@@ -60,7 +61,7 @@ const AdminManagement = () => {
     full_name: '',
     phone: '',
     country: '',
-    role: 'parent'
+    role: 'parent' as UserRole
   });
 
   useEffect(() => {
@@ -336,10 +337,10 @@ const AdminManagement = () => {
       if (data.user) {
         const { error: roleError } = await supabase
           .from('user_roles')
-          .insert([{
+          .insert({
             user_id: data.user.id,
             role: newUser.role
-          }]);
+          });
         
         if (roleError) throw roleError;
       }
@@ -371,15 +372,15 @@ const AdminManagement = () => {
     }
   };
 
-  const handleUpdateUserRole = async (userId: string, newRole: string) => {
+  const handleUpdateUserRole = async (userId: string, newRole: UserRole) => {
     try {
       setLoading(true);
       const { error } = await supabase
         .from('user_roles')
-        .upsert([{
+        .upsert({
           user_id: userId,
           role: newRole
-        }]);
+        });
       
       if (error) throw error;
       
@@ -1102,7 +1103,7 @@ const AdminManagement = () => {
                         </div>
                         <div>
                           <Label htmlFor="user-role" className="text-blue-700">Role *</Label>
-                          <Select onValueChange={(value) => setNewUser({...newUser, role: value})}>
+                          <Select onValueChange={(value: UserRole) => setNewUser({...newUser, role: value})}>
                             <SelectTrigger className="rounded-xl border-blue-300">
                               <SelectValue placeholder="Select role" />
                             </SelectTrigger>
@@ -1189,7 +1190,7 @@ const AdminManagement = () => {
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Select onValueChange={(value) => handleUpdateUserRole(user.id, value)}>
+                            <Select onValueChange={(value: UserRole) => handleUpdateUserRole(user.id, value)}>
                               <SelectTrigger className="w-40 rounded-xl border-blue-300">
                                 <SelectValue placeholder="Change role" />
                               </SelectTrigger>
