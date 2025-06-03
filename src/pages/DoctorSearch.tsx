@@ -20,7 +20,7 @@ interface DoctorReview {
   rating: number;
   comment: string | null;
   created_at: string;
-  profiles: {
+  user_profile?: {
     full_name: string | null;
   } | null;
 }
@@ -29,6 +29,9 @@ interface DoctorWithReviews extends Doctor {
   doctor_reviews: DoctorReview[];
   avgRating: number;
   reviewCount: number;
+  hospitals?: {
+    name: string;
+  } | null;
 }
 
 const DoctorSearch = () => {
@@ -49,28 +52,63 @@ const DoctorSearch = () => {
   const fetchDoctors = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      
+      // First fetch doctors with hospitals
+      const { data: doctorsData, error: doctorsError } = await supabase
         .from('doctors')
         .select(`
           *,
-          hospitals(name),
-          doctor_reviews(
-            id,
-            rating,
-            comment,
-            created_at,
-            profiles:user_id(full_name)
-          )
+          hospitals(name)
         `)
         .eq('available', true)
         .order('name');
 
-      if (error) throw error;
+      if (doctorsError) throw doctorsError;
 
-      const doctorsWithStats = (data || []).map(doctor => {
-        const reviews = doctor.doctor_reviews || [];
+      // Then fetch reviews separately and join with profiles
+      const { data: reviewsData, error: reviewsError } = await supabase
+        .from('doctor_reviews')
+        .select(`
+          id,
+          doctor_id,
+          rating,
+          comment,
+          created_at,
+          user_id
+        `)
+        .order('created_at', { ascending: false });
+
+      if (reviewsError) throw reviewsError;
+
+      // Get user profiles for the reviews
+      const userIds = [...new Set(reviewsData?.map(review => review.user_id) || [])];
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, full_name')
+        .in('id', userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Create a map of user profiles
+      const profilesMap = new Map(profilesData?.map(profile => [profile.id, profile]) || []);
+
+      // Group reviews by doctor and add profile data
+      const reviewsByDoctor = new Map<string, DoctorReview[]>();
+      reviewsData?.forEach(review => {
+        if (!reviewsByDoctor.has(review.doctor_id)) {
+          reviewsByDoctor.set(review.doctor_id, []);
+        }
+        reviewsByDoctor.get(review.doctor_id)?.push({
+          ...review,
+          user_profile: profilesMap.get(review.user_id) || null
+        });
+      });
+
+      // Combine doctors with their reviews and calculate stats
+      const doctorsWithStats = (doctorsData || []).map(doctor => {
+        const reviews = reviewsByDoctor.get(doctor.id) || [];
         const avgRating = reviews.length > 0 
-          ? reviews.reduce((sum: number, review: any) => sum + review.rating, 0) / reviews.length 
+          ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length 
           : 0;
         
         return {
@@ -347,7 +385,7 @@ const DoctorSearch = () => {
                             <div className="flex items-center gap-2 mb-1">
                               <div className="flex">{renderStars(review.rating)}</div>
                               <span className="text-xs text-gray-500">
-                                by {review.profiles?.full_name || 'Anonymous'}
+                                by {review.user_profile?.full_name || 'Anonymous'}
                               </span>
                             </div>
                             {review.comment && (

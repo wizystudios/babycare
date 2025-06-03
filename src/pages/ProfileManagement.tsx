@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,7 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBaby } from '@/hooks/useBaby';
 import { useToast } from '@/components/ui/use-toast';
-import { CountrySelect } from '@/components/forms/CountrySelect';
+import { SimpleCountrySelect } from '@/components/forms/SimpleCountrySelect';
 
 interface Profile {
   id: string;
@@ -242,7 +241,7 @@ const ProfileManagement = () => {
 
             <div>
               <Label className="text-gray-700">Country</Label>
-              <CountrySelect
+              <SimpleCountrySelect
                 value={profile?.country || ''}
                 onValueChange={(value) => setProfile(prev => prev ? {...prev, country: value} : null)}
                 className="mt-1"
