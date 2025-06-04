@@ -2,8 +2,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-
-type UserRole = 'admin' | 'parent' | 'medical_expert';
+import { UserRole } from '@/types/models';
 
 type AuthContextType = {
   user: User | null;
@@ -49,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUserRole('parent');
         return;
       }
-      setUserRole(data.role);
+      setUserRole(data.role as UserRole);
     } catch (error) {
       console.error('Error fetching user role:', error);
       setUserRole('parent'); // Default role

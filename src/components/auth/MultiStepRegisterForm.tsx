@@ -10,7 +10,9 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { CountrySelect } from '@/components/forms/CountrySelect';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { UserRole } from '@/types/models';
 
 interface Country {
   id: string;
@@ -23,7 +25,7 @@ interface MultiStepRegisterFormProps {
   showRoleSelection?: boolean;
 }
 
-export const MultiStepRegisterForm: React.FC<MultiStepRegisterFormProps> = ({ showRoleSelection = false }) => {
+export const MultiStepRegisterForm: React.FC<MultiStepRegisterFormProps> = ({ showRoleSelection = true }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,14 +33,21 @@ export const MultiStepRegisterForm: React.FC<MultiStepRegisterFormProps> = ({ sh
   const [fullName, setFullName] = useState('');
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [role, setRole] = useState<'parent' | 'admin'>('parent');
+  const [role, setRole] = useState<UserRole>('parent');
+  
+  // Professional fields
+  const [specialization, setSpecialization] = useState('');
+  const [licenseNumber, setLicenseNumber] = useState('');
+  const [hospitalAffiliation, setHospitalAffiliation] = useState('');
+  const [bio, setBio] = useState('');
+  
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
   const { signUp } = useAuth();
   const navigate = useNavigate();
 
-  const totalSteps = showRoleSelection ? 4 : 3;
+  const totalSteps = showRoleSelection ? (role === 'parent' ? 3 : 4) : 2;
 
   const handleNext = () => {
     if (currentStep === 1) {
@@ -79,6 +88,26 @@ export const MultiStepRegisterForm: React.FC<MultiStepRegisterFormProps> = ({ sh
         });
         return;
       }
+      
+      if (showRoleSelection && !role) {
+        toast({
+          title: "Error",
+          description: "Please select your role",
+          variant: "destructive"
+        });
+        return;
+      }
+    }
+
+    if (currentStep === 3 && role !== 'parent') {
+      if ((role === 'doctor' || role === 'medical_expert') && !specialization) {
+        toast({
+          title: "Error",
+          description: "Please enter your specialization",
+          variant: "destructive"
+        });
+        return;
+      }
     }
 
     setCurrentStep(prev => Math.min(prev + 1, totalSteps));
@@ -92,13 +121,25 @@ export const MultiStepRegisterForm: React.FC<MultiStepRegisterFormProps> = ({ sh
     setIsLoading(true);
     
     try {
-      const { error } = await signUp(email, password, {
+      const userData: any = {
         full_name: fullName,
         country: selectedCountry?.name,
         country_code: selectedCountry?.phone_code,
         phone: phoneNumber,
         role: role
-      });
+      };
+
+      // Add professional fields if applicable
+      if (role === 'doctor' || role === 'medical_expert') {
+        userData.specialization = specialization;
+        userData.license_number = licenseNumber;
+        userData.hospital_affiliation = hospitalAffiliation;
+        userData.bio = bio;
+      } else if (role === 'hospital') {
+        userData.bio = bio;
+      }
+
+      const { error } = await signUp(email, password, userData);
       
       if (error) {
         throw error;
@@ -184,10 +225,97 @@ export const MultiStepRegisterForm: React.FC<MultiStepRegisterFormProps> = ({ sh
                 required
               />
             </div>
+            
+            {showRoleSelection && (
+              <div className="space-y-2">
+                <Label htmlFor="role">I am a...</Label>
+                <Select value={role} onValueChange={(value) => setRole(value as UserRole)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select your role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="parent">Parent/Caregiver</SelectItem>
+                    <SelectItem value="doctor">Doctor</SelectItem>
+                    <SelectItem value="medical_expert">Medical Expert</SelectItem>
+                    <SelectItem value="hospital">Hospital Administrator</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
         );
 
       case 3:
+        if (role === 'parent') {
+          return (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-center">Contact Information</h3>
+              <CountrySelect
+                onCountryChange={setSelectedCountry}
+                onPhoneChange={setPhoneNumber}
+                selectedCountry={selectedCountry}
+                phoneNumber={phoneNumber}
+              />
+            </div>
+          );
+        } else {
+          return (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-center">Professional Information</h3>
+              
+              {(role === 'doctor' || role === 'medical_expert') && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="specialization">Specialization *</Label>
+                    <Input 
+                      id="specialization" 
+                      type="text" 
+                      placeholder="e.g., Pediatrics, Family Medicine" 
+                      value={specialization} 
+                      onChange={(e) => setSpecialization(e.target.value)}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="licenseNumber">License Number</Label>
+                    <Input 
+                      id="licenseNumber" 
+                      type="text" 
+                      placeholder="Medical license number" 
+                      value={licenseNumber} 
+                      onChange={(e) => setLicenseNumber(e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="hospitalAffiliation">Hospital/Clinic Affiliation</Label>
+                    <Input 
+                      id="hospitalAffiliation" 
+                      type="text" 
+                      placeholder="Where do you practice?" 
+                      value={hospitalAffiliation} 
+                      onChange={(e) => setHospitalAffiliation(e.target.value)}
+                    />
+                  </div>
+                </>
+              )}
+              
+              <div className="space-y-2">
+                <Label htmlFor="bio">Brief Bio</Label>
+                <Textarea 
+                  id="bio" 
+                  placeholder="Tell us about your experience and expertise..." 
+                  value={bio} 
+                  onChange={(e) => setBio(e.target.value)}
+                  rows={3}
+                />
+              </div>
+            </div>
+          );
+        }
+
+      case 4:
         return (
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-center">Contact Information</h3>
@@ -197,26 +325,6 @@ export const MultiStepRegisterForm: React.FC<MultiStepRegisterFormProps> = ({ sh
               selectedCountry={selectedCountry}
               phoneNumber={phoneNumber}
             />
-          </div>
-        );
-
-      case 4:
-        if (!showRoleSelection) return null;
-        return (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-center">Role Selection</h3>
-            <div className="space-y-2">
-              <Label htmlFor="role">Role</Label>
-              <Select value={role} onValueChange={(value) => setRole(value as 'parent' | 'admin')}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="parent">Parent</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
           </div>
         );
 

@@ -7,6 +7,9 @@ export type SleepType = "nap" | "night";
 
 export type MoodType = "happy" | "fussy" | "calm" | "crying";
 
+// Updated role type to match database enum
+export type UserRole = 'parent' | 'doctor' | 'medical_expert' | 'hospital' | 'admin';
+
 export interface Baby {
   id: string;
   name: string;
@@ -89,7 +92,7 @@ export interface HealthRecord {
   note?: string;
 }
 
-// Admin-specific interfaces
+// Updated interfaces to match new database structure
 export interface Doctor {
   id: string;
   name: string;
@@ -124,6 +127,67 @@ export interface UserProfile {
   full_name: string | null;
   phone: string | null;
   country: string | null;
+  country_code: string | null;
+  specialization: string | null;
+  license_number: string | null;
+  hospital_affiliation: string | null;
+  bio: string | null;
+  role: UserRole;
   created_at: string;
-  role: string;
+}
+
+// New interfaces for multi-role functionality
+export interface Notification {
+  id: string;
+  user_id: string;
+  title: string;
+  message: string;
+  type: string;
+  read: boolean;
+  created_at: string;
+  data?: any;
+}
+
+export interface Consultation {
+  id: string;
+  patient_id: string;
+  doctor_id: string;
+  baby_id: string | null;
+  type: 'audio' | 'video' | 'chat';
+  status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
+  scheduled_at: string;
+  started_at: string | null;
+  ended_at: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BabyReport {
+  id: string;
+  baby_id: string;
+  parent_id: string;
+  doctor_id: string | null;
+  title: string;
+  report_type: 'growth' | 'feeding' | 'sleep' | 'health' | 'milestone' | 'comprehensive';
+  period_start: string;
+  period_end: string;
+  data: any;
+  shared_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ReportRequest {
+  id: string;
+  doctor_id: string;
+  parent_id: string;
+  baby_id: string;
+  report_type: 'growth' | 'feeding' | 'sleep' | 'health' | 'milestone' | 'comprehensive';
+  period_start: string;
+  period_end: string;
+  message: string | null;
+  status: 'pending' | 'approved' | 'declined' | 'fulfilled';
+  created_at: string;
+  updated_at: string;
 }

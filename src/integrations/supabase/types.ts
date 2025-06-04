@@ -45,6 +45,112 @@ export type Database = {
         }
         Relationships: []
       }
+      baby_reports: {
+        Row: {
+          baby_id: string
+          created_at: string
+          data: Json
+          doctor_id: string | null
+          id: string
+          parent_id: string
+          period_end: string
+          period_start: string
+          report_type: string
+          shared_at: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          baby_id: string
+          created_at?: string
+          data: Json
+          doctor_id?: string | null
+          id?: string
+          parent_id: string
+          period_end: string
+          period_start: string
+          report_type: string
+          shared_at?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          baby_id?: string
+          created_at?: string
+          data?: Json
+          doctor_id?: string | null
+          id?: string
+          parent_id?: string
+          period_end?: string
+          period_start?: string
+          report_type?: string
+          shared_at?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "baby_reports_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consultations: {
+        Row: {
+          baby_id: string | null
+          created_at: string
+          doctor_id: string
+          ended_at: string | null
+          id: string
+          notes: string | null
+          patient_id: string
+          scheduled_at: string
+          started_at: string | null
+          status: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          baby_id?: string | null
+          created_at?: string
+          doctor_id: string
+          ended_at?: string | null
+          id?: string
+          notes?: string | null
+          patient_id: string
+          scheduled_at: string
+          started_at?: string | null
+          status?: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          baby_id?: string | null
+          created_at?: string
+          doctor_id?: string
+          ended_at?: string | null
+          id?: string
+          notes?: string | null
+          patient_id?: string
+          scheduled_at?: string
+          started_at?: string | null
+          status?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultations_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       countries: {
         Row: {
           code: string
@@ -464,38 +570,103 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          bio: string | null
           country: string | null
           country_code: string | null
           created_at: string
           full_name: string | null
+          hospital_affiliation: string | null
           id: string
+          license_number: string | null
           nationality: string | null
           phone: string | null
+          role: Database["public"]["Enums"]["app_role"] | null
+          specialization: string | null
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
           country?: string | null
           country_code?: string | null
           created_at?: string
           full_name?: string | null
+          hospital_affiliation?: string | null
           id: string
+          license_number?: string | null
           nationality?: string | null
           phone?: string | null
+          role?: Database["public"]["Enums"]["app_role"] | null
+          specialization?: string | null
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
           country?: string | null
           country_code?: string | null
           created_at?: string
           full_name?: string | null
+          hospital_affiliation?: string | null
           id?: string
+          license_number?: string | null
           nationality?: string | null
           phone?: string | null
+          role?: Database["public"]["Enums"]["app_role"] | null
+          specialization?: string | null
           updated_at?: string
         }
         Relationships: []
+      }
+      report_requests: {
+        Row: {
+          baby_id: string
+          created_at: string
+          doctor_id: string
+          id: string
+          message: string | null
+          parent_id: string
+          period_end: string
+          period_start: string
+          report_type: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          baby_id: string
+          created_at?: string
+          doctor_id: string
+          id?: string
+          message?: string | null
+          parent_id: string
+          period_end: string
+          period_start: string
+          report_type: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          baby_id?: string
+          created_at?: string
+          doctor_id?: string
+          id?: string
+          message?: string | null
+          parent_id?: string
+          period_end?: string
+          period_start?: string
+          report_type?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_requests_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sleeps: {
         Row: {
@@ -656,7 +827,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "parent" | "medical_expert"
+      app_role: "parent" | "doctor" | "medical_expert" | "hospital" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -772,7 +943,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "parent", "medical_expert"],
+      app_role: ["parent", "doctor", "medical_expert", "hospital", "admin"],
     },
   },
 } as const
