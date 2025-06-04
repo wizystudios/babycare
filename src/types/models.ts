@@ -1,4 +1,3 @@
-
 export type FeedingType = "breast-left" | "breast-right" | "bottle" | "formula" | "solid";
 
 export type DiaperType = "wet" | "dirty" | "mixed";
@@ -7,8 +6,8 @@ export type SleepType = "nap" | "night";
 
 export type MoodType = "happy" | "fussy" | "calm" | "crying";
 
-// Updated role type to match database enum
-export type UserRole = 'parent' | 'doctor' | 'medical_expert' | 'hospital' | 'admin';
+// Updated role type to match database enum - simplified to only parent, doctor, and admin
+export type UserRole = 'parent' | 'doctor' | 'admin';
 
 export interface Baby {
   id: string;

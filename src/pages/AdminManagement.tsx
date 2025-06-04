@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Trash2, UserCog, Users, Building, Stethoscope } from 'lucide-react';
+import { Trash2, UserCog, Users, Stethoscope } from 'lucide-react';
 
 const AdminManagement = () => {
   const { user, isAdmin } = useAuth();
@@ -106,10 +106,7 @@ const AdminManagement = () => {
       case 'admin':
         return <UserCog className="h-4 w-4" />;
       case 'doctor':
-      case 'medical_expert':
         return <Stethoscope className="h-4 w-4" />;
-      case 'hospital':
-        return <Building className="h-4 w-4" />;
       default:
         return <Users className="h-4 w-4" />;
     }
@@ -120,10 +117,7 @@ const AdminManagement = () => {
       case 'admin':
         return 'destructive';
       case 'doctor':
-      case 'medical_expert':
         return 'default';
-      case 'hospital':
-        return 'secondary';
       default:
         return 'outline';
     }
@@ -218,8 +212,6 @@ const AdminManagement = () => {
                       <SelectContent>
                         <SelectItem value="parent">Parent</SelectItem>
                         <SelectItem value="doctor">Doctor</SelectItem>
-                        <SelectItem value="medical_expert">Medical Expert</SelectItem>
-                        <SelectItem value="hospital">Hospital</SelectItem>
                         <SelectItem value="admin">Admin</SelectItem>
                       </SelectContent>
                     </Select>

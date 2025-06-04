@@ -99,8 +99,8 @@ export const MultiStepRegisterForm: React.FC<MultiStepRegisterFormProps> = ({ sh
       }
     }
 
-    if (currentStep === 3 && role !== 'parent') {
-      if ((role === 'doctor' || role === 'medical_expert') && !specialization) {
+    if (currentStep === 3 && role === 'doctor') {
+      if (!specialization) {
         toast({
           title: "Error",
           description: "Please enter your specialization",
@@ -129,13 +129,11 @@ export const MultiStepRegisterForm: React.FC<MultiStepRegisterFormProps> = ({ sh
         role: role
       };
 
-      // Add professional fields if applicable
-      if (role === 'doctor' || role === 'medical_expert') {
+      // Add professional fields if user is a doctor
+      if (role === 'doctor') {
         userData.specialization = specialization;
         userData.license_number = licenseNumber;
         userData.hospital_affiliation = hospitalAffiliation;
-        userData.bio = bio;
-      } else if (role === 'hospital') {
         userData.bio = bio;
       }
 
@@ -236,8 +234,6 @@ export const MultiStepRegisterForm: React.FC<MultiStepRegisterFormProps> = ({ sh
                   <SelectContent>
                     <SelectItem value="parent">Parent/Caregiver</SelectItem>
                     <SelectItem value="doctor">Doctor</SelectItem>
-                    <SelectItem value="medical_expert">Medical Expert</SelectItem>
-                    <SelectItem value="hospital">Hospital Administrator</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -263,43 +259,39 @@ export const MultiStepRegisterForm: React.FC<MultiStepRegisterFormProps> = ({ sh
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-center">Professional Information</h3>
               
-              {(role === 'doctor' || role === 'medical_expert') && (
-                <>
-                  <div className="space-y-2">
-                    <Label htmlFor="specialization">Specialization *</Label>
-                    <Input 
-                      id="specialization" 
-                      type="text" 
-                      placeholder="e.g., Pediatrics, Family Medicine" 
-                      value={specialization} 
-                      onChange={(e) => setSpecialization(e.target.value)}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="licenseNumber">License Number</Label>
-                    <Input 
-                      id="licenseNumber" 
-                      type="text" 
-                      placeholder="Medical license number" 
-                      value={licenseNumber} 
-                      onChange={(e) => setLicenseNumber(e.target.value)}
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="hospitalAffiliation">Hospital/Clinic Affiliation</Label>
-                    <Input 
-                      id="hospitalAffiliation" 
-                      type="text" 
-                      placeholder="Where do you practice?" 
-                      value={hospitalAffiliation} 
-                      onChange={(e) => setHospitalAffiliation(e.target.value)}
-                    />
-                  </div>
-                </>
-              )}
+              <div className="space-y-2">
+                <Label htmlFor="specialization">Specialization *</Label>
+                <Input 
+                  id="specialization" 
+                  type="text" 
+                  placeholder="e.g., Pediatrics, Family Medicine" 
+                  value={specialization} 
+                  onChange={(e) => setSpecialization(e.target.value)}
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="licenseNumber">License Number</Label>
+                <Input 
+                  id="licenseNumber" 
+                  type="text" 
+                  placeholder="Medical license number" 
+                  value={licenseNumber} 
+                  onChange={(e) => setLicenseNumber(e.target.value)}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="hospitalAffiliation">Hospital/Clinic Affiliation</Label>
+                <Input 
+                  id="hospitalAffiliation" 
+                  type="text" 
+                  placeholder="Where do you practice?" 
+                  value={hospitalAffiliation} 
+                  onChange={(e) => setHospitalAffiliation(e.target.value)}
+                />
+              </div>
               
               <div className="space-y-2">
                 <Label htmlFor="bio">Brief Bio</Label>
