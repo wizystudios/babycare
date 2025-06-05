@@ -580,7 +580,7 @@ export type Database = {
           license_number: string | null
           nationality: string | null
           phone: string | null
-          role: Database["public"]["Enums"]["app_role"] | null
+          role: Database["public"]["Enums"]["app_role"]
           specialization: string | null
           updated_at: string
         }
@@ -596,7 +596,7 @@ export type Database = {
           license_number?: string | null
           nationality?: string | null
           phone?: string | null
-          role?: Database["public"]["Enums"]["app_role"] | null
+          role?: Database["public"]["Enums"]["app_role"]
           specialization?: string | null
           updated_at?: string
         }
@@ -612,7 +612,7 @@ export type Database = {
           license_number?: string | null
           nationality?: string | null
           phone?: string | null
-          role?: Database["public"]["Enums"]["app_role"] | null
+          role?: Database["public"]["Enums"]["app_role"]
           specialization?: string | null
           updated_at?: string
         }

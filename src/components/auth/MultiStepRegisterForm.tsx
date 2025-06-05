@@ -70,6 +70,8 @@ export const MultiStepRegisterForm: React.FC<MultiStepRegisterFormProps> = ({ sh
     setIsLoading(true);
     
     try {
+      console.log('Starting registration with role:', role);
+      
       // Only pass essential data during registration
       const userData = {
         role: role
@@ -94,12 +96,14 @@ export const MultiStepRegisterForm: React.FC<MultiStepRegisterFormProps> = ({ sh
       let errorMessage = "Registration failed";
       
       if (error.message) {
-        if (error.message.includes('already registered')) {
+        if (error.message.includes('already registered') || error.message.includes('User already registered')) {
           errorMessage = "Email is already registered";
         } else if (error.message.includes('Invalid email')) {
           errorMessage = "Please enter a valid email address";
-        } else if (error.message.includes('Password')) {
+        } else if (error.message.includes('Password') || error.message.includes('password')) {
           errorMessage = "Password requirements not met";
+        } else if (error.message.includes('Email not confirmed')) {
+          errorMessage = "Please check your email and click the confirmation link";
         } else {
           errorMessage = error.message;
         }

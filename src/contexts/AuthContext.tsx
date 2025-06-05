@@ -37,6 +37,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Fetch user role
   const fetchUserRole = async (userId: string) => {
     try {
+      console.log('Fetching role for user:', userId);
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
@@ -44,10 +45,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .single();
       
       if (error) {
-        console.log('No role found for user, defaulting to parent');
+        console.log('No role found for user, defaulting to parent:', error);
         setUserRole('parent');
         return;
       }
+      console.log('User role fetched:', data.role);
       setUserRole(data.role as UserRole);
     } catch (error) {
       console.error('Error fetching user role:', error);
@@ -120,16 +122,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = async (email: string, password: string, userData: any) => {
     try {
       setIsLoading(true);
+      console.log('Attempting to sign up with userData:', userData);
+      
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: userData
+          data: userData,
+          emailRedirectTo: `${window.location.origin}/`
         }
       });
       
+      if (error) {
+        console.error('Sign up error:', error);
+      } else {
+        console.log('Sign up successful');
+      }
+      
       return { error };
     } catch (error: any) {
+      console.error('Sign up exception:', error);
       return { error };
     } finally {
       setIsLoading(false);
