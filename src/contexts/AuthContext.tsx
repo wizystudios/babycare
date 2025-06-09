@@ -34,7 +34,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   
-  // Fetch user role
+  // Fetch user role from user_roles table
   const fetchUserRole = async (userId: string) => {
     try {
       console.log('Fetching role for user:', userId);

@@ -26,6 +26,8 @@ const AdminManagement = () => {
   const fetchUsers = async () => {
     try {
       setIsLoading(true);
+      console.log('Fetching users from profiles table...');
+      
       const { data, error } = await supabase
         .from('profiles')
         .select(`
@@ -43,8 +45,12 @@ const AdminManagement = () => {
         `)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching users:', error);
+        throw error;
+      }
 
+      console.log('Fetched users:', data);
       setUsers(data || []);
     } catch (error: any) {
       console.error('Error fetching users:', error);
@@ -56,20 +62,28 @@ const AdminManagement = () => {
 
   const updateUserRole = async (userId: string, newRole: UserRole) => {
     try {
+      console.log('Updating user role:', userId, newRole);
+      
       // Update role in profiles table
       const { error: profileError } = await supabase
         .from('profiles')
         .update({ role: newRole })
         .eq('id', userId);
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Profile update error:', profileError);
+        throw profileError;
+      }
 
       // Update role in user_roles table
       const { error: roleError } = await supabase
         .from('user_roles')
         .upsert({ user_id: userId, role: newRole }, { onConflict: 'user_id' });
 
-      if (roleError) throw roleError;
+      if (roleError) {
+        console.error('User roles update error:', roleError);
+        throw roleError;
+      }
 
       // Update local state
       setUsers(users.map(user => 

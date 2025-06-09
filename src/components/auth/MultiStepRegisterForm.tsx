@@ -72,7 +72,7 @@ export const MultiStepRegisterForm: React.FC<MultiStepRegisterFormProps> = ({ sh
     try {
       console.log('Starting registration with role:', role);
       
-      // Only pass essential data during registration
+      // Pass role in user metadata for the trigger function
       const userData = {
         role: role
       };
