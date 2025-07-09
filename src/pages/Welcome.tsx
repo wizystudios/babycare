@@ -57,14 +57,14 @@ const Welcome = () => {
 
   if (showSplash) {
     return (
-      <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-baby-blue/30 to-background/90">
+      <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-primary/20 via-background to-accent/10">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6 }}
           className="flex flex-col items-center"
         >
-          <div className="h-36 w-36 rounded-full bg-white p-3 shadow-lg border-2 border-baby-primary flex items-center justify-center overflow-hidden mb-6">
+          <div className="h-40 w-40 rounded-3xl bg-white p-4 shadow-glow border border-primary/20 flex items-center justify-center overflow-hidden mb-8">
             <img 
               src="/lovable-uploads/35d286c5-a006-4d46-8d1b-5b194dddf7f2.png" 
               alt="BabyCare Logo" 
@@ -73,7 +73,7 @@ const Welcome = () => {
           </div>
           
           <motion.h1 
-            className="text-3xl font-bold text-baby-primary text-center mb-2"
+            className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent text-center mb-3"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.5 }}
@@ -82,7 +82,7 @@ const Welcome = () => {
           </motion.h1>
           
           <motion.p
-            className="text-sm text-muted-foreground"
+            className="text-base text-muted-foreground font-medium"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 0.5 }}
@@ -96,8 +96,8 @@ const Welcome = () => {
 
   return (
     <Layout hideNavigation={true} showFooterAttribution={true}>
-      <div className="min-h-screen flex flex-col bg-gradient-to-b from-baby-blue/20 to-background/90">
-        <header className="py-6 px-4 md:px-6 flex justify-center">
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-primary/10 via-background to-accent/5">
+        <header className="py-8 px-4 md:px-6 flex justify-center">
           <motion.div 
             className="container max-w-screen-xl flex justify-center items-center"
             initial={{ opacity: 0, y: -20 }}
@@ -106,7 +106,7 @@ const Welcome = () => {
           >
             <div className="flex flex-col items-center">
               <motion.div 
-                className="mb-2 h-24 w-24 rounded-full bg-white p-2 shadow-md border-2 border-baby-primary flex items-center justify-center overflow-hidden"
+                className="mb-4 h-28 w-28 rounded-3xl bg-white p-3 shadow-glow border border-primary/20 flex items-center justify-center overflow-hidden"
                 initial={{ scale: 0.8 }}
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.5 }}
@@ -118,7 +118,7 @@ const Welcome = () => {
                 />
               </motion.div>
               <motion.h1 
-                className="text-3xl font-bold text-baby-primary text-center"
+                className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent text-center"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
@@ -150,37 +150,43 @@ const Welcome = () => {
                 >
                   Tumia programu yetu kutunza afya na maendeleo ya mtoto wako
                 </motion.p>
-                <motion.div variants={itemVariants} className="space-y-3 mb-8">
-                  <div className="flex items-start">
-                    <svg className="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    <span>Fuatilia lishe, muda wa kulala na kubadilisha nepi</span>
+                <motion.div variants={itemVariants} className="space-y-4 mb-10">
+                  <div className="flex items-center bg-gradient-to-r from-primary/10 to-accent/10 rounded-2xl p-4">
+                    <div className="w-10 h-10 bg-gradient-to-r from-primary to-accent rounded-xl flex items-center justify-center mr-4">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                    </div>
+                    <span className="font-medium">Fuatilia lishe, muda wa kulala na kubadilisha nepi</span>
                   </div>
-                  <div className="flex items-start">
-                    <svg className="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    <span>Weka kumbukumbu za hatua muhimu za ukuaji wa mtoto wako</span>
+                  <div className="flex items-center bg-gradient-to-r from-secondary/10 to-primary/10 rounded-2xl p-4">
+                    <div className="w-10 h-10 bg-gradient-to-r from-secondary to-primary rounded-xl flex items-center justify-center mr-4">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                    </div>
+                    <span className="font-medium">Weka kumbukumbu za hatua muhimu za ukuaji wa mtoto wako</span>
                   </div>
-                  <div className="flex items-start">
-                    <svg className="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    <span>Shiriki taarifa na watu wanaomtunza mtoto</span>
+                  <div className="flex items-center bg-gradient-to-r from-accent/10 to-secondary/10 rounded-2xl p-4">
+                    <div className="w-10 h-10 bg-gradient-to-r from-accent to-secondary rounded-xl flex items-center justify-center mr-4">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                    </div>
+                    <span className="font-medium">Shiriki taarifa na watu wanaomtunza mtoto</span>
                   </div>
                 </motion.div>
                 
-                <motion.div variants={itemVariants} className="flex flex-col space-y-3">
+                <motion.div variants={itemVariants} className="flex flex-col space-y-4">
                   <Button 
-                    className="w-full bg-baby-primary hover:bg-baby-primary/90 text-white py-6 text-lg rounded-xl"
+                    className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white py-6 text-lg rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
                     onClick={() => setStep('auth')}
                   >
                     Anza Kutumia
                   </Button>
                   <Button 
                     variant="outline" 
-                    className="w-full py-6 text-lg rounded-xl"
+                    className="w-full py-6 text-lg rounded-2xl border-2 border-primary/20 hover:border-primary/40 hover:bg-primary/5 font-medium transition-all duration-300"
                     onClick={() => navigate('/auth')}
                   >
                     Tayari nina akaunti
@@ -196,16 +202,16 @@ const Welcome = () => {
               transition={{ duration: 0.5 }}
             >
               <div className="max-w-md w-full">
-                <Card className="shadow-lg">
-                  <CardHeader>
-                    <CardTitle className="text-center">Jiandikishe</CardTitle>
-                    <CardDescription className="text-center">Unda akaunti yako ya BabyCare</CardDescription>
+                <Card className="glass-card shadow-glow border border-primary/20">
+                  <CardHeader className="text-center pb-4">
+                    <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Jiandikishe</CardTitle>
+                    <CardDescription className="text-muted-foreground font-medium">Unda akaunti yako ya BabyCare</CardDescription>
                   </CardHeader>
                   <CardContent className="pb-6">
                     <div className="space-y-4">
                       <Button 
                         variant="outline" 
-                        className="w-full flex items-center justify-center gap-3 py-6"
+                        className="w-full flex items-center justify-center gap-3 py-6 rounded-2xl border-2 border-primary/20 hover:border-primary/40 hover:bg-primary/5 font-medium transition-all duration-300"
                         onClick={() => navigate('/auth')}
                       >
                         <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -219,15 +225,15 @@ const Welcome = () => {
                       
                       <div className="relative">
                         <div className="absolute inset-0 flex items-center">
-                          <span className="w-full border-t"></span>
+                          <span className="w-full border-t border-primary/20"></span>
                         </div>
                         <div className="relative flex justify-center text-xs uppercase">
-                          <span className="bg-background px-2">AU</span>
+                          <span className="bg-card px-4 font-medium text-muted-foreground">AU</span>
                         </div>
                       </div>
                       
                       <Button 
-                        className="w-full bg-baby-primary hover:bg-baby-primary/90 text-white py-6"
+                        className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white py-6 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
                         onClick={() => navigate('/auth')}
                       >
                         Jiandikishe kwa barua pepe
@@ -239,7 +245,7 @@ const Welcome = () => {
                         Tayari una akaunti?{' '}
                         <Button 
                           variant="link" 
-                          className="p-0 h-auto text-baby-primary"
+                          className="p-0 h-auto bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent font-semibold"
                           onClick={() => navigate('/auth')}
                         >
                           Ingia
@@ -249,10 +255,10 @@ const Welcome = () => {
                   </CardContent>
                 </Card>
                 
-                <div className="mt-4 text-center">
+                <div className="mt-6 text-center">
                   <Button 
                     variant="link" 
-                    className="text-muted-foreground"
+                    className="text-muted-foreground hover:text-primary transition-colors duration-300"
                     onClick={() => setStep('intro')}
                   >
                     Rudi nyuma

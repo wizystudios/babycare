@@ -107,7 +107,16 @@ export default {
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
-				'float': 'float 3s ease-in-out infinite'
+				'float': 'float 3s ease-in-out infinite',
+				'bounce-slow': 'bounce 2s infinite',
+				'pulse-soft': 'pulse 3s ease-in-out infinite',
+				'slide-up': 'slideUp 0.5s ease-out',
+				'fade-in-up': 'fadeInUp 0.6s ease-out'
+			},
+			boxShadow: {
+				'soft': '0 4px 20px rgba(0, 0, 0, 0.1)',
+				'glow': '0 0 30px rgba(138, 43, 226, 0.3)',
+				'accent-glow': '0 0 25px rgba(255, 165, 0, 0.4)'
 			}
 		}
 	},
