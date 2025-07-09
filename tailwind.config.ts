@@ -19,6 +19,11 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				'poppins': ['Poppins', 'sans-serif'],
+				'caveat': ['Caveat', 'cursive'],
+				'dancing': ['Dancing Script', 'cursive'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -108,15 +113,25 @@ export default {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'float': 'float 3s ease-in-out infinite',
+				'magic-float': 'magicFloat 4s ease-in-out infinite',
 				'bounce-slow': 'bounce 2s infinite',
 				'pulse-soft': 'pulse 3s ease-in-out infinite',
-				'slide-up': 'slideUp 0.5s ease-out',
-				'fade-in-up': 'fadeInUp 0.6s ease-out'
+				'gentle-pulse': 'gentlePulse 3s ease-in-out infinite',
+				'slide-up': 'slideUp 0.6s ease-out',
+				'fade-in-up': 'fadeInUp 0.8s ease-out',
+				'sparkle': 'sparkle 2s ease-in-out infinite',
+				'rainbow-shift': 'rainbowShift 3s linear infinite',
+				'magic-glow': 'magicGlow 2s ease-in-out infinite',
+				'heartbeat': 'heartbeat 2s ease-in-out infinite'
 			},
 			boxShadow: {
-				'soft': '0 4px 20px rgba(0, 0, 0, 0.1)',
-				'glow': '0 0 30px rgba(138, 43, 226, 0.3)',
-				'accent-glow': '0 0 25px rgba(255, 165, 0, 0.4)'
+				'soft': '0 8px 32px rgba(0, 0, 0, 0.08)',
+				'glow': '0 0 60px hsl(var(--primary) / 0.3)',
+				'accent-glow': '0 0 50px hsl(var(--accent) / 0.35)',
+				'secondary-glow': '0 0 40px hsl(var(--secondary) / 0.25)',
+				'magic': '0 0 80px hsl(var(--primary) / 0.4), 0 20px 40px hsl(var(--primary) / 0.1)',
+				'dreamy': '0 0 100px hsl(var(--primary) / 0.2), 0 0 60px hsl(var(--secondary) / 0.15), 0 0 40px hsl(var(--accent) / 0.1)',
+				'float': '0 10px 30px hsl(var(--primary) / 0.15)'
 			}
 		}
 	},

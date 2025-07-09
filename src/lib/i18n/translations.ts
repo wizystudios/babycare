@@ -16,6 +16,8 @@ export const translations = {
       noBabySelected: "No baby selected",
       saving: "Saving...",
       errorLoading: "Error loading data",
+      lightMode: "Light Mode",
+      darkMode: "Dark Mode",
     },
     welcome: {
       title: "Welcome to BabyCare Daily",
@@ -54,6 +56,9 @@ export const translations = {
       growth: "Growth",
       milestones: "Milestones",
       settings: "Settings",
+      profile: "Profile",
+      addBaby: "Add Baby",
+      signOut: "Sign Out",
     },
     feeding: {
       title: "Feeding",
@@ -345,6 +350,8 @@ export const translations = {
       noBabySelected: "Hakuna mtoto aliyechaguliwa",
       saving: "Inahifadhi...",
       errorLoading: "Hitilafu katika kupakia data",
+      lightMode: "Hali ya Mwanga",
+      darkMode: "Hali ya Giza",
     },
     welcome: {
       title: "Karibu kwenye BabyCare Daily",
@@ -383,6 +390,9 @@ export const translations = {
       growth: "Ukuaji",
       milestones: "Hatua Muhimu",
       settings: "Mipangilio",
+      profile: "Wasifu",
+      addBaby: "Ongeza Mtoto",
+      signOut: "Toka",
     },
     feeding: {
       title: "Kulisha",
