@@ -16,20 +16,20 @@
     --popover: 0 0% 100%;
     --popover-foreground: 230 10% 10%;
 
-    /* Beautiful primary - soft blue */
-    --primary: 212 100% 48%;
+    /* Beautiful primary - bright blue */
+    --primary: 212 100% 50%;
     --primary-foreground: 0 0% 100%;
     --primary-glow: 212 80% 85%;
 
-    /* Warm secondary - coral */
-    --secondary: 16 100% 66%;
+    /* Dark blue secondary */
+    --secondary: 212 100% 35%;
     --secondary-foreground: 0 0% 100%;
-    --secondary-glow: 16 80% 85%;
+    --secondary-glow: 212 60% 70%;
 
-    /* Gentle accent - emerald */
-    --accent: 142 86% 48%;
+    /* Light blue accent */
+    --accent: 212 80% 65%;
     --accent-foreground: 0 0% 100%;
-    --accent-glow: 142 70% 85%;
+    --accent-glow: 212 70% 85%;
 
     /* Soft muted colors */
     --muted: 240 10% 96%;
@@ -81,15 +81,15 @@
     --primary-foreground: 0 0% 100%;
     --primary-glow: 212 80% 75%;
 
-    /* Dark secondary - bright coral */
-    --secondary: 16 100% 70%;
+    /* Dark secondary - darker blue */
+    --secondary: 212 100% 40%;
     --secondary-foreground: 0 0% 100%;
-    --secondary-glow: 16 80% 85%;
+    --secondary-glow: 212 60% 75%;
 
-    /* Dark accent - bright emerald */
-    --accent: 142 86% 60%;
+    /* Dark accent - light blue */
+    --accent: 212 80% 70%;
     --accent-foreground: 0 0% 100%;
-    --accent-glow: 142 70% 80%;
+    --accent-glow: 212 70% 85%;
 
     /* Dark muted colors */
     --muted: 230 10% 18%;
