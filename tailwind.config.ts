@@ -69,12 +69,12 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				baby: {
-					blue: '#A7C7E7',
-					pink: '#FFB6C1',
-					mint: '#c5e8c8',
-					lavender: '#E6E6FA',
-					yellow: '#FFFFE0',
-					cream: '#FFFDD0',
+					blue: 'hsl(212 100% 85%)',
+					pink: 'hsl(340 82% 85%)',
+					mint: 'hsl(142 70% 85%)',
+					lavender: 'hsl(270 70% 85%)',
+					yellow: 'hsl(48 100% 85%)',
+					cream: 'hsl(40 100% 90%)',
 					primary: 'hsl(var(--baby-primary))',
 					secondary: 'hsl(var(--baby-secondary))',
 					tertiary: 'hsl(var(--baby-tertiary))',

@@ -5,53 +5,53 @@
 
 @layer base {
   :root {
-    /* Stunning gradient backgrounds */
-    --background: 322 35% 98%;
-    --foreground: 320 20% 12%;
+    /* Modern gradient backgrounds */
+    --background: 240 10% 98%;
+    --foreground: 230 10% 10%;
 
-    /* Magical card colors */
+    /* Clean card colors */
     --card: 0 0% 100%;
-    --card-foreground: 320 20% 12%;
+    --card-foreground: 230 10% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 320 20% 12%;
+    --popover-foreground: 230 10% 10%;
 
-    /* Dreamy primary colors */
-    --primary: 314 90% 70%;
+    /* Beautiful primary - soft blue */
+    --primary: 212 100% 48%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 322 85% 85%;
+    --primary-glow: 212 80% 85%;
 
-    /* Enchanting secondary colors */
-    --secondary: 46 100% 78%;
-    --secondary-foreground: 320 20% 12%;
-    --secondary-glow: 52 100% 88%;
+    /* Warm secondary - coral */
+    --secondary: 16 100% 66%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-glow: 16 80% 85%;
 
-    /* Soft accent colors */
-    --muted: 320 15% 96%;
-    --muted-foreground: 320 15% 55%;
-
-    /* Vibrant accent */
-    --accent: 186 90% 68%;
+    /* Gentle accent - emerald */
+    --accent: 142 86% 48%;
     --accent-foreground: 0 0% 100%;
-    --accent-glow: 186 80% 85%;
+    --accent-glow: 142 70% 85%;
 
-    /* Gentle destructive */
-    --destructive: 0 75% 65%;
+    /* Soft muted colors */
+    --muted: 240 10% 96%;
+    --muted-foreground: 240 5% 40%;
+
+    /* Clean destructive */
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Magical borders */
-    --border: 320 20% 88%;
-    --input: 320 15% 94%;
-    --ring: 314 90% 70%;
+    /* Modern borders */
+    --border: 240 6% 90%;
+    --input: 240 6% 95%;
+    --ring: 212 100% 48%;
 
-    --radius: 2rem;
+    --radius: 1rem;
 
     /* Baby care specific colors */
-    --baby-primary: 314 90% 70%;
-    --baby-secondary: 46 100% 78%;
-    --baby-tertiary: 186 90% 68%;
-    --baby-neutral: 320 15% 96%;
-    --baby-dark: 320 20% 12%;
+    --baby-primary: 212 100% 48%;
+    --baby-secondary: 16 100% 66%;
+    --baby-tertiary: 142 86% 48%;
+    --baby-neutral: 240 10% 96%;
+    --baby-dark: 230 10% 10%;
 
     /* Sidebar colors */
     --sidebar-background: 322 35% 98%;
@@ -65,51 +65,51 @@
   }
 
   .dark {
-    /* Dark magical backgrounds */
-    --background: 320 25% 8%;
-    --foreground: 320 10% 95%;
+    /* Modern dark backgrounds */
+    --background: 230 15% 8%;
+    --foreground: 230 5% 95%;
 
     /* Dark card colors */
-    --card: 320 20% 12%;
-    --card-foreground: 320 10% 95%;
+    --card: 230 10% 12%;
+    --card-foreground: 230 5% 95%;
 
-    --popover: 320 20% 12%;
-    --popover-foreground: 320 10% 95%;
+    --popover: 230 10% 12%;
+    --popover-foreground: 230 5% 95%;
 
-    /* Dark dreamy primary */
-    --primary: 314 80% 75%;
+    /* Dark primary - bright blue */
+    --primary: 212 100% 60%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 322 70% 65%;
+    --primary-glow: 212 80% 75%;
 
-    /* Dark enchanting secondary */
-    --secondary: 46 85% 70%;
-    --secondary-foreground: 320 20% 15%;
-    --secondary-glow: 52 80% 75%;
+    /* Dark secondary - bright coral */
+    --secondary: 16 100% 70%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-glow: 16 80% 85%;
 
-    /* Dark soft colors */
-    --muted: 320 20% 15%;
-    --muted-foreground: 320 10% 70%;
-
-    /* Dark vibrant accent */
-    --accent: 186 80% 65%;
+    /* Dark accent - bright emerald */
+    --accent: 142 86% 60%;
     --accent-foreground: 0 0% 100%;
-    --accent-glow: 186 70% 75%;
+    --accent-glow: 142 70% 80%;
 
-    /* Dark gentle destructive */
-    --destructive: 0 70% 70%;
+    /* Dark muted colors */
+    --muted: 230 10% 18%;
+    --muted-foreground: 230 5% 70%;
+
+    /* Dark destructive */
+    --destructive: 0 84% 65%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Dark magical borders */
-    --border: 320 15% 20%;
-    --input: 320 15% 18%;
-    --ring: 314 80% 75%;
+    /* Dark borders */
+    --border: 230 10% 22%;
+    --input: 230 10% 16%;
+    --ring: 212 100% 60%;
 
     /* Dark baby care colors */
-    --baby-primary: 314 80% 75%;
-    --baby-secondary: 46 85% 70%;
-    --baby-tertiary: 186 80% 65%;
-    --baby-neutral: 320 20% 15%;
-    --baby-dark: 320 10% 95%;
+    --baby-primary: 212 100% 60%;
+    --baby-secondary: 16 100% 70%;
+    --baby-tertiary: 142 86% 60%;
+    --baby-neutral: 230 10% 18%;
+    --baby-dark: 230 5% 95%;
     
     /* Dark sidebar */
     --sidebar-background: 320 25% 8%;

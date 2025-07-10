@@ -23,20 +23,20 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
   return (
     <Card
       className={cn(
-        "overflow-hidden shadow-sm hover:shadow-md transition-all",
-        onClick && "cursor-pointer",
+        "overflow-hidden shadow-sm transition-all",
+        onClick && "cursor-pointer hover:shadow-md",
         className
       )}
       onClick={onClick}
     >
-      <div className="flex flex-col items-center justify-center p-4 text-center h-full">
-        <div className={cn("p-2 rounded-full mb-2", iconClassName || "bg-primary/10")}>
+      <div className="flex flex-col items-center justify-center p-3 text-center h-full">
+        <div className="mb-1">
           {icon}
         </div>
-        <h3 className="font-medium text-sm text-gray-500 dark:text-gray-400">
+        <h3 className="font-medium text-xs text-muted-foreground">
           {title}
         </h3>
-        <div className="mt-1 font-semibold text-xl">
+        <div className="mt-1 font-bold text-sm">
           {value}
         </div>
       </div>

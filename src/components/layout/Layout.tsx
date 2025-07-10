@@ -20,8 +20,8 @@ export const Layout: React.FC<LayoutProps> = ({
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {!hideNavigation && <Header />}
-      <main className={`flex-1 ${!hideNavigation ? 'pb-20' : ''} overflow-auto bg-gradient-to-b from-baby-blue/5 via-baby-mint/5 to-transparent px-2 sm:px-4`}>
-        <div className={`${isMobile ? 'py-2' : 'py-4'} max-w-5xl mx-auto`}>
+      <main className={`flex-1 ${!hideNavigation ? 'pb-16' : ''} overflow-auto bg-gradient-to-br from-primary/3 via-secondary/3 to-accent/3 px-2 sm:px-4`}>
+        <div className={`${isMobile ? 'py-1' : 'py-2'} max-w-2xl mx-auto`}>
           {children}
         </div>
       </main>

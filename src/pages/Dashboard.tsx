@@ -236,10 +236,12 @@ const Dashboard = () => {
     return (
       <Layout>
         <div className="p-4 flex flex-col items-center justify-center h-[70vh] text-center">
-          <BottleIcon className="w-16 h-16 mb-4 text-baby-blue opacity-50" />
-          <h2 className="text-2xl font-bold mb-2">Welcome to BabyCare Daily</h2>
-          <p className="text-gray-500 mb-6">Start by adding your baby's information</p>
-          <Button onClick={handleAddBaby}>
+          <div className="w-20 h-20 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center mb-4">
+            <BottleIcon className="w-10 h-10 text-white" />
+          </div>
+          <h2 className="text-xl font-bold mb-2">Welcome to BabyCare! 👶</h2>
+          <p className="text-muted-foreground text-sm mb-6">Start your journey by adding your baby</p>
+          <Button onClick={handleAddBaby} className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90">
             <AddIcon className="w-4 h-4 mr-2" />
             Add Your Baby
           </Button>
@@ -251,148 +253,144 @@ const Dashboard = () => {
   return (
     <Layout>
       {selectedBaby && (
-        <div className="p-4 space-y-6">
-          {/* Baby info */}
-          <Card className="p-4 bg-gradient-to-r from-baby-blue/30 to-baby-lavender/30">
+        <div className="p-3 space-y-4">
+          {/* Welcome Header */}
+          <div className="text-center mb-4">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Welcome back! 👋
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Track {selectedBaby.name}'s daily activities
+            </p>
+          </div>
+
+          {/* Baby Info Card */}
+          <Card className="p-4 bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
             <div className="flex items-center justify-between">
-              <div>
-                <h2 className="font-bold text-2xl">{selectedBaby.name}</h2>
-                <p className="text-gray-600">{getAgeDisplay(selectedBaby.birthDate)}</p>
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">
+                    {selectedBaby.name.charAt(0)}
+                  </span>
+                </div>
+                <div>
+                  <h2 className="font-bold text-lg">{selectedBaby.name}</h2>
+                  <p className="text-sm text-muted-foreground">{getAgeDisplay(selectedBaby.birthDate)}</p>
+                </div>
               </div>
-              <div className="flex space-x-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="rounded-full">
-                      <UserIcon className="w-4 h-4 mr-1" />
-                      Account
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={handleOpenProfile}>
-                      My Profile
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                    <UserIcon className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-card">
+                  <DropdownMenuItem onClick={handleOpenProfile}>
+                    My Profile
+                  </DropdownMenuItem>
+                  {babies.length > 1 && (
+                    <DropdownMenuItem>
+                      Switch Baby
                     </DropdownMenuItem>
-                    {babies.length > 1 && (
-                      <DropdownMenuItem>
-                        Switch Baby
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem onClick={() => navigate('/admin')}>
-                      Admin Panel
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <Button variant="outline" className="rounded-full" onClick={handleAddBaby}>
-                  <AddIcon className="w-4 h-4 mr-1" />
-                  {t("dashboard.addNew")}
-                </Button>
-              </div>
+                  )}
+                  <DropdownMenuItem onClick={() => navigate('/admin')}>
+                    Admin Panel
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </Card>
 
-          {/* Daily summary */}
+          {/* Today's Summary */}
           <div>
-            <h3 className="text-lg font-semibold mb-3">{t("dashboard.todaySummary")}</h3>
-            <div className="grid grid-cols-3 gap-3">
+            <h3 className="text-base font-semibold mb-3 flex items-center">
+              <span className="mr-2">📊</span>
+              Today's Summary
+            </h3>
+            <div className="grid grid-cols-3 gap-2">
               <SummaryCard 
-                icon={<BottleIcon className="w-4 h-4 text-baby-blue" />}
-                title={t("nav.feeding")}
+                icon={<BottleIcon className="w-4 h-4 text-primary" />}
+                title="Feeding"
                 value={totalFeedingAmount > 0 ? `${totalFeedingAmount}ml` : todayFeedings.length.toString()}
-                className="bg-gradient-to-b from-white to-baby-blue/10"
+                className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20 hover:shadow-md transition-all"
                 onClick={() => {navigate('/feeding')}}
               />
               <SummaryCard 
-                icon={<DiaperIcon className="w-4 h-4 text-baby-mint" />}
-                title={t("nav.diaper")}
+                icon={<DiaperIcon className="w-4 h-4 text-secondary" />}
+                title="Diapers"
                 value={todayDiapers.length.toString()}
-                className="bg-gradient-to-b from-white to-baby-mint/10"
+                className="bg-gradient-to-br from-secondary/10 to-secondary/5 border-secondary/20 hover:shadow-md transition-all"
                 onClick={() => {navigate('/diaper')}}
               />
               <SummaryCard 
-                icon={<SleepIcon className="w-4 h-4 text-baby-lavender" />}
-                title={t("nav.sleep")}
+                icon={<SleepIcon className="w-4 h-4 text-accent" />}
+                title="Sleep"
                 value={formatDuration(totalSleepDuration)}
-                className="bg-gradient-to-b from-white to-baby-lavender/10"
+                className="bg-gradient-to-br from-accent/10 to-accent/5 border-accent/20 hover:shadow-md transition-all"
                 onClick={() => {navigate('/sleep')}}
               />
             </div>
           </div>
 
-          {/* Recent feedings */}
+          {/* Quick Actions */}
           <div>
-            <h3 className="text-lg font-semibold mb-3">{t("dashboard.recentFeedings")}</h3>
+            <h3 className="text-base font-semibold mb-3 flex items-center">
+              <span className="mr-2">⚡</span>
+              Quick Actions
+            </h3>
+            <div className="grid grid-cols-3 gap-2">
+              <Button 
+                onClick={() => navigate('/feeding')} 
+                className="h-16 flex flex-col items-center justify-center bg-gradient-to-br from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white shadow-lg"
+              >
+                <BottleIcon className="w-5 h-5 mb-1" />
+                <span className="text-xs">Feed</span>
+              </Button>
+              <Button 
+                onClick={() => navigate('/diaper')}
+                className="h-16 flex flex-col items-center justify-center bg-gradient-to-br from-secondary to-secondary/80 hover:from-secondary/90 hover:to-secondary/70 text-white shadow-lg"
+              >
+                <DiaperIcon className="w-5 h-5 mb-1" />
+                <span className="text-xs">Diaper</span>
+              </Button>
+              <Button 
+                onClick={() => navigate('/sleep')}
+                className="h-16 flex flex-col items-center justify-center bg-gradient-to-br from-accent to-accent/80 hover:from-accent/90 hover:to-accent/70 text-white shadow-lg"
+              >
+                <SleepIcon className="w-5 h-5 mb-1" />
+                <span className="text-xs">Sleep</span>
+              </Button>
+            </div>
+          </div>
+
+          {/* Recent Activity */}
+          <div>
+            <h3 className="text-base font-semibold mb-3 flex items-center">
+              <span className="mr-2">⏰</span>
+              Recent Activity
+            </h3>
             {isFeedingLoading ? (
-              <div className="flex justify-center py-4">
+              <div className="flex justify-center py-3">
                 <Loader size="small" />
               </div>
             ) : feedings.length > 0 ? (
-              <div className="space-y-3">
-                {feedings.slice(0, 3).map(feeding => (
+              <div className="space-y-2">
+                {feedings.slice(0, 2).map(feeding => (
                   <FeedingEntry key={feeding.id} feeding={feeding} />
                 ))}
-                <Button variant="ghost" className="w-full" asChild>
-                  <Link to="/feeding">View all</Link>
+                <Button variant="ghost" size="sm" className="w-full h-8" asChild>
+                  <Link to="/feeding">View all feeding records</Link>
                 </Button>
               </div>
             ) : (
-              <div className="text-center py-4 text-gray-500">
-                <p>No feeding records yet</p>
-                <Button variant="ghost" className="mt-2" onClick={() => navigate('/feeding')}>
-                  Add feeding record
+              <div className="text-center py-3 text-muted-foreground">
+                <p className="text-sm">No recent activity</p>
+                <Button variant="ghost" size="sm" className="mt-2" onClick={() => navigate('/feeding')}>
+                  Add first record
                 </Button>
               </div>
             )}
-          </div>
 
-          {/* Recent diapers */}
-          <div>
-            <h3 className="text-lg font-semibold mb-3">{t("dashboard.recentDiapers")}</h3>
-            {isDiaperLoading ? (
-              <div className="flex justify-center py-4">
-                <Loader size="small" />
-              </div>
-            ) : diapers.length > 0 ? (
-              <div className="space-y-3">
-                {diapers.slice(0, 2).map(diaper => (
-                  <DiaperEntry key={diaper.id} diaper={diaper} />
-                ))}
-                <Button variant="ghost" className="w-full" asChild>
-                  <Link to="/diaper">View all</Link>
-                </Button>
-              </div>
-            ) : (
-              <div className="text-center py-4 text-gray-500">
-                <p>No diaper records yet</p>
-                <Button variant="ghost" className="mt-2" onClick={() => navigate('/diaper')}>
-                  Add diaper record
-                </Button>
-              </div>
-            )}
-          </div>
-
-          {/* Recent sleep */}
-          <div>
-            <h3 className="text-lg font-semibold mb-3">{t("dashboard.recentSleep")}</h3>
-            {isSleepLoading ? (
-              <div className="flex justify-center py-4">
-                <Loader size="small" />
-              </div>
-            ) : sleeps.length > 0 ? (
-              <div className="space-y-3">
-                {sleeps.slice(0, 2).map(sleep => (
-                  <SleepEntry key={sleep.id} sleep={sleep} />
-                ))}
-                <Button variant="ghost" className="w-full" asChild>
-                  <Link to="/sleep">View all</Link>
-                </Button>
-              </div>
-            ) : (
-              <div className="text-center py-4 text-gray-500">
-                <p>No sleep records yet</p>
-                <Button variant="ghost" className="mt-2" onClick={() => navigate('/sleep')}>
-                  Add sleep record
-                </Button>
-              </div>
-            )}
           </div>
         </div>
       )}
