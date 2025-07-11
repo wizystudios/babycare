@@ -27,8 +27,16 @@ export const Layout: React.FC<LayoutProps> = ({
       </main>
       {!hideNavigation && <BottomNav />}
       {showFooterAttribution && (
-        <footer className="py-2 px-4 text-center text-xs text-muted-foreground">
-          <p>© 2025 BabyCare by KN Technology</p>
+        <footer className="py-3 px-4 text-center bg-gradient-to-r from-primary/5 to-secondary/5 border-t border-primary/10">
+          <div className="flex items-center justify-center space-x-2 text-xs text-muted-foreground">
+            <span>Powered by</span>
+            <img 
+              src="/lovable-uploads/10a31bb6-5b94-43dd-829b-c00dd01ddb89.png" 
+              alt="KN Technology" 
+              className="w-4 h-4"
+            />
+            <span className="font-medium bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">KN Technology</span>
+          </div>
         </footer>
       )}
     </div>

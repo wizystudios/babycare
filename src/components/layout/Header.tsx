@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { AppLogo } from "@/components/ui/AppLogo";
 
 export const Header = () => {
   const { t, language, setLanguage } = useLanguage();
@@ -118,7 +119,7 @@ export const Header = () => {
 
   return (
     <motion.header 
-      className="border-b bg-gradient-to-r from-primary/15 to-baby-blue/20 p-2 sm:p-3 sticky top-0 z-10 shadow-sm"
+      className="border-b border-primary/20 bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5 backdrop-blur-xl p-2 sm:p-3 sticky top-0 z-10 shadow-glow"
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.3 }}
@@ -137,31 +138,7 @@ export const Header = () => {
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
-                <motion.div 
-                  whileHover={{ rotate: 10 }}
-                  transition={{ duration: 0.2 }}
-                  className="mr-2"
-                >
-                  <div className={cn(
-                    "rounded-full bg-white p-0.5 shadow-md border-2 border-baby-primary flex items-center justify-center overflow-hidden",
-                    isMobile ? "h-8 w-8" : "h-11 w-11"
-                  )}>
-                    <img 
-                      src="/lovable-uploads/b7205a62-6702-4855-9178-d6cbe95eac27.png" 
-                      alt="BabyCare Logo" 
-                      className="h-full w-full object-contain"
-                    />
-                  </div>
-                </motion.div>
-                <motion.h1 
-                  className={cn(
-                    "font-bold text-baby-primary",
-                    isMobile ? "text-base" : "text-xl"
-                  )}
-                  whileHover={{ scale: 1.05 }}
-                >
-                  {!isMobile ? "BabyCare" : ""}
-                </motion.h1>
+                <AppLogo size={isMobile ? "sm" : "md"} showText={!isMobile} />
               </motion.div>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
@@ -172,26 +149,25 @@ export const Header = () => {
                 </DialogDescription>
               </DialogHeader>
               <div className="flex flex-col items-center space-y-4 p-4">
-                <div className="w-32 h-32 rounded-full bg-white p-2 shadow-lg border-4 border-baby-primary flex items-center justify-center overflow-hidden">
-                  <img 
-                    src="/lovable-uploads/b7205a62-6702-4855-9178-d6cbe95eac27.png" 
-                    alt="BabyCare Logo" 
-                    className="h-full w-full object-contain"
-                  />
-                </div>
+                <AppLogo size="lg" />
                 <div className="text-center space-y-3">
-                  <h2 className="text-2xl font-bold text-baby-primary">BabyCare Daily</h2>
                   <p className="text-gray-600 dark:text-gray-400">
                     Track your baby's feeding, diaper changes, sleep patterns, health records, and milestones all in one place. 
                     Our comprehensive app helps you monitor your baby's development and ensure their well-being.
                   </p>
-                  <p className="text-baby-secondary font-medium">
-                    Designed with love for parents and caregivers.
-                  </p>
+                  <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground">
+                    <span>Powered by</span>
+                    <img 
+                      src="/lovable-uploads/10a31bb6-5b94-43dd-829b-c00dd01ddb89.png" 
+                      alt="KN Technology" 
+                      className="w-4 h-4"
+                    />
+                    <span className="font-medium bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">KN Technology</span>
+                  </div>
                 </div>
                 <Button 
                   onClick={() => setLogoDialogOpen(false)}
-                  className="bg-baby-primary hover:bg-baby-primary/90 text-white"
+                  className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white shadow-glow"
                 >
                   Close
                 </Button>
@@ -206,7 +182,7 @@ export const Header = () => {
                   variant="outline" 
                   size={isMobile ? "xs" : "sm"}
                   className={cn(
-                    "ml-1 sm:ml-2 animate-fade-in bg-white/80 text-baby-primary border-baby-primary/30 hover:bg-baby-primary/5",
+                    "ml-1 sm:ml-2 animate-fade-in bg-white/80 text-primary border-primary/30 hover:bg-primary/10 shadow-soft",
                     isMobile ? "text-xs px-2" : ""
                   )}
                 >
@@ -221,13 +197,13 @@ export const Header = () => {
                       console.log('Switching to baby:', baby.name, baby.id);
                       switchBaby(baby.id);
                     }}
-                    className={baby.id === selectedBaby.id ? "bg-baby-primary/10 text-baby-primary font-medium" : ""}
+                    className={baby.id === selectedBaby.id ? "bg-primary/10 text-primary font-medium" : ""}
                   >
                     {baby.name}
                   </DropdownMenuItem>
                 ))}
                 <DropdownMenuItem onClick={handleAddBaby}>
-                  <Plus className="mr-2 h-4 w-4 text-baby-primary" />
+                  <Plus className="mr-2 h-4 w-4 text-primary" />
                   {t("nav.addBaby")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -252,7 +228,7 @@ export const Header = () => {
                 size="icon"
                 onClick={handleThemeToggle}
                 title={theme === "dark" ? t("common.lightMode") : t("common.darkMode")}
-                className="text-baby-primary hover:bg-baby-primary/10"
+                className="text-primary hover:bg-primary/10"
               >
                 {theme === "dark" ? (
                   <Sun className="h-5 w-5" />
@@ -274,8 +250,8 @@ export const Header = () => {
                 size="sm"
                 onClick={handleLanguageToggle}
                 className={cn(
-                  "font-medium hover:bg-baby-primary/10",
-                  language === "en" ? "text-baby-primary" : "text-baby-secondary"
+                  "font-medium hover:bg-primary/10",
+                  language === "en" ? "text-primary" : "text-secondary"
                 )}
               >
                 {language === "en" ? "SW" : "EN"}
@@ -291,7 +267,7 @@ export const Header = () => {
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
                   <Avatar className={cn(
-                    "cursor-pointer border-2 border-baby-primary/50",
+                    "cursor-pointer border-2 border-primary/50 shadow-soft",
                     isMobile ? "h-8 w-8" : "h-9 w-9"
                   )}>
                     {avatarUrl ? (
@@ -306,31 +282,31 @@ export const Header = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="animate-scale-in">
                 <DropdownMenuItem onClick={handleOpenProfile}>
-                  <User className="mr-2 h-4 w-4 text-baby-primary" />
+                  <User className="mr-2 h-4 w-4 text-primary" />
                   {t("nav.profile")}
                 </DropdownMenuItem>
                 {isAdmin() && (
                   <DropdownMenuItem onClick={handleOpenAdmin}>
-                    <Shield className="mr-2 h-4 w-4 text-baby-primary" />
+                    <Shield className="mr-2 h-4 w-4 text-primary" />
                     Admin Panel
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem onClick={handleOpenSettings}>
-                  <Settings className="mr-2 h-4 w-4 text-baby-primary" />
+                  <Settings className="mr-2 h-4 w-4 text-primary" />
                   {t("nav.settings")}
                 </DropdownMenuItem>
                 {isMobile && (
                   <>
                     <DropdownMenuItem onClick={handleThemeToggle}>
                       {theme === "dark" ? (
-                        <Sun className="mr-2 h-4 w-4 text-baby-primary" />
+                        <Sun className="mr-2 h-4 w-4 text-primary" />
                       ) : (
-                        <Moon className="mr-2 h-4 w-4 text-baby-primary" />
+                        <Moon className="mr-2 h-4 w-4 text-primary" />
                       )}
                       {theme === "dark" ? t("common.lightMode") : t("common.darkMode")}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleLanguageToggle}>
-                      <span className="mr-2 w-4 h-4 inline-flex items-center justify-center text-baby-primary font-bold text-xs">
+                      <span className="mr-2 w-4 h-4 inline-flex items-center justify-center text-primary font-bold text-xs">
                         {language === "en" ? "SW" : "EN"}
                       </span>
                       {language === "en" ? "Switch to Swahili" : "Switch to English"}
@@ -338,13 +314,27 @@ export const Header = () => {
                   </>
                 )}
                 <DropdownMenuItem onClick={handleSignOut}>
-                  <LogOut className="mr-2 h-4 w-4 text-baby-primary" />
+                  <LogOut className="mr-2 h-4 w-4 text-primary" />
                   {t("nav.signOut")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           )}
         </motion.div>
+      </div>
+      
+      {/* Bottom gradient line */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
+      
+      {/* Powered by footer in header */}
+      <div className="absolute bottom-1 right-4 flex items-center space-x-1 text-[10px] text-muted-foreground opacity-50">
+        <span>Powered by</span>
+        <img 
+          src="/lovable-uploads/10a31bb6-5b94-43dd-829b-c00dd01ddb89.png" 
+          alt="KN Technology" 
+          className="w-3 h-3"
+        />
+        <span className="font-medium">KN Technology</span>
       </div>
     </motion.header>
   );

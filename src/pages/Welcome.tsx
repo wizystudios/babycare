@@ -90,17 +90,24 @@ const Welcome = () => {
         <div className="text-center max-w-sm w-full">
           {/* Logo Section */}
           <div className="relative mb-8">
-            <div className="w-24 h-24 mx-auto mb-4 relative">
-              <img 
-                src="/lovable-uploads/10a31bb6-5b94-43dd-829b-c00dd01ddb89.png" 
-                alt="KN Technology Logo" 
-                className="w-full h-full object-contain"
-              />
+            <div className="w-20 h-20 mx-auto mb-4 relative bg-gradient-to-br from-primary via-secondary to-accent rounded-3xl shadow-glow flex items-center justify-center">
+              <div className="absolute inset-2 bg-white/95 rounded-2xl flex items-center justify-center">
+                <div className="text-primary font-bold text-3xl">👶</div>
+              </div>
+              <div className="absolute top-1 right-1 w-4 h-4 bg-gradient-to-br from-accent to-secondary rounded-full animate-gentle-pulse"></div>
             </div>
-            <h1 className="text-3xl font-bold text-foreground mb-1">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
               <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">BabyCare</span>
             </h1>
-            <p className="text-sm text-muted-foreground font-medium">KN Technology</p>
+            <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground">
+              <span>Powered by</span>
+              <img 
+                src="/lovable-uploads/10a31bb6-5b94-43dd-829b-c00dd01ddb89.png" 
+                alt="KN Technology" 
+                className="w-4 h-4"
+              />
+              <span className="font-medium bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">KN Technology</span>
+            </div>
           </div>
 
           {/* Feature card */}
