@@ -129,7 +129,14 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground overflow-hidden;
+  }
+  
+  html, body {
+    overflow-x: hidden;
+    overflow-y: hidden;
+    height: 100vh;
+    max-height: 100vh;
   }
 }
 

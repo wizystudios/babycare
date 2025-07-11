@@ -325,17 +325,6 @@ export const Header = () => {
       
       {/* Bottom gradient line */}
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
-      
-      {/* Powered by footer in header */}
-      <div className="absolute bottom-1 right-4 flex items-center space-x-1 text-[10px] text-muted-foreground opacity-50">
-        <span>Powered by</span>
-        <img 
-          src="/lovable-uploads/10a31bb6-5b94-43dd-829b-c00dd01ddb89.png" 
-          alt="KN Technology" 
-          className="w-3 h-3"
-        />
-        <span className="font-medium">KN Technology</span>
-      </div>
     </motion.header>
   );
 };
