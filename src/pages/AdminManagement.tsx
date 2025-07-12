@@ -8,12 +8,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Trash2, UserCog, Users, Stethoscope } from 'lucide-react';
+import { Trash2, UserCog, Users, Stethoscope, ArrowLeft, AlertCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const AdminManagement = () => {
   const { user, isAdmin } = useAuth();
+  const navigate = useNavigate();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAdmin()) {
@@ -26,6 +30,7 @@ const AdminManagement = () => {
   const fetchUsers = async () => {
     try {
       setIsLoading(true);
+      setError(null);
       console.log('Fetching users from profiles table...');
       
       const { data, error } = await supabase
@@ -54,7 +59,9 @@ const AdminManagement = () => {
       setUsers(data || []);
     } catch (error: any) {
       console.error('Error fetching users:', error);
-      toast.error('Failed to fetch users');
+      const errorMessage = error.message || 'Failed to fetch users';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -85,6 +92,28 @@ const AdminManagement = () => {
         throw roleError;
       }
 
+      // If changing to doctor, create doctor entry
+      if (newRole === 'doctor') {
+        const user = users.find(u => u.id === userId);
+        if (user) {
+          const { error: doctorError } = await supabase
+            .from('doctors')
+            .upsert({
+              user_id: userId,
+              name: user.full_name || 'Doctor',
+              specialization: user.specialization || 'General Medicine',
+              phone: user.phone,
+              email: userId, // This would need to be fetched from auth.users if needed
+              available: true
+            }, { onConflict: 'user_id' });
+          
+          if (doctorError) {
+            console.error('Error creating doctor entry:', doctorError);
+            // Don't throw here, role update was successful
+          }
+        }
+      }
+
       // Update local state
       setUsers(users.map(user => 
         user.id === userId ? { ...user, role: newRole } : user
@@ -93,7 +122,8 @@ const AdminManagement = () => {
       toast.success('User role updated successfully');
     } catch (error: any) {
       console.error('Error updating user role:', error);
-      toast.error('Failed to update user role');
+      const errorMessage = error.message || 'Failed to update user role';
+      toast.error(errorMessage);
     }
   };
 
@@ -140,11 +170,25 @@ const AdminManagement = () => {
   if (!isAdmin()) {
     return (
       <div className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <Button
+            variant="outline"
+            onClick={() => navigate('/dashboard')}
+            className="mb-4"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Dashboard
+          </Button>
+        </div>
         <Card>
           <CardContent className="pt-6">
-            <p className="text-center text-muted-foreground">
-              Access denied. You need admin privileges to view this page.
-            </p>
+            <div className="text-center">
+              <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Access Denied</h3>
+              <p className="text-muted-foreground">
+                You need admin privileges to view this page.
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -154,17 +198,56 @@ const AdminManagement = () => {
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="text-center">Loading...</div>
+        <div className="mb-6">
+          <Button
+            variant="outline"
+            onClick={() => navigate('/dashboard')}
+            className="mb-4"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Dashboard
+          </Button>
+        </div>
+        <div className="space-y-4">
+          {[1, 2, 3].map(i => (
+            <Card key={i}>
+              <CardContent className="pt-6">
+                <div className="animate-pulse space-y-4">
+                  <div className="h-4 bg-muted rounded w-3/4"></div>
+                  <div className="h-4 bg-muted rounded w-1/2"></div>
+                  <div className="h-4 bg-muted rounded w-1/4"></div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Admin Management</h1>
-        <p className="text-muted-foreground">Manage users and their roles</p>
+      <div className="mb-6">
+        <Button
+          variant="outline"
+          onClick={() => navigate('/dashboard')}
+          className="mb-4"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Dashboard
+        </Button>
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-primary">Admin Management</h1>
+          <p className="text-muted-foreground">Manage users, their roles, and permissions</p>
+        </div>
       </div>
+
+      {error && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
       <div className="grid gap-4">
         {users.map((userProfile) => (
@@ -175,11 +258,16 @@ const AdminManagement = () => {
                   {getRoleIcon(userProfile.role)}
                   <div>
                     <CardTitle className="text-lg">
-                      {userProfile.full_name || 'Unnamed User'}
+                      {userProfile.full_name || 'User Profile Incomplete'}
                     </CardTitle>
                     <CardDescription>
-                      {userProfile.phone && `${userProfile.phone} • `}
-                      {userProfile.country || 'No country specified'}
+                      {userProfile.phone ? `${userProfile.phone} • ` : 'No phone • '}
+                      {userProfile.country || 'No country set'}
+                      {!userProfile.full_name && (
+                        <Badge variant="outline" className="ml-2 text-warning">
+                          Incomplete Profile
+                        </Badge>
+                      )}
                     </CardDescription>
                   </div>
                 </div>
@@ -246,12 +334,16 @@ const AdminManagement = () => {
           </Card>
         ))}
         
-        {users.length === 0 && (
+        {users.length === 0 && !isLoading && (
           <Card>
             <CardContent className="pt-6">
-              <p className="text-center text-muted-foreground">
-                No users found.
-              </p>
+              <div className="text-center">
+                <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No Users Found</h3>
+                <p className="text-muted-foreground">
+                  There are no user profiles in the system yet.
+                </p>
+              </div>
             </CardContent>
           </Card>
         )}
