@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import { Doctor } from '@/types/models';
+import { ConsultationBooking } from '@/components/booking/ConsultationBooking';
 
 interface DoctorReview {
   id: string;
@@ -268,41 +269,19 @@ const DoctorSearch = () => {
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="text-xl font-semibold text-blue-900">{doctor.name}</h3>
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => setSelectedDoctor(doctor)}
-                              className="rounded-xl border-blue-300 text-blue-600 hover:bg-blue-50"
-                            >
-                              <Calendar className="w-4 h-4 mr-2" />
-                              Book
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="rounded-2xl">
-                            <DialogHeader>
-                              <DialogTitle>Contact {doctor.name}</DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-4">
-                              <div className="flex items-center gap-2">
-                                <Phone className="w-4 h-4 text-blue-600" />
-                                <span>{doctor.phone || 'Not available'}</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Mail className="w-4 h-4 text-blue-600" />
-                                <span>{doctor.email || 'Not available'}</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <MapPin className="w-4 h-4 text-blue-600" />
-                                <span>{doctor.hospitals?.name || 'Multiple locations'}</span>
-                              </div>
-                              <p className="text-sm text-gray-600">
-                                Please contact the doctor directly to schedule an appointment.
-                              </p>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
+                        <ConsultationBooking
+                          doctorId={doctor.id}
+                          doctorName={doctor.name}
+                        >
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="rounded-xl border-blue-300 text-blue-600 hover:bg-blue-50"
+                          >
+                            <Calendar className="w-4 h-4 mr-2" />
+                            Book
+                          </Button>
+                        </ConsultationBooking>
                       </div>
                       
                       <Badge variant="secondary" className="mb-3 bg-blue-100 text-blue-700">

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { ParentFeaturesDialog } from "@/components/doctor/ParentFeaturesDialog";
 import { Layout } from "@/components/layout/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,10 +34,12 @@ import {
 
 const Dashboard = () => {
   const { t } = useLanguage();
-  const { user } = useAuth();
+  const { user, userRole } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [selectedBaby, setSelectedBaby] = useState<Baby | null>(null);
+  const [showParentFeaturesDialog, setShowParentFeaturesDialog] = useState(false);
+  const [hasCheckedParentFeatures, setHasCheckedParentFeatures] = useState(false);
 
   // Fetch babies data with improved caching and error handling
   const { 
@@ -156,6 +159,38 @@ const Dashboard = () => {
     staleTime: 60 * 1000, // 1 minute
   });
 
+  // Check if doctor needs to choose parent features
+  useEffect(() => {
+    const checkParentFeatures = async () => {
+      if (userRole === 'doctor' && user && !hasCheckedParentFeatures) {
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('parent_features_enabled')
+            .eq('id', user.id)
+            .single();
+          
+          if (error) throw error;
+          
+          // If parent_features_enabled is null (not set), show the dialog
+          if (data.parent_features_enabled === null) {
+            setShowParentFeaturesDialog(true);
+          } else if (!data.parent_features_enabled) {
+            // If doctor chose not to have parent features, redirect to doctor dashboard
+            navigate('/doctor-dashboard');
+            return;
+          }
+          setHasCheckedParentFeatures(true);
+        } catch (error) {
+          console.error('Error checking parent features:', error);
+          setHasCheckedParentFeatures(true);
+        }
+      }
+    };
+    
+    checkParentFeatures();
+  }, [userRole, user, hasCheckedParentFeatures, navigate]);
+
   // Select first baby when babies load
   useEffect(() => {
     if (babies && babies.length > 0 && !selectedBaby) {
@@ -220,6 +255,14 @@ const Dashboard = () => {
     navigate("/profile");
   };
 
+  // Handle parent features choice completion
+  const handleParentFeaturesComplete = (hasParentFeatures: boolean) => {
+    setHasCheckedParentFeatures(true);
+    if (!hasParentFeatures) {
+      navigate('/doctor-dashboard');
+    }
+  };
+
   // Initial loading state - only show main loader when babies are loading
   if (isLoadingBabies) {
     return (
@@ -252,6 +295,11 @@ const Dashboard = () => {
 
   return (
     <Layout>
+      <ParentFeaturesDialog 
+        open={showParentFeaturesDialog} 
+        onOpenChange={setShowParentFeaturesDialog}
+        onComplete={handleParentFeaturesComplete}
+      />
       {selectedBaby && (
         <div className="p-3 space-y-4">
           {/* Welcome Header */}

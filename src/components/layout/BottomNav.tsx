@@ -1,19 +1,36 @@
 
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Home, Baby, BarChart3, Search, User } from 'lucide-react';
+import { Home, Baby, BarChart3, Search, User, Calendar, Stethoscope } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const BottomNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { userRole } = useAuth();
 
-  const navItems = [
-    { icon: Home, label: 'Home', path: '/dashboard' },
-    { icon: Baby, label: 'Baby', path: '/add-baby' },
-    { icon: Search, label: 'Doctors', path: '/doctors' },
-    { icon: BarChart3, label: 'Insights', path: '/insights' },
-    { icon: User, label: 'Profile', path: '/profile' },
-  ];
+  // Different navigation items based on user role
+  const getNavItems = () => {
+    if (userRole === 'doctor') {
+      return [
+        { icon: Home, label: 'Dashboard', path: '/doctor-dashboard' },
+        { icon: Calendar, label: 'Requests', path: '/doctor-dashboard' },
+        { icon: Search, label: 'Patients', path: '/doctors' },
+        { icon: Stethoscope, label: 'Profile', path: '/profile' },
+      ];
+    }
+    
+    // Default parent navigation
+    return [
+      { icon: Home, label: 'Home', path: '/dashboard' },
+      { icon: Baby, label: 'Baby', path: '/add-baby' },
+      { icon: Search, label: 'Doctors', path: '/doctors' },
+      { icon: BarChart3, label: 'Insights', path: '/insights' },
+      { icon: User, label: 'Profile', path: '/profile' },
+    ];
+  };
+
+  const navItems = getNavItems();
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-xl border-t border-primary/20 shadow-glow px-2 py-1 z-50">

@@ -103,6 +103,54 @@ export type Database = {
           },
         ]
       }
+      consultation_requests: {
+        Row: {
+          baby_id: string | null
+          created_at: string
+          doctor_id: string
+          doctor_response: string | null
+          id: string
+          patient_id: string
+          reason: string
+          requested_date: string
+          requested_time_slot: string
+          status: string
+          suggested_date: string | null
+          suggested_time_slot: string | null
+          updated_at: string
+        }
+        Insert: {
+          baby_id?: string | null
+          created_at?: string
+          doctor_id: string
+          doctor_response?: string | null
+          id?: string
+          patient_id: string
+          reason: string
+          requested_date: string
+          requested_time_slot: string
+          status?: string
+          suggested_date?: string | null
+          suggested_time_slot?: string | null
+          updated_at?: string
+        }
+        Update: {
+          baby_id?: string | null
+          created_at?: string
+          doctor_id?: string
+          doctor_response?: string | null
+          id?: string
+          patient_id?: string
+          reason?: string
+          requested_date?: string
+          requested_time_slot?: string
+          status?: string
+          suggested_date?: string | null
+          suggested_time_slot?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       consultations: {
         Row: {
           baby_id: string | null
@@ -584,6 +632,7 @@ export type Database = {
           id: string
           license_number: string | null
           nationality: string | null
+          parent_features_enabled: boolean | null
           phone: string | null
           role: Database["public"]["Enums"]["app_role"]
           specialization: string | null
@@ -600,6 +649,7 @@ export type Database = {
           id: string
           license_number?: string | null
           nationality?: string | null
+          parent_features_enabled?: boolean | null
           phone?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           specialization?: string | null
@@ -616,10 +666,44 @@ export type Database = {
           id?: string
           license_number?: string | null
           nationality?: string | null
+          parent_features_enabled?: boolean | null
           phone?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           specialization?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      real_time_notifications: {
+        Row: {
+          created_at: string
+          data: Json | null
+          id: string
+          message: string
+          read: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json | null
+          id?: string
+          message: string
+          read?: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json | null
+          id?: string
+          message?: string
+          read?: boolean | null
+          title?: string
+          type?: string
+          user_id?: string
         }
         Relationships: []
       }

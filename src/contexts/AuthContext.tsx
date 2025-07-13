@@ -38,19 +38,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const fetchUserRole = async (userId: string) => {
     try {
       console.log('Fetching role for user:', userId);
-      const { data, error } = await supabase
+      
+      // First try to get role from user_roles table
+      const { data: roleData, error: roleError } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', userId)
         .single();
       
-      if (error) {
-        console.log('No role found for user, defaulting to parent:', error);
-        setUserRole('parent');
-        return;
+      if (roleError) {
+        console.log('No role found in user_roles, checking profiles table:', roleError);
+        
+        // Fallback to profiles table
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', userId)
+          .single();
+        
+        if (profileError) {
+          console.log('No profile found, defaulting to parent:', profileError);
+          setUserRole('parent');
+          return;
+        }
+        
+        console.log('User role fetched from profiles:', profileData.role);
+        setUserRole(profileData.role as UserRole);
+      } else {
+        console.log('User role fetched from user_roles:', roleData.role);
+        setUserRole(roleData.role as UserRole);
       }
-      console.log('User role fetched:', data.role);
-      setUserRole(data.role as UserRole);
     } catch (error) {
       console.error('Error fetching user role:', error);
       setUserRole('parent'); // Default role
