@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointment_reminders: {
+        Row: {
+          consultation_request_id: string | null
+          created_at: string | null
+          id: string
+          reminder_type: string
+          scheduled_for: string
+          sent: boolean | null
+          user_id: string
+        }
+        Insert: {
+          consultation_request_id?: string | null
+          created_at?: string | null
+          id?: string
+          reminder_type: string
+          scheduled_for: string
+          sent?: boolean | null
+          user_id: string
+        }
+        Update: {
+          consultation_request_id?: string | null
+          created_at?: string | null
+          id?: string
+          reminder_type?: string
+          scheduled_for?: string
+          sent?: boolean | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_reminders_consultation_request_id_fkey"
+            columns: ["consultation_request_id"]
+            isOneToOne: false
+            referencedRelation: "consultation_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       babies: {
         Row: {
           birth_date: string

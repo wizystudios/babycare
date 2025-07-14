@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 interface ConsultationRequest {
   id: string;
   patient_id: string;
+  doctor_id: string;
   baby_id: string | null;
   requested_date: string;
   requested_time_slot: string;
@@ -123,7 +124,8 @@ const DoctorDashboard = () => {
         updated_at: new Date().toISOString()
       };
 
-      if (response === 'decline' && suggestedDate && suggestedTime) {
+      // For accepted requests, we might suggest alternative time
+      if (response === 'accept' && suggestedDate && suggestedTime) {
         updateData.suggested_date = suggestedDate;
         updateData.suggested_time_slot = suggestedTime;
       }
@@ -135,6 +137,63 @@ const DoctorDashboard = () => {
 
       if (error) throw error;
 
+      // Create consultation if accepted
+      if (response === 'accept') {
+        const consultationDate = suggestedDate || selectedRequest.requested_date;
+        const consultationTime = suggestedTime || selectedRequest.requested_time_slot;
+        
+        const { error: consultationError } = await supabase
+          .from('consultations')
+          .insert({
+            patient_id: selectedRequest.patient_id,
+            doctor_id: selectedRequest.doctor_id,
+            baby_id: selectedRequest.baby_id,
+            scheduled_at: `${consultationDate}T${consultationTime.split('-')[0]}:00`,
+            type: 'video',
+            status: 'scheduled'
+          });
+
+        if (consultationError) {
+          console.log('Consultation creation error (non-blocking):', consultationError);
+        }
+
+        // Create appointment reminders
+        try {
+          const reminderDate = new Date(`${consultationDate}T${consultationTime.split('-')[0]}:00`);
+          const reminder24h = new Date(reminderDate.getTime() - 24 * 60 * 60 * 1000);
+          const reminder1h = new Date(reminderDate.getTime() - 60 * 60 * 1000);
+
+          await supabase.from('appointment_reminders').insert([
+            {
+              consultation_request_id: selectedRequest.id,
+              user_id: selectedRequest.patient_id,
+              reminder_type: 'patient_24h',
+              scheduled_for: reminder24h.toISOString()
+            },
+            {
+              consultation_request_id: selectedRequest.id,
+              user_id: selectedRequest.doctor_id,
+              reminder_type: 'doctor_24h',
+              scheduled_for: reminder24h.toISOString()
+            },
+            {
+              consultation_request_id: selectedRequest.id,
+              user_id: selectedRequest.patient_id,
+              reminder_type: 'patient_1h',
+              scheduled_for: reminder1h.toISOString()
+            },
+            {
+              consultation_request_id: selectedRequest.id,
+              user_id: selectedRequest.doctor_id,
+              reminder_type: 'doctor_1h',
+              scheduled_for: reminder1h.toISOString()
+            }
+          ]);
+        } catch (reminderError) {
+          console.log('Reminder creation error (non-blocking):', reminderError);
+        }
+      }
+
       // Send notification to patient
       await supabase
         .from('real_time_notifications')
@@ -143,7 +202,7 @@ const DoctorDashboard = () => {
           type: 'consultation_response',
           title: `Consultation ${response === 'accept' ? 'Accepted' : 'Declined'}`,
           message: response === 'accept' 
-            ? `Your consultation request has been accepted.`
+            ? `Your consultation request has been accepted${suggestedDate ? ' with a suggested alternative time' : ''}.`
             : `Your consultation request has been declined. ${responseMessage || ''}`,
           data: {
             consultation_id: selectedRequest.id,
@@ -155,7 +214,7 @@ const DoctorDashboard = () => {
 
       toast({
         title: "Success",
-        description: `Consultation request ${response === 'accept' ? 'accepted' : 'declined'}`
+        description: `Consultation request ${response === 'accept' ? 'accepted' : 'declined'}. ${response === 'accept' ? 'Patient will be notified and reminders have been set.' : ''}`
       });
 
       setResponseDialog(false);
@@ -353,6 +412,41 @@ const DoctorDashboard = () => {
                                 required={response === 'decline'}
                               />
                             </div>
+                            
+                            {response === 'accept' && (
+                              <>
+                                <div>
+                                  <label className="block text-sm font-medium mb-2">
+                                    Alternative Date (Optional)
+                                  </label>
+                                  <input
+                                    type="date"
+                                    value={suggestedDate}
+                                    onChange={(e) => setSuggestedDate(e.target.value)}
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                  />
+                                </div>
+                                
+                                <div>
+                                  <label className="block text-sm font-medium mb-2">
+                                    Alternative Time (Optional)
+                                  </label>
+                                  <Select value={suggestedTime} onValueChange={setSuggestedTime}>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select a time slot" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="09:00-10:00">9:00 AM - 10:00 AM</SelectItem>
+                                      <SelectItem value="10:00-11:00">10:00 AM - 11:00 AM</SelectItem>
+                                      <SelectItem value="11:00-12:00">11:00 AM - 12:00 PM</SelectItem>
+                                      <SelectItem value="14:00-15:00">2:00 PM - 3:00 PM</SelectItem>
+                                      <SelectItem value="15:00-16:00">3:00 PM - 4:00 PM</SelectItem>
+                                      <SelectItem value="16:00-17:00">4:00 PM - 5:00 PM</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </>
+                            )}
                             
                             {response === 'decline' && (
                               <>
