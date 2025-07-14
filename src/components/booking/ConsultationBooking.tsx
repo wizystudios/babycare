@@ -57,7 +57,7 @@ export const ConsultationBooking: React.FC<ConsultationBookingProps> = ({
         .insert({
           patient_id: user.id,
           doctor_id: doctorId,
-          baby_id: selectedBabyId || null,
+          baby_id: selectedBabyId && selectedBabyId !== 'general' ? selectedBabyId : null,
           requested_date: selectedDate,
           requested_time_slot: selectedTime,
           reason: reason.trim(),
@@ -76,7 +76,7 @@ export const ConsultationBooking: React.FC<ConsultationBookingProps> = ({
           message: `You have a new consultation request from a patient.`,
           data: {
             patient_id: user.id,
-            baby_id: selectedBabyId,
+            baby_id: selectedBabyId && selectedBabyId !== 'general' ? selectedBabyId : null,
             requested_date: selectedDate,
             requested_time_slot: selectedTime,
             reason: reason.trim()
@@ -164,7 +164,7 @@ export const ConsultationBooking: React.FC<ConsultationBookingProps> = ({
                   <SelectValue placeholder="Select a baby (optional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">General consultation</SelectItem>
+                  <SelectItem value="general">General consultation</SelectItem>
                   {babies.map(baby => (
                     <SelectItem key={baby.id} value={baby.id}>
                       {baby.name}
