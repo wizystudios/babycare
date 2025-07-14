@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AppLogo } from "@/components/ui/AppLogo";
 import { getAgeDisplay } from "@/lib/date-utils";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 export const Header = () => {
   const { t, language, setLanguage } = useLanguage();
@@ -259,6 +260,8 @@ export const Header = () => {
               </Button>
             </motion.div>
           )}
+
+          <NotificationBell />
 
           {user && (
             <DropdownMenu>

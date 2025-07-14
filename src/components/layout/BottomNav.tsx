@@ -15,7 +15,7 @@ const BottomNav = () => {
       return [
         { icon: Home, label: 'Dashboard', path: '/doctor-dashboard' },
         { icon: Calendar, label: 'Requests', path: '/doctor-dashboard' },
-        { icon: Search, label: 'Patients', path: '/doctors' },
+        { icon: Search, label: 'Patients', path: '/patients' },
         { icon: Stethoscope, label: 'Profile', path: '/profile' },
       ];
     }

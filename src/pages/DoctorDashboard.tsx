@@ -58,11 +58,24 @@ const DoctorDashboard = () => {
     try {
       setLoading(true);
       
-      // Fetch consultation requests for this doctor
+      // First get the doctor record ID from the doctors table using user_id
+      const { data: doctorData, error: doctorError } = await supabase
+        .from('doctors')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (doctorError || !doctorData) {
+        console.error('Doctor not found:', doctorError);
+        setRequests([]);
+        return;
+      }
+
+      // Fetch consultation requests for this doctor using the doctor record ID
       const { data: requestsData, error: requestsError } = await supabase
         .from('consultation_requests')
         .select('*')
-        .eq('doctor_id', user.id)
+        .eq('doctor_id', doctorData.id)
         .order('created_at', { ascending: false });
 
       if (requestsError) throw requestsError;
@@ -274,18 +287,18 @@ const DoctorDashboard = () => {
     <Layout>
       <div className="p-4 space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-blue-900 mb-2">Doctor Dashboard</h1>
-          <p className="text-gray-600">Manage your consultation requests</p>
+          <h1 className="text-xl font-bold text-blue-900 mb-1">Dashboard</h1>
+          <p className="text-sm text-gray-600">Manage requests</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <Card>
+        <div className="flex gap-4 mb-6 overflow-x-auto">
+          <Card className="min-w-fit">
             <CardContent className="p-4">
               <div className="flex items-center space-x-2">
                 <Calendar className="w-5 h-5 text-blue-600" />
                 <div>
-                  <p className="text-sm text-gray-600">Pending Requests</p>
-                  <p className="text-2xl font-bold">
+                  <p className="text-xs text-gray-600">Pending</p>
+                  <p className="text-xl font-bold">
                     {requests.filter(r => r.status === 'pending').length}
                   </p>
                 </div>
@@ -293,13 +306,13 @@ const DoctorDashboard = () => {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="min-w-fit">
             <CardContent className="p-4">
               <div className="flex items-center space-x-2">
                 <CheckCircle className="w-5 h-5 text-green-600" />
                 <div>
-                  <p className="text-sm text-gray-600">Accepted Today</p>
-                  <p className="text-2xl font-bold">
+                  <p className="text-xs text-gray-600">Accepted</p>
+                  <p className="text-xl font-bold">
                     {requests.filter(r => 
                       r.status === 'accepted' && 
                       new Date(r.updated_at || r.created_at).toDateString() === new Date().toDateString()
@@ -310,13 +323,13 @@ const DoctorDashboard = () => {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="min-w-fit">
             <CardContent className="p-4">
               <div className="flex items-center space-x-2">
                 <User className="w-5 h-5 text-purple-600" />
                 <div>
-                  <p className="text-sm text-gray-600">Total Requests</p>
-                  <p className="text-2xl font-bold">{requests.length}</p>
+                  <p className="text-xs text-gray-600">Total</p>
+                  <p className="text-xl font-bold">{requests.length}</p>
                 </div>
               </div>
             </CardContent>
@@ -324,13 +337,13 @@ const DoctorDashboard = () => {
         </div>
 
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Consultation Requests</h2>
+          <h2 className="text-lg font-semibold">Requests</h2>
           
           {requests.length === 0 ? (
             <Card>
-              <CardContent className="p-8 text-center">
-                <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">No consultation requests yet</p>
+              <CardContent className="p-6 text-center">
+                <Calendar className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+                <p className="text-sm text-gray-500">No requests</p>
               </CardContent>
             </Card>
           ) : (

@@ -24,6 +24,7 @@ import ResetPassword from "./pages/ResetPassword";
 import AdminManagement from "./pages/AdminManagement";
 import DoctorSearch from "./pages/DoctorSearch";
 import DoctorDashboard from "./pages/DoctorDashboard";
+import PatientsList from "./pages/PatientsList";
 import ProfileManagement from "./pages/ProfileManagement";
 import Feedback from "./pages/Feedback";
 import NotFound from "./pages/NotFound";
@@ -56,6 +57,7 @@ function App() {
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/profile" element={<ProfileManagement />} />
                   <Route path="/doctors" element={<DoctorSearch />} />
+                  <Route path="/patients" element={<PatientsList />} />
                   <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
                   <Route path="/feedback" element={<Feedback />} />
                   <Route path="/admin" element={<AdminManagement />} />
