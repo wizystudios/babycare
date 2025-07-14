@@ -40,6 +40,14 @@ export const ConsultationBooking: React.FC<ConsultationBookingProps> = ({
   ];
 
   const handleSubmit = async () => {
+    console.log('Form validation:', {
+      user: !!user,
+      selectedDate,
+      selectedTime,
+      reason: reason.trim(),
+      reasonLength: reason.trim().length
+    });
+    
     if (!user || !selectedDate || !selectedTime || !reason.trim()) {
       toast({
         title: "Missing Information",

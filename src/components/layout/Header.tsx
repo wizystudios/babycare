@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AppLogo } from "@/components/ui/AppLogo";
+import { getAgeDisplay } from "@/lib/date-utils";
 
 export const Header = () => {
   const { t, language, setLanguage } = useLanguage();
@@ -186,7 +187,7 @@ export const Header = () => {
                     isMobile ? "text-xs px-2" : ""
                   )}
                 >
-                  {selectedBaby.name}
+                  {selectedBaby.name} • {getAgeDisplay(selectedBaby.birthDate)}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="animate-scale-in">

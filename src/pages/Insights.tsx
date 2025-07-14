@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Layout } from "@/components/layout/Layout";
 import { FeedingInsights } from "@/components/insights/FeedingInsights";
 import { DiaperInsights } from "@/components/insights/DiaperInsights";
-import { ChatComponent } from "@/components/chat/ChatComponent";
 import { GraphComponent } from "@/components/charts/GraphComponent";
 import { ReportGenerator } from "@/components/reports/ReportGenerator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -48,15 +47,14 @@ const Insights = () => {
       <div className="p-4 space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-baby-primary">Insights & Reports</h1>
-          <p className="text-sm text-gray-600">Data insights for {selectedBaby.name}</p>
+          <p className="text-sm text-gray-600">Track {selectedBaby.name}'s patterns and growth</p>
         </div>
 
         <Tabs defaultValue="insights" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="insights">Insights</TabsTrigger>
             <TabsTrigger value="charts">Charts</TabsTrigger>
             <TabsTrigger value="reports">Reports</TabsTrigger>
-            <TabsTrigger value="chat">AI Chat</TabsTrigger>
           </TabsList>
 
           <TabsContent value="insights" className="space-y-6">
@@ -79,17 +77,6 @@ const Insights = () => {
 
           <TabsContent value="reports" className="space-y-6">
             <ReportGenerator babyId={selectedBaby.id} />
-          </TabsContent>
-
-          <TabsContent value="chat" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>AI Baby Care Assistant</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ChatComponent />
-              </CardContent>
-            </Card>
           </TabsContent>
         </Tabs>
       </div>
