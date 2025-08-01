@@ -58,24 +58,11 @@ const DoctorDashboard = () => {
     try {
       setLoading(true);
       
-      // First get the doctor record ID from the doctors table using user_id
-      const { data: doctorData, error: doctorError } = await supabase
-        .from('doctors')
-        .select('id')
-        .eq('user_id', user.id)
-        .single();
-
-      if (doctorError || !doctorData) {
-        console.error('Doctor not found:', doctorError);
-        setRequests([]);
-        return;
-      }
-
-      // Fetch consultation requests for this doctor using the doctor record ID
+      // Fetch consultation requests for this doctor using the user_id directly
       const { data: requestsData, error: requestsError } = await supabase
         .from('consultation_requests')
         .select('*')
-        .eq('doctor_id', doctorData.id)
+        .eq('doctor_id', user.id)
         .order('created_at', { ascending: false });
 
       if (requestsError) throw requestsError;

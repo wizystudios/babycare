@@ -23,12 +23,11 @@ export const AppLogo: React.FC<AppLogoProps> = ({
 
   return (
     <div className="flex items-center space-x-3">
-      <div className={`${sizeClasses[size]} relative bg-gradient-to-br from-primary via-secondary to-accent rounded-2xl shadow-glow flex items-center justify-center`}>
-        <div className="absolute inset-1 bg-white/90 rounded-xl flex items-center justify-center">
-          <div className="text-primary font-bold text-lg">👶</div>
-        </div>
-        <div className="absolute top-0 right-0 w-3 h-3 bg-gradient-to-br from-accent to-secondary rounded-full"></div>
-      </div>
+      <img 
+        src="/lovable-uploads/bc8311e3-a5c0-489b-97e3-bee216f3fa41.png" 
+        alt="KJ Technology Logo" 
+        className={`${sizeClasses[size]} object-contain`}
+      />
       {showText && (
         <div className="flex flex-col">
           <h1 className={`${textSizeClasses[size]} font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent`}>
