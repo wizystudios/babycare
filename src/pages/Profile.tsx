@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { ProfileImageUpload } from "@/components/profile/ProfileImageUpload";
 import { Loader } from "@/components/ui/loader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Baby } from "@/types/models";
@@ -48,37 +48,53 @@ const ProfilePage = () => {
   const [babyHeight, setBabyHeight] = useState("");
   const [babyNote, setBabyNote] = useState("");
 
-  // Fetch user avatar if available
-  useEffect(() => {
-    async function fetchAvatar() {
-      if (!user) return;
+  // Fetch user profile data
+  const { 
+    data: profile,
+    isLoading: isLoadingProfile,
+    error: profileError
+  } = useQuery({
+    queryKey: ['profile', user?.id],
+    queryFn: async () => {
+      if (!user) return null;
       
-      try {
-        // Check if user has an avatar in storage
-        const { data, error } = await supabase.storage
-          .from('avatars')
-          .download(`${user.id}.jpg`);
-          
-        if (error || !data) {
-          // No avatar found, use initials (handled by fallback)
-          return;
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+        
+      if (error) {
+        // If profile doesn't exist, create one
+        if (error.code === 'PGRST116') {
+          const { data: newProfile, error: createError } = await supabase
+            .from('profiles')
+            .insert([{ 
+              id: user.id,
+              full_name: user.email?.split('@')[0] || 'User',
+              role: 'parent'
+            }])
+            .select()
+            .single();
+            
+          if (createError) throw createError;
+          return newProfile;
         }
-        
-        const url = URL.createObjectURL(data);
-        setAvatarUrl(url);
-        
-      } catch (error) {
-        console.error('Error downloading avatar:', error);
+        throw error;
       }
+      
+      return data;
+    },
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Set avatar URL from profile
+  useEffect(() => {
+    if (profile?.avatar_url) {
+      setAvatarUrl(profile.avatar_url);
     }
-    
-    fetchAvatar();
-    
-    return () => {
-      // Clean up object URL on unmount
-      if (avatarUrl) URL.revokeObjectURL(avatarUrl);
-    };
-  }, [user]);
+  }, [profile]);
 
   // Fetch babies data
   const { 
@@ -135,53 +151,10 @@ const ProfilePage = () => {
     }
   });
 
-  // Handle avatar upload
-  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!user || !event.target.files || event.target.files.length === 0) {
-      return;
-    }
-    
-    const file = event.target.files[0];
-    setIsUploading(true);
-    
-    try {
-      // Create avatars bucket if it doesn't exist
-      const { error: createBucketError } = await supabase.storage.createBucket('avatars', {
-        public: false,
-        fileSizeLimit: 1024 * 1024 * 2, // 2MB
-      });
-      
-      // Upload file to Supabase storage
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(`${user.id}.jpg`, file, {
-          cacheControl: '3600',
-          upsert: true,
-          contentType: file.type,
-        });
-        
-      if (uploadError) {
-        throw uploadError;
-      }
-      
-      // Get the public URL of the uploaded file
-      const url = URL.createObjectURL(file);
-      setAvatarUrl(url);
-      
-      toast({
-        title: "Avatar uploaded",
-        description: "Your profile picture has been updated successfully",
-      });
-    } catch (error) {
-      console.error('Error uploading avatar:', error);
-      toast({
-        title: "Upload failed",
-        description: "There was an error uploading your profile picture",
-        variant: "destructive"
-      });
-    } finally {
-      setIsUploading(false);
-    }
+  // Handle avatar update
+  const handleAvatarUpdate = (newAvatarUrl: string | null) => {
+    setAvatarUrl(newAvatarUrl);
+    queryClient.invalidateQueries({ queryKey: ['profile', user?.id] });
   };
 
   // Open edit dialog with baby data
@@ -262,44 +235,19 @@ const ProfilePage = () => {
       <div className="p-4 space-y-6">
         <h1 className="text-2xl font-bold">My Profile</h1>
         
-        <Card className="p-4">
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <div className="relative">
-              <Avatar className="w-20 h-20">
-                {avatarUrl ? (
-                  <AvatarImage src={avatarUrl} alt={user?.email || "User"} />
-                ) : (
-                  <AvatarFallback style={{ backgroundColor: getAvatarColor(user?.email || '') }}>
-                    {getInitials(user?.email || "U")}
-                  </AvatarFallback>
-                )}
-              </Avatar>
-              
-              {isUploading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full">
-                  <Loader size="small" className="text-white" />
-                </div>
-              )}
-              
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="absolute -bottom-2 -right-2 rounded-full w-8 h-8 p-1"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <span className="text-lg">+</span>
-              </Button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleAvatarUpload}
-              />
-            </div>
-            <div className="flex-1">
-              <h2 className="text-xl font-semibold">{user?.email}</h2>
-              <p className="text-gray-500 text-sm">Member since {formatDate(new Date(user?.created_at || ""))}</p>
+        <Card className="p-6">
+          <div className="flex flex-col items-center space-y-6">
+            <ProfileImageUpload
+              currentImageUrl={avatarUrl}
+              userName={profile?.full_name || user?.email}
+              onImageUpdate={handleAvatarUpdate}
+            />
+            <div className="text-center">
+              <h2 className="text-xl font-semibold">{profile?.full_name || user?.email}</h2>
+              <p className="text-muted-foreground text-sm">{user?.email}</p>
+              <p className="text-muted-foreground text-sm">
+                Member since {formatDate(new Date(user?.created_at || ""))}
+              </p>
             </div>
             <Button variant="outline" onClick={handleLogout}>
               Sign Out
