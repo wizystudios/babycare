@@ -15,6 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import { Doctor } from '@/types/models';
 import { ConsultationBooking } from '@/components/booking/ConsultationBooking';
+import { ReviewsDropdown } from '@/components/reviews/ReviewsDropdown';
 
 interface DoctorReview {
   id: string;
@@ -288,12 +289,12 @@ const DoctorSearch = () => {
                         {doctor.specialization}
                       </Badge>
                       
-                      <div className="flex items-center gap-4 mb-3">
-                        <div className="flex items-center gap-2">
-                          <div className="flex">{renderStars(Math.round(doctor.avgRating))}</div>
-                          <span className="text-sm font-medium">{doctor.avgRating.toFixed(1)}</span>
-                          <span className="text-sm text-gray-500">({doctor.reviewCount} reviews)</span>
-                        </div>
+                      <div className="mb-3">
+                        <ReviewsDropdown 
+                          reviews={doctor.doctor_reviews}
+                          avgRating={doctor.avgRating}
+                          reviewCount={doctor.reviewCount}
+                        />
                       </div>
                       
                       <div className="flex items-center justify-between">

@@ -21,7 +21,7 @@ export const Layout: React.FC<LayoutProps> = ({
     <div className="flex flex-col h-screen max-h-screen bg-background overflow-hidden">
       {!hideNavigation && <Header />}
       <main className={`flex-1 ${!hideNavigation ? 'pb-16' : ''} overflow-y-auto overflow-x-hidden bg-gradient-to-br from-primary/3 via-secondary/3 to-accent/3 px-2 sm:px-4`}>
-        <div className={`${isMobile ? 'py-1' : 'py-2'} max-w-2xl mx-auto`}>
+        <div className={`${isMobile ? 'py-1' : 'py-2'} w-full max-w-2xl mx-auto`}>
           {children}
         </div>
       </main>

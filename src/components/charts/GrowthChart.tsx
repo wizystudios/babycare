@@ -149,12 +149,12 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({ growthData, gender, bi
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full max-w-full">
       <CardHeader>
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
           <CardTitle>{t('growth.chartTitle')}</CardTitle>
           <Select value={metric} onValueChange={(value: 'weight' | 'height' | 'headCircumference') => setMetric(value)}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Select metric" />
             </SelectTrigger>
             <SelectContent>
@@ -166,10 +166,13 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({ growthData, gender, bi
         </div>
       </CardHeader>
       <CardContent>
-        <div className="h-[400px]">
+        <div className="h-[400px] w-full overflow-hidden">
           {chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart margin={{ top: 20, right: 30, left: 20, bottom: 10 }}>
+              <LineChart 
+                data={chartData}
+                margin={{ top: 20, right: 10, left: 10, bottom: 10 }}
+              >
                 {/* Percentile lines */}
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis 

@@ -28,6 +28,7 @@ import PatientsList from "./pages/PatientsList";
 import ProfileManagement from "./pages/ProfileManagement";
 import Feedback from "./pages/Feedback";
 import NotFound from "./pages/NotFound";
+import Notifications from "./pages/Notifications";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +61,7 @@ function App() {
                   <Route path="/patients" element={<PatientsList />} />
                   <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
                   <Route path="/feedback" element={<Feedback />} />
+                  <Route path="/notifications" element={<Notifications />} />
                   <Route path="/admin" element={<AdminManagement />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
