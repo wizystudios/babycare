@@ -32,10 +32,10 @@ const Insights = () => {
   if (!selectedBaby) {
     return (
       <Layout>
-        <div className="p-4">
+        <div className="p-4 max-w-md mx-auto">
           <div className="text-center py-8">
-            <h2 className="text-xl font-semibold mb-2">No Baby Selected</h2>
-            <p className="text-gray-600">Please add a baby to view insights.</p>
+            <h2 className="text-xl font-semibold mb-2 text-foreground">No Baby Selected</h2>
+            <p className="text-muted-foreground">Please add a baby to view insights.</p>
           </div>
         </div>
       </Layout>
@@ -44,21 +44,21 @@ const Insights = () => {
 
   return (
     <Layout>
-      <div className="p-4 space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-baby-primary">Insights & Reports</h1>
-          <p className="text-sm text-gray-600">Track {selectedBaby.name}'s patterns and growth</p>
+      <div className="p-4 space-y-6 max-w-4xl mx-auto">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-primary mb-2">Insights & Reports</h1>
+          <p className="text-muted-foreground">Track {selectedBaby.name}'s patterns and growth</p>
         </div>
 
         <Tabs defaultValue="insights" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-3 max-w-md mx-auto">
             <TabsTrigger value="insights">Insights</TabsTrigger>
             <TabsTrigger value="charts">Charts</TabsTrigger>
             <TabsTrigger value="reports">Reports</TabsTrigger>
           </TabsList>
 
           <TabsContent value="insights" className="space-y-6">
-            <div className="grid gap-6">
+            <div className="space-y-6">
               <FeedingInsights feedingEntries={feedingEntries} />
               <DiaperInsights diaperEntries={diaperEntries} />
             </div>
