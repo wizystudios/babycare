@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_reminders: {
+        Row: {
+          activity_type: string
+          baby_id: string
+          completed: boolean | null
+          created_at: string
+          expected_time: string
+          id: string
+          reminder_sent: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          baby_id: string
+          completed?: boolean | null
+          created_at?: string
+          expected_time: string
+          id?: string
+          reminder_sent?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          baby_id?: string
+          completed?: boolean | null
+          created_at?: string
+          expected_time?: string
+          id?: string
+          reminder_sent?: boolean | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       appointment_reminders: {
         Row: {
           consultation_request_id: string | null
@@ -945,7 +981,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_activity_reminders: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      create_activity_notification: {
+        Args: {
+          p_user_id: string
+          p_title: string
+          p_message: string
+          p_type?: string
+          p_data?: Json
+        }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "parent" | "doctor" | "admin"
