@@ -29,7 +29,7 @@ export const Layout: React.FC<LayoutProps> = ({
       {showFooterAttribution && (
         <footer className="py-3 px-4 text-center bg-gradient-to-r from-primary/5 to-secondary/5 border-t border-primary/10">
           <div className="flex items-center justify-center space-x-2 text-xs text-muted-foreground">
-            <span>Created by</span>
+            <span>Powered by</span>
             <img 
               src="/lovable-uploads/75ac049f-edb6-4e99-a137-a7f9075e750f.png" 
               alt="KN Technology" 

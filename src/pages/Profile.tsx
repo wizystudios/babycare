@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { ProfileImageUpload } from "@/components/profile/ProfileImageUpload";
+import { BabyImageUpload } from "@/components/baby/BabyImageUpload";
 import { Loader } from "@/components/ui/loader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Baby } from "@/types/models";
@@ -277,8 +278,19 @@ const ProfilePage = () => {
                 <div className="grid gap-4 md:grid-cols-2">
                   {babies.map((baby) => (
                     <Card key={baby.id} className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div>
+                      <div className="flex items-start space-x-4">
+                        <BabyImageUpload
+                          currentImageUrl={baby.photoUrl}
+                          babyName={baby.name}
+                          babyId={baby.id}
+                          onImageUpdate={(url) => {
+                            // Update baby in local state
+                            queryClient.setQueryData(['babies'], (oldBabies: Baby[]) => 
+                              oldBabies?.map(b => b.id === baby.id ? { ...b, photoUrl: url } : b)
+                            );
+                          }}
+                        />
+                        <div className="flex-1">
                           <h3 className="text-lg font-semibold">{baby.name}</h3>
                           <p className="text-gray-500 text-sm">Born on {formatDate(baby.birthDate)}</p>
                           {baby.weight && (
@@ -287,14 +299,14 @@ const ProfilePage = () => {
                           {baby.height && (
                             <p className="text-sm">Height: {baby.height} cm</p>
                           )}
-                        </div>
-                        <div className="flex space-x-2">
-                          <Button variant="ghost" size="sm" onClick={() => handleEditBaby(baby)}>
-                            Edit
-                          </Button>
-                          <Button variant="ghost" size="sm" className="text-red-500" onClick={() => handleDeleteBaby(baby)}>
-                            Delete
-                          </Button>
+                          <div className="flex space-x-2 mt-3">
+                            <Button variant="ghost" size="sm" onClick={() => handleEditBaby(baby)}>
+                              Edit
+                            </Button>
+                            <Button variant="ghost" size="sm" className="text-red-500" onClick={() => handleDeleteBaby(baby)}>
+                              Delete
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </Card>

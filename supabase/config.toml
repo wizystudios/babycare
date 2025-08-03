@@ -1,1 +1,69 @@
 project_id = "cosfmipenbtnyhbeqxeo"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[graphql]
+enabled = true
+port = 54329
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[inbucket]
+enabled = true
+port = 54324
+smtp_port = 54325
+pop3_port = 54326
+
+[realtime]
+enabled = true
+ip_version = "ipv6"
+tenant_name = "realtime-dev"
+encryption_key = "supabase_realtime_dev"
+max_connections = 100
+max_channels_per_client = 100
+max_joins_per_second = 500
+max_events_per_second = 500
+
+[studio]
+enabled = true
+port = 54323
+api_url = "http://localhost"
+
+[auth]
+enabled = true
+port = 54322
+external_apple_enabled = false
+external_azure_enabled = false
+external_bitbucket_enabled = false
+external_discord_enabled = false
+external_facebook_enabled = false
+external_github_enabled = false
+external_gitlab_enabled = false
+external_google_enabled = false
+external_keycloak_enabled = false
+external_linkedin_enabled = false
+external_notion_enabled = false
+external_twitch_enabled = false
+external_twitter_enabled = false
+external_slack_enabled = false
+external_spotify_enabled = false
+external_workos_enabled = false
+external_zoom_enabled = false
+
+[edge-runtime]
+enabled = true
+port = 54327
+inspector_port = 8083
+
+[functions.activity-reminder-checker]
+verify_jwt = false
+
+[db]
+port = 54322
+major_version = 15

@@ -3,6 +3,7 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { UserRole } from '@/types/models';
+import { notificationService } from '@/services/notificationService';
 
 type AuthContextType = {
   user: User | null;
@@ -89,6 +90,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         if (currentSession?.user) {
           await fetchUserRole(currentSession.user.id);
+          // Start activity monitoring
+          notificationService.startActivityMonitoring();
         } else {
           setUserRole(null);
         }
@@ -117,8 +120,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setTimeout(() => {
               fetchUserRole(currentSession.user.id);
             }, 0);
+            
+            // Start activity monitoring on sign in
+            if (event === 'SIGNED_IN') {
+              notificationService.startActivityMonitoring();
+            }
           } else {
             setUserRole(null);
+            
+            // Stop activity monitoring on sign out
+            if (event === 'SIGNED_OUT') {
+              notificationService.stopActivityMonitoring();
+            }
           }
           
           if (event !== 'TOKEN_REFRESHED') {
