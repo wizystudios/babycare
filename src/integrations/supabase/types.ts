@@ -435,6 +435,45 @@ export type Database = {
           },
         ]
       }
+      emergency_contacts: {
+        Row: {
+          address: string | null
+          created_at: string
+          email: string | null
+          id: string
+          is_primary: boolean | null
+          name: string
+          phone: string
+          relationship: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_primary?: boolean | null
+          name: string
+          phone: string
+          relationship: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_primary?: boolean | null
+          name?: string
+          phone?: string
+          relationship?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       feedings: {
         Row: {
           amount: number | null
@@ -609,6 +648,45 @@ export type Database = {
         }
         Relationships: []
       }
+      medical_documents: {
+        Row: {
+          baby_id: string
+          created_at: string
+          document_type: string
+          file_name: string
+          file_size: number | null
+          file_url: string
+          id: string
+          title: string
+          uploaded_at: string
+          user_id: string
+        }
+        Insert: {
+          baby_id: string
+          created_at?: string
+          document_type: string
+          file_name: string
+          file_size?: number | null
+          file_url: string
+          id?: string
+          title: string
+          uploaded_at?: string
+          user_id: string
+        }
+        Update: {
+          baby_id?: string
+          created_at?: string
+          document_type?: string
+          file_name?: string
+          file_size?: number | null
+          file_url?: string
+          id?: string
+          title?: string
+          uploaded_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       milestones: {
         Row: {
           baby_id: string
@@ -693,6 +771,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      prescriptions: {
+        Row: {
+          baby_id: string
+          created_at: string
+          doctor_id: string
+          dosage: string
+          duration: string
+          end_date: string | null
+          frequency: string
+          id: string
+          instructions: string | null
+          medication_name: string
+          patient_id: string
+          prescribed_at: string
+          start_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          baby_id: string
+          created_at?: string
+          doctor_id: string
+          dosage: string
+          duration: string
+          end_date?: string | null
+          frequency: string
+          id?: string
+          instructions?: string | null
+          medication_name: string
+          patient_id: string
+          prescribed_at?: string
+          start_date: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          baby_id?: string
+          created_at?: string
+          doctor_id?: string
+          dosage?: string
+          duration?: string
+          end_date?: string | null
+          frequency?: string
+          id?: string
+          instructions?: string | null
+          medication_name?: string
+          patient_id?: string
+          prescribed_at?: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -975,6 +1107,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      video_sessions: {
+        Row: {
+          consultation_id: string
+          created_at: string
+          ended_at: string | null
+          id: string
+          room_id: string
+          session_token: string | null
+          started_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          consultation_id: string
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          room_id: string
+          session_token?: string | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          consultation_id?: string
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          room_id?: string
+          session_token?: string | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
     }
     Views: {
