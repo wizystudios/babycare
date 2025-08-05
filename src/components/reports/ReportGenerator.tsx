@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, Download, Eye } from 'lucide-react';
+import { CalendarIcon, Download, Eye, ArrowDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -138,16 +138,153 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({ babyId }) => {
   };
 
   const downloadReport = (data: any, start: Date, end: Date) => {
-    const reportContent = generateReportContent(data, start, end);
-    const blob = new Blob([reportContent], { type: 'text/plain' });
+    const reportContent = generateHTMLReportContent(data, start, end);
+    const blob = new Blob([reportContent], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `baby-report-${format(start, 'yyyy-MM-dd')}-to-${format(end, 'yyyy-MM-dd')}.txt`;
+    a.download = `baby-report-${format(start, 'yyyy-MM-dd')}-to-${format(end, 'yyyy-MM-dd')}.html`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  };
+
+  const generateHTMLReportContent = (data: any, start: Date, end: Date) => {
+    return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baby Care Report</title>
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 40px 20px; background: #fafafa; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 { color: hsl(262.1 83.3% 57.8%); font-size: 2.5rem; margin-bottom: 10px; }
+        .header .period { color: hsl(215.4 16.3% 46.9%); font-size: 1.1rem; }
+        .header .generated { color: hsl(215.4 16.3% 56.9%); font-size: 0.9rem; }
+        .section { background: white; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .section-title { color: hsl(222.2 84% 4.9%); font-size: 1.4rem; font-weight: 600; margin-bottom: 16px; border-bottom: 2px solid hsl(262.1 83.3% 57.8%); padding-bottom: 8px; }
+        .record { padding: 12px 0; border-bottom: 1px solid hsl(214.3 31.8% 91.4%); }
+        .record:last-child { border-bottom: none; }
+        .record-time { color: hsl(262.1 83.3% 57.8%); font-weight: 600; }
+        .record-details { color: hsl(215.4 16.3% 46.9%); margin-top: 4px; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
+        .stat-card { background: hsl(262.1 83.3% 57.8%); color: white; padding: 16px; border-radius: 8px; text-align: center; }
+        .stat-number { font-size: 2rem; font-weight: bold; }
+        .stat-label { font-size: 0.9rem; opacity: 0.9; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🍼 Baby Care Report</h1>
+        <div class="period">Period: ${format(start, 'MMM dd, yyyy')} - ${format(end, 'MMM dd, yyyy')}</div>
+        <div class="generated">Generated: ${format(new Date(), 'MMM dd, yyyy HH:mm')}</div>
+    </div>
+
+    ${data.feedings?.length > 0 ? `
+    <div class="section">
+        <h2 class="section-title">🍼 Feeding Records (${data.feedings.length})</h2>
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">${data.feedings.length}</div>
+                <div class="stat-label">Total Feedings</div>
+            </div>
+        </div>
+        ${data.feedings.map((feeding: any) => `
+        <div class="record">
+            <div class="record-time">${format(new Date(feeding.start_time), 'MMM dd, HH:mm')}</div>
+            <div class="record-details">
+                Type: ${feeding.type}
+                ${feeding.duration ? ` • Duration: ${feeding.duration} min` : ''}
+                ${feeding.amount ? ` • Amount: ${feeding.amount} ml` : ''}
+            </div>
+        </div>
+        `).join('')}
+    </div>
+    ` : ''}
+
+    ${data.diapers?.length > 0 ? `
+    <div class="section">
+        <h2 class="section-title">🧷 Diaper Changes (${data.diapers.length})</h2>
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">${data.diapers.length}</div>
+                <div class="stat-label">Total Changes</div>
+            </div>
+        </div>
+        ${data.diapers.map((diaper: any) => `
+        <div class="record">
+            <div class="record-time">${format(new Date(diaper.time), 'MMM dd, HH:mm')}</div>
+            <div class="record-details">Type: ${diaper.type}</div>
+        </div>
+        `).join('')}
+    </div>
+    ` : ''}
+
+    ${data.sleeps?.length > 0 ? `
+    <div class="section">
+        <h2 class="section-title">😴 Sleep Records (${data.sleeps.length})</h2>
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">${data.sleeps.length}</div>
+                <div class="stat-label">Sleep Sessions</div>
+            </div>
+        </div>
+        ${data.sleeps.map((sleep: any) => `
+        <div class="record">
+            <div class="record-time">${format(new Date(sleep.start_time), 'MMM dd, HH:mm')}</div>
+            <div class="record-details">
+                Type: ${sleep.type}
+                ${sleep.duration ? ` • Duration: ${sleep.duration} min` : ''}
+            </div>
+        </div>
+        `).join('')}
+    </div>
+    ` : ''}
+
+    ${data.health?.length > 0 ? `
+    <div class="section">
+        <h2 class="section-title">🏥 Health Records (${data.health.length})</h2>
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">${data.health.length}</div>
+                <div class="stat-label">Health Entries</div>
+            </div>
+        </div>
+        ${data.health.map((health: any) => `
+        <div class="record">
+            <div class="record-time">${format(new Date(health.date), 'MMM dd, yyyy')}</div>
+            <div class="record-details">
+                Type: ${health.type}
+                ${health.value ? ` • Value: ${health.value}` : ''}
+            </div>
+        </div>
+        `).join('')}
+    </div>
+    ` : ''}
+
+    ${data.milestones?.length > 0 ? `
+    <div class="section">
+        <h2 class="section-title">🎉 Milestones (${data.milestones.length})</h2>
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">${data.milestones.length}</div>
+                <div class="stat-label">Achievements</div>
+            </div>
+        </div>
+        ${data.milestones.map((milestone: any) => `
+        <div class="record">
+            <div class="record-time">${format(new Date(milestone.date), 'MMM dd, yyyy')}</div>
+            <div class="record-details">${milestone.title}</div>
+        </div>
+        `).join('')}
+    </div>
+    ` : ''}
+</body>
+</html>
+    `;
   };
 
   const generateReportContent = (data: any, start: Date, end: Date) => {
@@ -293,19 +430,26 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({ babyId }) => {
             onClick={() => generateReport(true)} 
             disabled={loading}
             variant="outline"
-            className="flex-1"
+            size="icon"
+            className="shrink-0"
           >
-            <Download className="mr-2 h-4 w-4" />
-            Download Report
+            <ArrowDown className="h-4 w-4" />
           </Button>
         </div>
 
         {reportData && (
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg max-h-96 overflow-y-auto">
-            <h3 className="font-semibold mb-2">Report Preview</h3>
-            <pre className="text-sm whitespace-pre-wrap">
-              {generateReportContent(reportData, startDate || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), endDate || new Date())}
-            </pre>
+          <div className="mt-4 p-4 bg-card border rounded-lg max-h-96 overflow-y-auto">
+            <h3 className="font-semibold mb-4 text-primary">📊 Report Preview</h3>
+            <div 
+              className="prose prose-sm max-w-none"
+              dangerouslySetInnerHTML={{ 
+                __html: generateHTMLReportContent(
+                  reportData, 
+                  startDate || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), 
+                  endDate || new Date()
+                ).replace(/<!DOCTYPE html>[\s\S]*?<body[^>]*>/, '').replace(/<\/body>[\s\S]*$/, '')
+              }}
+            />
           </div>
         )}
       </CardContent>
