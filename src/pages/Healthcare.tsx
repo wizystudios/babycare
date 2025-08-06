@@ -4,13 +4,9 @@ import { Layout } from '@/components/layout/Layout';
 import PrescriptionManager from '@/components/healthcare/PrescriptionManager';
 import EmergencyContacts from '@/components/healthcare/EmergencyContacts';
 import AdvancedAnalytics from '@/components/analytics/AdvancedAnalytics';
-import ReportManagement from '@/components/reports/ReportManagement';
-import { useAuth } from '@/contexts/AuthContext';
 import { Pill, Phone, TrendingUp, FileText } from 'lucide-react';
 
 const Healthcare = () => {
-  const { userRole } = useAuth();
-  
   return (
     <Layout>
       <div className="space-y-6">
@@ -37,7 +33,7 @@ const Healthcare = () => {
             </TabsTrigger>
             <TabsTrigger value="documents" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
-              {userRole === 'doctor' ? 'Reports' : 'Documents'}
+              Documents
             </TabsTrigger>
           </TabsList>
 
@@ -54,15 +50,11 @@ const Healthcare = () => {
           </TabsContent>
 
           <TabsContent value="documents">
-            {userRole === 'doctor' ? (
-              <ReportManagement />
-            ) : (
-              <div className="text-center py-12">
-                <FileText className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium mb-2">Medical Documents</h3>
-                <p className="text-muted-foreground">Coming soon - Upload and manage medical documents</p>
-              </div>
-            )}
+            <div className="text-center py-12">
+              <FileText className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-medium mb-2">Medical Documents</h3>
+              <p className="text-muted-foreground">Coming soon - Upload and manage medical documents</p>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
