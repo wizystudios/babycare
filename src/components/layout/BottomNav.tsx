@@ -25,6 +25,7 @@ const BottomNav = () => {
       { icon: Home, label: 'Home', path: '/dashboard' },
       { icon: Baby, label: 'Baby', path: '/add-baby' },
       { icon: Search, label: 'Doctors', path: '/doctors' },
+      { icon: Search, label: 'Doctors', path: '/doctors' },
       { icon: BarChart3, label: 'Insights', path: '/insights' },
       { icon: User, label: 'Profile', path: '/profile' },
     ];
