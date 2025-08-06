@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Home, Baby, BarChart3, Search, User, Calendar, Stethoscope } from 'lucide-react';
+import { Home, Baby, BarChart3, Search, User, Calendar, Stethoscope, Heart } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const BottomNav = () => {
@@ -24,8 +24,7 @@ const BottomNav = () => {
     return [
       { icon: Home, label: 'Home', path: '/dashboard' },
       { icon: Baby, label: 'Baby', path: '/add-baby' },
-      { icon: Search, label: 'Doctors', path: '/doctors' },
-      { icon: Search, label: 'Doctors', path: '/doctors' },
+      { icon: Heart, label: 'Health', path: '/healthcare' },
       { icon: BarChart3, label: 'Insights', path: '/insights' },
       { icon: User, label: 'Profile', path: '/profile' },
     ];
