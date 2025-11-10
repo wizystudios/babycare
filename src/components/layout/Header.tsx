@@ -81,7 +81,7 @@ export const Header = () => {
   const handleSignOut = async () => {
     try {
       await signOut();
-      navigate("/welcome");
+      navigate("/auth");
     } catch (error) {
       console.error("Error signing out:", error);
     }
@@ -121,7 +121,7 @@ export const Header = () => {
 
   return (
     <motion.header 
-      className="border-b border-primary/20 bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5 backdrop-blur-xl p-2 sm:p-3 sticky top-0 z-10 shadow-glow"
+      className="border-b border-primary/20 bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5 backdrop-blur-xl p-1.5 sm:p-2 sticky top-0 z-10"
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.3 }}
@@ -233,9 +233,9 @@ export const Header = () => {
                 className="text-primary hover:bg-primary/10"
               >
                 {theme === "dark" ? (
-                  <Sun className="h-5 w-5" />
+                  <Sun className="h-3.5 w-3.5" />
                 ) : (
-                  <Moon className="h-5 w-5" />
+                  <Moon className="h-3.5 w-3.5" />
                 )}
               </Button>
             </motion.div>
@@ -271,8 +271,8 @@ export const Header = () => {
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
                   <Avatar className={cn(
-                    "cursor-pointer border-2 border-primary/50 shadow-soft",
-                    isMobile ? "h-8 w-8" : "h-9 w-9"
+                    "cursor-pointer border border-primary/50",
+                    isMobile ? "h-6 w-6" : "h-7 w-7"
                   )}>
                     {avatarUrl ? (
                       <AvatarImage src={avatarUrl} alt={user.email || "User"} />

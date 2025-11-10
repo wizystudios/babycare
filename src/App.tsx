@@ -19,7 +19,7 @@ import Milestones from "./pages/Milestones";
 import Insights from "./pages/Insights";
 import Settings from "./pages/Settings";
 import Profile from "./pages/Profile";
-import Welcome from "./pages/Welcome";
+
 import ResetPassword from "./pages/ResetPassword";
 import AdminManagement from "./pages/AdminManagement";
 import DoctorSearch from "./pages/DoctorSearch";
@@ -46,7 +46,6 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
-                  <Route path="/welcome" element={<Welcome />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/add-baby" element={<AddBaby />} />
