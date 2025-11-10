@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -10,6 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UserRole } from '@/types/models';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface MultiStepRegisterFormProps {
   showRoleSelection?: boolean;
@@ -21,6 +21,7 @@ export const MultiStepRegisterForm: React.FC<MultiStepRegisterFormProps> = ({ sh
   const [confirmPassword, setConfirmPassword] = useState('');
   const [role, setRole] = useState<UserRole>('parent');
   const [isLoading, setIsLoading] = useState(false);
+  const [step, setStep] = useState(1);
   
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -30,7 +31,6 @@ export const MultiStepRegisterForm: React.FC<MultiStepRegisterFormProps> = ({ sh
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validation
     if (!email || !password || !confirmPassword) {
       toast({
         title: "Error",
@@ -70,9 +70,6 @@ export const MultiStepRegisterForm: React.FC<MultiStepRegisterFormProps> = ({ sh
     setIsLoading(true);
     
     try {
-      console.log('Starting registration with role:', role);
-      
-      // Pass role in user metadata for the trigger function
       const userData = {
         role: role
       };
@@ -85,7 +82,7 @@ export const MultiStepRegisterForm: React.FC<MultiStepRegisterFormProps> = ({ sh
       
       toast({
         title: "Success",
-        description: "Registration successful! You can complete your profile in account settings.",
+        description: "Registration successful!",
         variant: "default"
       });
       
@@ -120,82 +117,118 @@ export const MultiStepRegisterForm: React.FC<MultiStepRegisterFormProps> = ({ sh
   };
 
   return (
-    <div className="space-y-6">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-center">Create Account</h3>
-          
-          <div className="space-y-2">
-            <Label htmlFor="email">Email *</Label>
-            <Input 
-              id="email" 
-              type="email" 
-              placeholder="example@email.com" 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="password">Password *</Label>
+    <form onSubmit={handleSubmit} className="space-y-3">
+      <AnimatePresence mode="wait">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2 }}
+          className="space-y-1.5"
+        >
+          <Label htmlFor="email" className="text-xs">Email</Label>
+          <Input 
+            id="email" 
+            type="email" 
+            placeholder="example@email.com" 
+            value={email} 
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (e.target.value && step < 2) setStep(2);
+            }}
+            className="h-8 text-xs"
+            required
+          />
+        </motion.div>
+
+        {step >= 2 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+            className="space-y-1.5"
+          >
+            <Label htmlFor="password" className="text-xs">Password</Label>
             <Input 
               id="password" 
               type="password" 
               placeholder="At least 6 characters"
               value={password} 
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (e.target.value && step < 3) setStep(3);
+              }}
+              className="h-8 text-xs"
               required
             />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm Password *</Label>
+          </motion.div>
+        )}
+        
+        {step >= 3 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+            className="space-y-1.5"
+          >
+            <Label htmlFor="confirmPassword" className="text-xs">Confirm Password</Label>
             <Input 
               id="confirmPassword" 
               type="password" 
               placeholder="Confirm your password"
               value={confirmPassword} 
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+                if (e.target.value && step < 4 && showRoleSelection) setStep(4);
+              }}
+              className="h-8 text-xs"
               required
             />
-          </div>
-          
-          {showRoleSelection && (
-            <div className="space-y-2">
-              <Label htmlFor="role">I am a... *</Label>
-              <Select value={role} onValueChange={(value) => setRole(value as UserRole)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select your role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="parent">Parent/Caregiver</SelectItem>
-                  <SelectItem value="doctor">Doctor</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-        </div>
+          </motion.div>
+        )}
+        
+        {step >= 4 && showRoleSelection && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+            className="space-y-1.5"
+          >
+            <Label htmlFor="role" className="text-xs">I am a...</Label>
+            <Select value={role} onValueChange={(value) => setRole(value as UserRole)}>
+              <SelectTrigger className="h-8 text-xs">
+                <SelectValue placeholder="Select your role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="parent" className="text-xs">Parent/Caregiver</SelectItem>
+                <SelectItem value="doctor" className="text-xs">Doctor</SelectItem>
+              </SelectContent>
+            </Select>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-        <Button 
-          type="submit"
-          disabled={isLoading}
-          className="w-full"
+      {(step >= 4 || (step >= 3 && !showRoleSelection)) && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2 }}
         >
-          {isLoading ? (
-            <>
-              <Loader size="small" className="mr-2" />
-              Creating Account...
-            </>
-          ) : (
-            'Create Account'
-          )}
-        </Button>
-      </form>
-      
-      <div className="text-sm text-gray-600 text-center">
-        <p>You can complete your profile information later in Account Settings.</p>
-      </div>
-    </div>
+          <Button 
+            type="submit"
+            disabled={isLoading}
+            className="w-full h-8 text-xs"
+          >
+            {isLoading ? (
+              <>
+                <Loader size="small" className="mr-1.5" />
+                Creating...
+              </>
+            ) : (
+              'Create Account'
+            )}
+          </Button>
+        </motion.div>
+      )}
+    </form>
   );
 };

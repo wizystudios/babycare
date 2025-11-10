@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -10,7 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -20,6 +19,7 @@ export const LoginForm = () => {
   const [isResetLoading, setIsResetLoading] = useState(false);
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
   const { signIn } = useAuth();
@@ -90,7 +90,6 @@ export const LoginForm = () => {
     setIsResetLoading(true);
     
     try {
-      // Use Supabase's resetPasswordForEmail method with the site URL
       const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
         redirectTo: window.location.origin + '/reset-password',
       });
@@ -106,7 +105,6 @@ export const LoginForm = () => {
         description: t("auth.resetPasswordSuccess"),
       });
       
-      // Don't close dialog immediately so user can see success message
       setTimeout(() => {
         setIsResetDialogOpen(false);
         setResetSuccess(false);
@@ -124,97 +122,124 @@ export const LoginForm = () => {
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="email">{t("auth.email")}</Label>
-          <Input 
-            id="email" 
-            type="email" 
-            placeholder="example@email.com" 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)}
-            className="transition-all duration-200 focus:ring-2 focus:ring-offset-0 focus:ring-baby-blue focus:border-transparent"
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <Label htmlFor="password">{t("auth.password")}</Label>
-            <button 
-              type="button" 
-              className="text-xs text-blue-600 hover:underline transition-colors"
-              onClick={() => setIsResetDialogOpen(true)}
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <AnimatePresence mode="wait">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+            className="space-y-1.5"
+          >
+            <Label htmlFor="email" className="text-xs">{t("auth.email")}</Label>
+            <Input 
+              id="email" 
+              type="email" 
+              placeholder="example@email.com" 
+              value={email} 
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (!showPassword && e.target.value) {
+                  setShowPassword(true);
+                }
+              }}
+              className="h-8 text-xs"
+            />
+          </motion.div>
+
+          {showPassword && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+              className="space-y-1.5"
             >
-              {t("auth.forgotPassword")}
-            </button>
-          </div>
-          <Input 
-            id="password" 
-            type="password" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)}
-            className="transition-all duration-200 focus:ring-2 focus:ring-offset-0 focus:ring-baby-blue focus:border-transparent"
-          />
-        </div>
-        
-        <Button 
-          type="submit" 
-          className="w-full hover:shadow-md transition-all duration-200" 
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <>
-              <Loader size="small" className="mr-2" />
-              {t("auth.loggingIn")}
-            </>
-          ) : (
-            t("auth.login")
+              <div className="flex justify-between items-center">
+                <Label htmlFor="password" className="text-xs">{t("auth.password")}</Label>
+                <button 
+                  type="button" 
+                  className="text-[10px] text-primary hover:underline"
+                  onClick={() => setIsResetDialogOpen(true)}
+                >
+                  {t("auth.forgotPassword")}
+                </button>
+              </div>
+              <Input 
+                id="password" 
+                type="password" 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)}
+                className="h-8 text-xs"
+              />
+            </motion.div>
           )}
-        </Button>
+        </AnimatePresence>
+        
+        {showPassword && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Button 
+              type="submit" 
+              className="w-full h-8 text-xs" 
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader size="small" className="mr-1.5" />
+                  {t("auth.loggingIn")}
+                </>
+              ) : (
+                t("auth.login")
+              )}
+            </Button>
+          </motion.div>
+        )}
       </form>
 
       <Dialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>{t("auth.resetPasswordTitle")}</DialogTitle>
-            <DialogDescription>{t("auth.resetPasswordInstructions")}</DialogDescription>
+            <DialogTitle className="text-sm">{t("auth.resetPasswordTitle")}</DialogTitle>
+            <DialogDescription className="text-xs">{t("auth.resetPasswordInstructions")}</DialogDescription>
           </DialogHeader>
           {resetSuccess ? (
             <motion.div 
-              className="py-6 text-center"
+              className="py-4 text-center"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="mb-4 text-green-500 flex justify-center">
-                <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <div className="mb-3 text-green-500 flex justify-center">
+                <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
-              <h3 className="text-lg font-medium">{t("auth.emailSent")}</h3>
-              <p className="text-sm text-gray-500 mt-2">{t("auth.checkInbox")}</p>
+              <h3 className="text-sm font-medium">{t("auth.emailSent")}</h3>
+              <p className="text-xs text-muted-foreground mt-1.5">{t("auth.checkInbox")}</p>
             </motion.div>
           ) : (
             <form onSubmit={handleResetPassword}>
-              <div className="space-y-2 py-4">
-                <Label htmlFor="reset-email">{t("auth.email")}</Label>
+              <div className="space-y-1.5 py-3">
+                <Label htmlFor="reset-email" className="text-xs">{t("auth.email")}</Label>
                 <Input 
                   id="reset-email" 
                   type="email" 
                   placeholder="example@email.com" 
                   value={resetEmail} 
                   onChange={(e) => setResetEmail(e.target.value)}
-                  className="transition-all duration-200 focus:ring-2 focus:ring-offset-0 focus:ring-baby-blue focus:border-transparent"
+                  className="h-8 text-xs"
                 />
               </div>
-              <DialogFooter className="mt-4">
-                <Button type="button" variant="outline" onClick={() => setIsResetDialogOpen(false)}>
+              <DialogFooter className="mt-3">
+                <Button type="button" variant="outline" onClick={() => setIsResetDialogOpen(false)} className="h-8 text-xs">
                   {t("common.cancel")}
                 </Button>
-                <Button type="submit" disabled={isResetLoading}>
+                <Button type="submit" disabled={isResetLoading} className="h-8 text-xs">
                   {isResetLoading ? (
                     <>
-                      <Loader size="small" className="mr-2" />
+                      <Loader size="small" className="mr-1.5" />
                       {t("auth.sending")}
                     </>
                   ) : (
