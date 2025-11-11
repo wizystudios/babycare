@@ -140,7 +140,7 @@ export const Header = () => {
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
-                <AppLogo size={isMobile ? "sm" : "md"} showText={!isMobile} />
+                <AppLogo size="sm" showText={false} />
               </motion.div>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">

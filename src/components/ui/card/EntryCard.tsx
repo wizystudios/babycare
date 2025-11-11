@@ -30,19 +30,19 @@ export const EntryCard: React.FC<EntryCardProps> = ({
       )}
       onClick={onClick}
     >
-      <div className="flex items-start p-4">
-        <div className="flex-shrink-0 mr-3 p-2 bg-primary/10 rounded-full">
+      <div className="flex items-start p-2">
+        <div className="flex-shrink-0 mr-2 p-1 bg-primary/10 rounded-full">
           {icon}
         </div>
         <div className="flex-grow">
           <div className="flex justify-between items-start">
-            <h3 className="font-medium text-gray-900 dark:text-gray-100">{title}</h3>
-            <div className="text-xs text-gray-500 dark:text-gray-400 flex flex-col items-end">
+            <h3 className="font-medium text-xs text-gray-900 dark:text-gray-100">{title}</h3>
+            <div className="text-[10px] text-gray-500 dark:text-gray-400 flex flex-col items-end">
               <span>{formatTime(time)}</span>
               <TimeAgo date={time} />
             </div>
           </div>
-          <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <div className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
             {children}
           </div>
         </div>
