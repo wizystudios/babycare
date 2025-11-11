@@ -3,21 +3,23 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, Clock, Send } from 'lucide-react';
+import { Calendar, Send } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useBaby } from '@/hooks/useBaby';
 
 interface ConsultationBookingProps {
   doctorId: string;
   doctorName: string;
+  doctorSpecialty?: string;
   children?: React.ReactNode;
 }
 
 export const ConsultationBooking: React.FC<ConsultationBookingProps> = ({
   doctorId,
   doctorName,
+  doctorSpecialty,
   children
 }) => {
   const { user } = useAuth();
@@ -40,14 +42,6 @@ export const ConsultationBooking: React.FC<ConsultationBookingProps> = ({
   ];
 
   const handleSubmit = async () => {
-    console.log('Form validation:', {
-      user: !!user,
-      selectedDate,
-      selectedTime,
-      reason: reason.trim(),
-      reasonLength: reason.trim().length
-    });
-    
     if (!user || !selectedDate || !selectedTime || !reason.trim()) {
       toast({
         title: "Missing Information",
@@ -59,7 +53,6 @@ export const ConsultationBooking: React.FC<ConsultationBookingProps> = ({
 
     setLoading(true);
     try {
-      // Insert consultation request
       const { error: requestError } = await supabase
         .from('consultation_requests')
         .insert({
@@ -74,7 +67,6 @@ export const ConsultationBooking: React.FC<ConsultationBookingProps> = ({
 
       if (requestError) throw requestError;
 
-      // Send notification to doctor
       await supabase
         .from('real_time_notifications')
         .insert({
@@ -96,7 +88,6 @@ export const ConsultationBooking: React.FC<ConsultationBookingProps> = ({
         description: `Your consultation request has been sent to ${doctorName}. You'll be notified when they respond.`
       });
 
-      // Reset form
       setSelectedDate('');
       setSelectedTime('');
       setSelectedBabyId('');
@@ -124,34 +115,37 @@ export const ConsultationBooking: React.FC<ConsultationBookingProps> = ({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {children || (
-          <Button className="rounded-xl bg-blue-600 hover:bg-blue-700">
-            <Calendar className="w-4 h-4 mr-2" />
+          <Button className="rounded-xl bg-blue-600 hover:bg-blue-700 h-7 text-[10px]">
+            <Calendar className="w-3 h-3 mr-1" />
             Book Consultation
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="rounded-2xl max-w-md">
         <DialogHeader>
-          <DialogTitle>Book Consultation with {doctorName}</DialogTitle>
+          <DialogTitle className="text-sm">Book Consultation with {doctorName}</DialogTitle>
+          {doctorSpecialty && (
+            <p className="text-[10px] text-muted-foreground">{doctorSpecialty}</p>
+          )}
         </DialogHeader>
         
-        <div className="space-y-4">
+        <div className="space-y-3">
           <div>
-            <label className="block text-sm font-medium mb-2">Select Date *</label>
+            <label className="block text-[10px] font-medium mb-1">Select Date *</label>
             <input
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
               min={getTomorrowDate()}
-              className="w-full p-2 border border-gray-300 rounded-md"
+              className="w-full p-1.5 border border-gray-300 rounded-md text-[10px]"
               required
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium mb-2">Select Time *</label>
+            <label className="block text-[10px] font-medium mb-1">Select Time *</label>
             <Select value={selectedTime} onValueChange={setSelectedTime} required>
-              <SelectTrigger>
+              <SelectTrigger className="h-7 text-[10px]">
                 <SelectValue placeholder="Choose a time slot" />
               </SelectTrigger>
               <SelectContent>
@@ -166,9 +160,9 @@ export const ConsultationBooking: React.FC<ConsultationBookingProps> = ({
           
           {babies.length > 0 && (
             <div>
-              <label className="block text-sm font-medium mb-2">For which baby? (Optional)</label>
+              <label className="block text-[10px] font-medium mb-1">For which baby? (Optional)</label>
               <Select value={selectedBabyId} onValueChange={setSelectedBabyId}>
-                <SelectTrigger>
+                <SelectTrigger className="h-7 text-[10px]">
                   <SelectValue placeholder="Select a baby (optional)" />
                 </SelectTrigger>
                 <SelectContent>
@@ -184,12 +178,12 @@ export const ConsultationBooking: React.FC<ConsultationBookingProps> = ({
           )}
           
           <div>
-            <label className="block text-sm font-medium mb-2">Reason for consultation *</label>
+            <label className="block text-[10px] font-medium mb-1">Reason for consultation *</label>
             <Textarea
               placeholder="Please describe your concerns or the reason for this consultation..."
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="min-h-[100px]"
+              className="min-h-[60px] text-[10px] p-1.5"
               required
             />
           </div>
@@ -198,13 +192,13 @@ export const ConsultationBooking: React.FC<ConsultationBookingProps> = ({
             <Button
               onClick={handleSubmit}
               disabled={loading || !selectedDate || !selectedTime || !reason.trim()}
-              className="flex-1 bg-blue-600 hover:bg-blue-700"
+              className="flex-1 bg-blue-600 hover:bg-blue-700 h-7 text-[10px]"
             >
               {loading ? (
                 <>Loading...</>
               ) : (
                 <>
-                  <Send className="w-4 h-4 mr-2" />
+                  <Send className="w-3 h-3 mr-1" />
                   Send Request
                 </>
               )}
@@ -212,7 +206,7 @@ export const ConsultationBooking: React.FC<ConsultationBookingProps> = ({
             <Button
               variant="outline"
               onClick={() => setOpen(false)}
-              className="border-gray-300"
+              className="border-gray-300 h-7 text-[10px]"
             >
               Cancel
             </Button>

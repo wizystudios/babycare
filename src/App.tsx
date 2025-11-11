@@ -20,16 +20,17 @@ import Insights from "./pages/Insights";
 import Settings from "./pages/Settings";
 import Profile from "./pages/Profile";
 
-import ResetPassword from "./pages/ResetPassword";
-import AdminManagement from "./pages/AdminManagement";
-import DoctorSearch from "./pages/DoctorSearch";
 import DoctorDashboard from "./pages/DoctorDashboard";
 import PatientsList from "./pages/PatientsList";
 import ProfileManagement from "./pages/ProfileManagement";
 import Feedback from "./pages/Feedback";
-import NotFound from "./pages/NotFound";
+import DoctorSearch from "./pages/DoctorSearch";
+import Specialists from "./pages/Specialists";
+import ResetPassword from "./pages/ResetPassword";
+import AdminManagement from "./pages/AdminManagement";
 import Notifications from "./pages/Notifications";
 import Healthcare from "./pages/Healthcare";
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,7 @@ function App() {
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/profile" element={<ProfileManagement />} />
                   <Route path="/doctors" element={<DoctorSearch />} />
+                  <Route path="/specialists" element={<Specialists />} />
                   <Route path="/patients" element={<PatientsList />} />
                   <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
                   <Route path="/feedback" element={<Feedback />} />

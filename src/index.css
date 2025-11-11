@@ -129,7 +129,7 @@
   }
 
   body {
-    @apply bg-background text-foreground overflow-hidden text-sm;
+    @apply bg-background text-foreground overflow-hidden text-xs;
   }
   
   html, body {
@@ -137,7 +137,7 @@
     overflow-y: hidden;
     height: 100vh;
     max-height: 100vh;
-    font-size: 14px;
+    font-size: 12px;
   }
 }
 
