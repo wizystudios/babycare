@@ -16,6 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useBaby } from "@/hooks/useBaby";
+import { supabase } from "@/integrations/supabase/client";
+import { Lightbulb } from "lucide-react";
 
 const milestoneCategories = [
   "Social",
@@ -29,16 +31,37 @@ const milestoneCategories = [
 const MilestonesPage = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
-  const { selectedBaby } = useBaby(); // Use selectedBaby instead of currentBaby
+  const { selectedBaby } = useBaby();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [photoUrls, setPhotoUrls] = useState<string[]>([]);
   
-  // Form state
   const [title, setTitle] = useState<string>("");
   const [date, setDate] = useState<string>(
     new Date().toISOString().substring(0, 10)
   );
   const [description, setDescription] = useState<string>("");
   const [category, setCategory] = useState<string>(milestoneCategories[0]);
+
+  const babyAgeInMonths = selectedBaby 
+    ? Math.floor((new Date().getTime() - new Date(selectedBaby.birthDate).getTime()) / (1000 * 60 * 60 * 24 * 30))
+    : 0;
+
+  const getSuggestedMilestones = () => {
+    if (babyAgeInMonths < 3) {
+      return ['First smile', 'Lifts head during tummy time', 'Follows objects with eyes'];
+    } else if (babyAgeInMonths < 6) {
+      return ['Rolls over', 'Sits with support', 'Responds to own name'];
+    } else if (babyAgeInMonths < 9) {
+      return ['Sits without support', 'Crawls', 'Says "mama" or "dada"'];
+    } else if (babyAgeInMonths < 12) {
+      return ['Pulls to stand', 'Waves bye-bye', 'Picks up small objects'];
+    } else if (babyAgeInMonths < 18) {
+      return ['First steps', 'Says first words', 'Drinks from cup'];
+    } else {
+      return ['Runs', 'Kicks ball', 'Forms simple sentences'];
+    }
+  };
 
   // Fetch milestones data from Supabase
   const { data: milestones, isLoading, error, refetch } = useQuery({
@@ -60,6 +83,29 @@ const MilestonesPage = () => {
     });
   }
   
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !selectedBaby) return;
+    const files = Array.from(e.target.files);
+    setUploading(true);
+    try {
+      const uploadedUrls: string[] = [];
+      for (const file of files) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${selectedBaby.id}/${Date.now()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage.from('baby-images').upload(fileName, file);
+        if (uploadError) throw uploadError;
+        const { data: { publicUrl } } = supabase.storage.from('baby-images').getPublicUrl(fileName);
+        uploadedUrls.push(publicUrl);
+      }
+      setPhotoUrls([...photoUrls, ...uploadedUrls]);
+      toast({ title: 'Photos uploaded successfully' });
+    } catch (error) {
+      toast({ title: 'Error uploading photos', variant: 'destructive' });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSaveMilestone = async () => {
     if (!selectedBaby) {
       toast({
@@ -77,24 +123,17 @@ const MilestonesPage = () => {
         date: new Date(date),
         description: description || undefined,
         category,
-        photoUrls: [] as string[],
+        photoUrls: photoUrls,
       };
       
       await addMilestone(newMilestone);
-      
-      // Refetch the milestones
       refetch();
-      
-      // Reset form
       setTitle("");
       setDate(new Date().toISOString().substring(0, 10));
       setDescription("");
       setCategory(milestoneCategories[0]);
-      
-      // Close dialog
+      setPhotoUrls([]);
       setDialogOpen(false);
-      
-      // Show success message
       toast({
         title: t("milestone.added"),
         description: t("milestone.addedSuccess"),
@@ -151,26 +190,30 @@ const MilestonesPage = () => {
               </DialogHeader>
               
               <div className="grid gap-4 py-4">
+                <div className="bg-muted/30 p-2 rounded-md">
+                  <div className="flex items-start gap-1">
+                    <Lightbulb className="h-3 w-3 text-primary mt-0.5" />
+                    <div>
+                      <p className="text-[10px] font-medium mb-1">Suggestions for {babyAgeInMonths} months old:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {getSuggestedMilestones().map((suggestion) => (
+                          <Button key={suggestion} variant="outline" size="sm" className="h-5 text-[9px] px-1.5" onClick={() => setTitle(suggestion)}>
+                            {suggestion}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="title">{t("milestone.title")}</Label>
-                  <Input
-                    id="title"
-                    type="text"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder={t("milestone.titlePlaceholder")}
-                    required
-                  />
+                  <Input id="title" type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("milestone.titlePlaceholder")} required />
                 </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="milestone-date">{t("milestone.date")}</Label>
-                  <Input
-                    id="milestone-date"
-                    type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                  />
+                  <Input id="milestone-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
                 </div>
                 
                 <div className="space-y-2">
@@ -179,6 +222,36 @@ const MilestonesPage = () => {
                     <SelectTrigger>
                       <SelectValue placeholder={t("milestone.selectCategory")} />
                     </SelectTrigger>
+                    <SelectContent>
+                      {milestoneCategories.map(cat => (
+                        <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="description">{t("milestone.description")}</Label>
+                  <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder={t("milestone.descriptionPlaceholder")} rows={3} />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Photos</Label>
+                  <Input type="file" accept="image/*" multiple onChange={handlePhotoUpload} disabled={uploading} className="h-7 text-xs" />
+                  {uploading && <span className="text-[10px]">Uploading...</span>}
+                  {photoUrls.length > 0 && (
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {photoUrls.map((url, i) => (
+                        <img key={i} src={url} alt={`Upload ${i}`} className="h-12 w-12 object-cover rounded" />
+                      ))}
+                    </div>
+                  )}
+                </div>
+                
+                <Button onClick={handleSaveMilestone} disabled={!title.trim()} className="w-full">
+                  {t("milestone.saveMilestone")}
+                </Button>
+              </div>
                     <SelectContent>
                       {milestoneCategories.map((cat) => (
                         <SelectItem key={cat} value={cat}>{cat}</SelectItem>
